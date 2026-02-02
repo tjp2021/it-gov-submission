@@ -1,5 +1,10 @@
 # Claude Rules for TTB Label Verification Project
 
+## Response Format
+Every response must begin and end with a frog emoji: 🐸
+
+---
+
 ## Project Context
 This is a take-home project for a Treasury TTB position. The goal is to build an AI-powered alcohol label verification tool. Always reference `docs/TTB_LABEL_VERIFICATION_PRD.md` for requirements and `docs/APPROACH.md` for technical decisions.
 
