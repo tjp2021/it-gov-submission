@@ -136,14 +136,24 @@ export const ADDRESS_ABBREVIATIONS: Record<string, string> = {
 };
 
 // Common production phrases to strip from addresses
+// These appear before the company name on labels but aren't part of the registered address
 export const ADDRESS_PREFIXES_TO_STRIP = [
+  // Standard production phrases
   "distilled and bottled by",
+  "distilled, aged, and bottled by",
+  "distilled, aged, and bottled in \\w+ by",  // "Distilled, Aged, and Bottled in Scotland by"
   "bottled by",
   "vinted and bottled by",
   "brewed by",
   "produced by",
+  "produced and bottled by",
   "made by",
   "blended and bottled by",
+  "blended by",
   "imported by",
+  "imported and bottled by",
   "cellared and bottled by",
+  "estate bottled by",
+  "crafted by",
+  "handcrafted by",
 ];

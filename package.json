@@ -8,7 +8,10 @@
     "start": "next start",
     "lint": "next lint",
     "test": "node scripts/run-tests.js",
-    "test:screenshots": "node scripts/screenshot-labels.js"
+    "test:all": "node scripts/run-tests.js --all",
+    "test:advanced": "node scripts/run-tests.js advanced",
+    "test:screenshots": "node scripts/screenshot-labels.js",
+    "test:generate": "node scripts/generate-test-labels.js"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.39.0",

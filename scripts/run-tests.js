@@ -16,6 +16,12 @@ const API_URL = 'http://localhost:3000/api/verify';
 const TEST_DATA_DIR = path.join(__dirname, '../src/test-data');
 const RESULTS_DIR = path.join(__dirname, '../src/test-data/test-results');
 
+// Filter groups via command line: node run-tests.js basic intermediate
+// Default: run all except 'advanced' (DALL-E generated)
+const ARGS = process.argv.slice(2);
+const INCLUDE_GROUPS = ARGS.length > 0 ? ARGS : ['basic', 'intermediate'];
+const INCLUDE_ALL = ARGS.includes('--all');
+
 // Performance thresholds (from PRD: Sarah's 5-second requirement)
 const LATENCY_THRESHOLDS = {
   target: 5000,    // 5 seconds - must meet
@@ -64,12 +70,23 @@ async function runTests() {
     tests: []
   };
 
-  // Group scenarios
+  // Group scenarios (filter by command line args)
   const groups = {};
   for (const scenario of scenarios.labels) {
     const group = scenario.group || 'unknown';
+    // Skip groups not in filter unless --all
+    if (!INCLUDE_ALL && !INCLUDE_GROUPS.includes(group)) {
+      continue;
+    }
     if (!groups[group]) groups[group] = [];
     groups[group].push(scenario);
+  }
+
+  if (Object.keys(groups).length === 0) {
+    console.error('No test scenarios found for groups:', INCLUDE_GROUPS.join(', '));
+    console.log('Available groups:', Object.keys(scenarios.groups || {}).join(', '));
+    console.log('Use --all to run all groups including DALL-E generated');
+    process.exit(1);
   }
 
   // Run tests by group

@@ -7,6 +7,10 @@
     "intermediate": {
       "name": "Group 2: Intermediate",
       "purpose": "Verify unit conversions, format variations, and normalization logic"
+    },
+    "advanced": {
+      "name": "Group 3: Advanced (Real-world Conditions)",
+      "description": "AI-generated images with challenging real-world conditions"
     }
   },
   "labels": [
@@ -175,6 +179,91 @@
         "alcoholContent": "45% Alc./Vol. (90 Proof)",
         "netContents": "750 mL",
         "nameAddress": "Makers Mark Distillery, Inc., Loretto, Kentucky",
+        "countryOfOrigin": "",
+        "governmentWarning": "GOVERNMENT WARNING: (1) According to the Surgeon General, women should not drink alcoholic beverages during pregnancy because of the risk of birth defects. (2) Consumption of alcoholic beverages impairs your ability to drive a car or operate machinery, and may cause health problems."
+      }
+    },
+    {
+      "id": "A1-glare",
+      "group": "advanced",
+      "description": "Wine label with glare/reflection from lighting",
+      "htmlFile": "labels/label-a1-glare.png",
+      "expectedResult": "REVIEW",
+      "expectedReason": "Glare may obscure some fields, requiring manual verification",
+      "applicationData": {
+        "brandName": "Chateau Lumiere",
+        "classType": "Cabernet Sauvignon",
+        "alcoholContent": "13.5% Alc./Vol.",
+        "netContents": "750 mL",
+        "nameAddress": "Chateau Lumiere Winery, Sonoma, California",
+        "countryOfOrigin": "",
+        "governmentWarning": "GOVERNMENT WARNING: (1) According to the Surgeon General, women should not drink alcoholic beverages during pregnancy because of the risk of birth defects. (2) Consumption of alcoholic beverages impairs your ability to drive a car or operate machinery, and may cause health problems."
+      }
+    },
+    {
+      "id": "A2-angled",
+      "group": "advanced",
+      "description": "Whiskey label photographed at 45-degree angle",
+      "htmlFile": "labels/label-a2-angled.png",
+      "expectedResult": "PASS",
+      "expectedReason": "Claude Vision should handle moderate perspective distortion",
+      "applicationData": {
+        "brandName": "Golden Oak",
+        "classType": "Kentucky Straight Bourbon Whiskey",
+        "alcoholContent": "45% Alc./Vol.",
+        "netContents": "750 mL",
+        "nameAddress": "Golden Oak Distillery, Bardstown, Kentucky",
+        "countryOfOrigin": "",
+        "governmentWarning": "GOVERNMENT WARNING: (1) According to the Surgeon General, women should not drink alcoholic beverages during pregnancy because of the risk of birth defects. (2) Consumption of alcoholic beverages impairs your ability to drive a car or operate machinery, and may cause health problems."
+      }
+    },
+    {
+      "id": "A3-lowlight",
+      "group": "advanced",
+      "description": "Beer label in dim bar lighting",
+      "htmlFile": "labels/label-a3-lowlight.png",
+      "expectedResult": "REVIEW",
+      "expectedReason": "Low contrast may affect text extraction accuracy",
+      "applicationData": {
+        "brandName": "Midnight Brewing",
+        "classType": "Imperial Stout",
+        "alcoholContent": "9.5%",
+        "netContents": "12 FL. OZ.",
+        "nameAddress": "Midnight Brewing Company, Denver, Colorado",
+        "countryOfOrigin": "",
+        "governmentWarning": "GOVERNMENT WARNING: (1) According to the Surgeon General, women should not drink alcoholic beverages during pregnancy because of the risk of birth defects. (2) Consumption of alcoholic beverages impairs your ability to drive a car or operate machinery, and may cause health problems."
+      }
+    },
+    {
+      "id": "A4-blurry",
+      "group": "advanced",
+      "description": "Slightly out of focus vodka label",
+      "htmlFile": "labels/label-a4-blurry.png",
+      "expectedResult": "REVIEW",
+      "expectedReason": "Blur may reduce OCR confidence",
+      "applicationData": {
+        "brandName": "Crystal Peak",
+        "classType": "Premium Vodka",
+        "alcoholContent": "40% Alc./Vol.",
+        "netContents": "750 mL",
+        "nameAddress": "Crystal Peak Spirits, Minneapolis, Minnesota",
+        "countryOfOrigin": "",
+        "governmentWarning": "GOVERNMENT WARNING: (1) According to the Surgeon General, women should not drink alcoholic beverages during pregnancy because of the risk of birth defects. (2) Consumption of alcoholic beverages impairs your ability to drive a car or operate machinery, and may cause health problems."
+      }
+    },
+    {
+      "id": "A5-partial",
+      "group": "advanced",
+      "description": "Gin label partially covered by hand holding bottle",
+      "htmlFile": "labels/label-a5-partial.png",
+      "expectedResult": "REVIEW",
+      "expectedReason": "Partial occlusion requires careful extraction",
+      "applicationData": {
+        "brandName": "Botanist Bay",
+        "classType": "London Dry Gin",
+        "alcoholContent": "47% Alc./Vol.",
+        "netContents": "750 mL",
+        "nameAddress": "Botanist Bay Distillers, Portland, Oregon",
         "countryOfOrigin": "",
         "governmentWarning": "GOVERNMENT WARNING: (1) According to the Surgeon General, women should not drink alcoholic beverages during pregnancy because of the risk of birth defects. (2) Consumption of alcoholic beverages impairs your ability to drive a car or operate machinery, and may cause health problems."
       }

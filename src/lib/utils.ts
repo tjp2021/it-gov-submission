@@ -189,10 +189,14 @@ export function normalizeAddress(s: string): string {
   let normalized = s.toLowerCase();
 
   // Strip common production phrases (e.g., "Distilled and Bottled by")
+  // Some prefixes are regex patterns (contain \w or other regex chars)
   for (const prefix of ADDRESS_PREFIXES_TO_STRIP) {
     const regex = new RegExp(`^${prefix}\\s*`, "i");
     normalized = normalized.replace(regex, "");
   }
+
+  // Also strip any remaining "in [Country] by" patterns at the start
+  normalized = normalized.replace(/^in\s+\w+\s+by\s*/i, "");
 
   // Remove newlines (label extraction often includes them)
   normalized = normalized.replace(/\n/g, " ");
