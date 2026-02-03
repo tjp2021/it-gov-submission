@@ -237,23 +237,16 @@ async function runSingleTest(scenario) {
     if (expected === actual) {
       result.passed = true;
     } else if (expected === 'PASS' && actual === 'REVIEW') {
-      // REVIEW is acceptable for PASS if only warnings are:
-      // - Bold detection (always unreliable from images)
-      // - Address partial match (labels often have variations)
-      const acceptableWarningFields = [
-        'Gov Warning — Header Bold',
-        'Name & Address'
-      ];
-      const unexpectedIssues = data.fieldResults.filter(
+      // REVIEW is acceptable for PASS ONLY if the sole warning is bold detection
+      // Bold detection from images is inherently unreliable - agent must visually confirm
+      // All other fields should match properly with correct normalization
+      const nonBoldWarnings = data.fieldResults.filter(
         f => (f.status === 'WARNING' || f.status === 'FAIL') &&
-             !acceptableWarningFields.includes(f.fieldName)
+             f.fieldName !== 'Gov Warning — Header Bold'
       );
-      if (unexpectedIssues.length === 0) {
+      if (nonBoldWarnings.length === 0) {
         result.passed = true;
-        const warnings = data.fieldResults
-          .filter(f => f.status === 'WARNING')
-          .map(f => f.fieldName.replace('Gov Warning — ', ''));
-        result.note = `REVIEW acceptable - only warnings: ${warnings.join(', ')}`;
+        result.note = 'REVIEW acceptable - only bold warning';
       }
     }
 

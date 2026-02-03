@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Test Results - test-run-2026-02-03T00-49-03-454Z</title>
+  <style>
+    body { font-family: -apple-system, sans-serif; padding: 20px; max-width: 1400px; margin: 0 auto; }
+    h1 { color: #333; }
+    .summary { display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px; margin: 20px 0; }
+    .stat { background: #f5f5f5; padding: 20px; border-radius: 8px; text-align: center; }
+    .stat .value { font-size: 2em; font-weight: bold; }
+    .stat .label { color: #666; }
+    .stat.passed .value { color: #22c55e; }
+    .stat.failed .value { color: #ef4444; }
+    table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+    th, td { padding: 12px; text-align: left; border-bottom: 1px solid #ddd; }
+    th { background: #f9fafb; font-weight: 600; }
+    tr.passed { background: #f0fdf4; }
+    tr.failed { background: #fef2f2; }
+    tr.error { background: #fefce8; }
+    .latency-excellent { color: #22c55e; font-weight: bold; }
+    .latency-good { color: #84cc16; }
+    .latency-ok { color: #f59e0b; }
+    .latency-slow { color: #ef4444; font-weight: bold; }
+    .latency-section { margin: 20px 0; padding: 20px; background: #f9fafb; border-radius: 8px; }
+    img { border: 1px solid #ddd; border-radius: 4px; }
+  </style>
+</head>
+<body>
+  <h1>🐸 TTB Label Verification - Test Results</h1>
+  <p><strong>Run ID:</strong> test-run-2026-02-03T00-49-03-454Z</p>
+  <p><strong>Timestamp:</strong> 2026-02-03T00:49:03.455Z</p>
+
+  <div class="summary">
+    <div class="stat"><div class="value">10</div><div class="label">Total Tests</div></div>
+    <div class="stat passed"><div class="value">10</div><div class="label">Passed</div></div>
+    <div class="stat failed"><div class="value">0</div><div class="label">Failed</div></div>
+    <div class="stat"><div class="value">100.0%</div><div class="label">Pass Rate</div></div>
+  </div>
+
+  <div class="latency-section">
+    <h2>⏱️ Latency Metrics</h2>
+    <p><strong>Target:</strong> &lt;5000ms (per PRD - Sarah's 5-second requirement)</p>
+    <p><strong>Min:</strong> 4610ms |
+       <strong>Max:</strong> 6413ms |
+       <strong>Avg:</strong> 5223ms |
+       <strong>P95:</strong> 6413ms</p>
+    <p><strong>Exceeds Target:</strong> 4/10 tests</p>
+  </div>
+
+  <h2>Test Details</h2>
+  <table>
+    <thead>
+      <tr>
+        <th>ID</th>
+        <th>Description</th>
+        <th>Expected</th>
+        <th>Actual</th>
+        <th>Latency</th>
+        <th>Image</th>
+      </tr>
+    </thead>
+    <tbody>
+      
+      <tr class="passed">
+        <td>✅ B1-perfect</td>
+        <td>Perfect match - all fields correct (happy path)</td>
+        <td>PASS</td>
+        <td>REVIEW</td>
+        <td class="latency-ok">4837ms</td>
+        <td><img src="sample-labels/label-perfect.png" alt="B1-perfect" style="max-width:150px;max-height:100px;"></td>
+      </tr>
+    
+      <tr class="passed">
+        <td>✅ B2-case-mismatch</td>
+        <td>Dave scenario - brand name case mismatch (STONE'S THROW vs Stone's Throw)</td>
+        <td>PASS</td>
+        <td>REVIEW</td>
+        <td class="latency-ok">4750ms</td>
+        <td><img src="sample-labels/label-case-mismatch.png" alt="B2-case-mismatch" style="max-width:150px;max-height:100px;"></td>
+      </tr>
+    
+      <tr class="passed">
+        <td>✅ B3-wrong-abv</td>
+        <td>ABV mismatch - label shows 14.5% but application has 13.5%</td>
+        <td>FAIL</td>
+        <td>FAIL</td>
+        <td class="latency-ok">4896ms</td>
+        <td><img src="sample-labels/label-wrong-abv.png" alt="B3-wrong-abv" style="max-width:150px;max-height:100px;"></td>
+      </tr>
+    
+      <tr class="passed">
+        <td>✅ B4-warning-titlecase</td>
+        <td>Jenny scenario - Government Warning in title case instead of ALL CAPS</td>
+        <td>FAIL</td>
+        <td>FAIL</td>
+        <td class="latency-slow">6413ms</td>
+        <td><img src="sample-labels/label-warning-titlecase.png" alt="B4-warning-titlecase" style="max-width:150px;max-height:100px;"></td>
+      </tr>
+    
+      <tr class="passed">
+        <td>✅ B5-no-warning</td>
+        <td>Missing government warning entirely</td>
+        <td>FAIL</td>
+        <td>FAIL</td>
+        <td class="latency-ok">4610ms</td>
+        <td><img src="sample-labels/label-no-warning.png" alt="B5-no-warning" style="max-width:150px;max-height:100px;"></td>
+      </tr>
+    
+      <tr class="passed">
+        <td>✅ B6-imported</td>
+        <td>Imported spirit with country of origin - full field coverage</td>
+        <td>PASS</td>
+        <td>REVIEW</td>
+        <td class="latency-slow">6076ms</td>
+        <td><img src="sample-labels/label-imported.png" alt="B6-imported" style="max-width:150px;max-height:100px;"></td>
+      </tr>
+    
+      <tr class="passed">
+        <td>✅ I1-proof-to-abv</td>
+        <td>Proof to ABV conversion - label shows 90 Proof, app has 45%</td>
+        <td>PASS</td>
+        <td>REVIEW</td>
+        <td class="latency-ok">4614ms</td>
+        <td><img src="sample-labels/label-proof-to-abv.png" alt="I1-proof-to-abv" style="max-width:150px;max-height:100px;"></td>
+      </tr>
+    
+      <tr class="passed">
+        <td>✅ I2-ml-to-floz</td>
+        <td>mL to fl oz conversion - label shows 750 mL, app has 25.4 fl oz</td>
+        <td>PASS</td>
+        <td>REVIEW</td>
+        <td class="latency-ok">4921ms</td>
+        <td><img src="sample-labels/label-ml-to-floz.png" alt="I2-ml-to-floz" style="max-width:150px;max-height:100px;"></td>
+      </tr>
+    
+      <tr class="passed">
+        <td>✅ I3-address-abbrev</td>
+        <td>Address abbreviations - label has St./Ste./KY, app has full words</td>
+        <td>PASS</td>
+        <td>REVIEW</td>
+        <td class="latency-slow">5990ms</td>
+        <td><img src="sample-labels/label-address-abbrev.png" alt="I3-address-abbrev" style="max-width:150px;max-height:100px;"></td>
+      </tr>
+    
+      <tr class="passed">
+        <td>✅ I4-punctuation</td>
+        <td>Punctuation variance - label has apostrophe, app doesn't</td>
+        <td>PASS</td>
+        <td>REVIEW</td>
+        <td class="latency-slow">5121ms</td>
+        <td><img src="sample-labels/label-punctuation.png" alt="I4-punctuation" style="max-width:150px;max-height:100px;"></td>
+      </tr>
+    
+    </tbody>
+  </table>
+</body>
+</html>

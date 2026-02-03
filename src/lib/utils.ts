@@ -203,8 +203,9 @@ export function normalizeAddress(s: string): string {
     normalized = normalized.replace(regex, full);
   }
 
-  // Remove punctuation and collapse whitespace
-  normalized = normalized.replace(/[.,]/g, "").replace(/\s+/g, " ").trim();
+  // Remove punctuation INCLUDING apostrophes and collapse whitespace
+  // "Maker's" and "Makers" should match
+  normalized = normalized.replace(/[.,''""-]/g, "").replace(/\s+/g, " ").trim();
 
   return normalized;
 }
