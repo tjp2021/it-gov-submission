@@ -1,0 +1,2111 @@
+{
+  "runId": "test-run-2026-02-03T00-23-23-186Z",
+  "timestamp": "2026-02-03T00:23:23.187Z",
+  "summary": {
+    "total": 10,
+    "passed": 6,
+    "failed": 4,
+    "errors": 0,
+    "passRate": 60
+  },
+  "latency": {
+    "target": 5000,
+    "min": 4777,
+    "max": 7103,
+    "avg": 5496.7,
+    "p95": 7103,
+    "exceedsTarget": 7,
+    "all": [
+      5582,
+      4777,
+      5092,
+      5835,
+      4882,
+      5603,
+      4820,
+      6023,
+      7103,
+      5250
+    ]
+  },
+  "tests": [
+    {
+      "id": "B1-perfect",
+      "group": "basic",
+      "description": "Perfect match - all fields correct (happy path)",
+      "expectedResult": "PASS",
+      "actualResult": "REVIEW",
+      "passed": true,
+      "error": null,
+      "latencyMs": 5582,
+      "imagePath": "sample-labels/label-perfect.png",
+      "imageExists": true,
+      "applicationData": {
+        "brandName": "Old Tom Distillery",
+        "classType": "Kentucky Straight Bourbon Whiskey",
+        "alcoholContent": "45% Alc./Vol. (90 Proof)",
+        "netContents": "750 mL",
+        "nameAddress": "Old Tom Distillery, Louisville, Kentucky",
+        "countryOfOrigin": "",
+        "governmentWarning": "GOVERNMENT WARNING: (1) According to the Surgeon General, women should not drink alcoholic beverages during pregnancy because of the risk of birth defects. (2) Consumption of alcoholic beverages impairs your ability to drive a car or operate machinery, and may cause health problems."
+      },
+      "fieldResults": [
+        {
+          "fieldName": "Brand Name",
+          "applicationValue": "Old Tom Distillery",
+          "extractedValue": "OLD TOM DISTILLERY",
+          "status": "PASS",
+          "matchType": "fuzzy",
+          "confidence": 1,
+          "details": "Match (after normalization)"
+        },
+        {
+          "fieldName": "Class/Type",
+          "applicationValue": "Kentucky Straight Bourbon Whiskey",
+          "extractedValue": "Kentucky Straight Bourbon Whiskey",
+          "status": "PASS",
+          "matchType": "fuzzy",
+          "confidence": 1,
+          "details": "Match (after normalization)"
+        },
+        {
+          "fieldName": "Alcohol Content",
+          "applicationValue": "45% Alc./Vol. (90 Proof)",
+          "extractedValue": "45% Alc./Vol. (90 Proof)",
+          "status": "PASS",
+          "matchType": "abv",
+          "confidence": 1,
+          "details": "ABV match: 45%"
+        },
+        {
+          "fieldName": "Net Contents",
+          "applicationValue": "750 mL",
+          "extractedValue": "750 mL",
+          "status": "PASS",
+          "matchType": "volume",
+          "confidence": 1,
+          "details": "Volume match: 750 mL ≈ 750 mL (750.0 mL)"
+        },
+        {
+          "fieldName": "Name & Address",
+          "applicationValue": "Old Tom Distillery, Louisville, Kentucky",
+          "extractedValue": "Old Tom Distillery, Louisville, Kentucky",
+          "status": "PASS",
+          "matchType": "address",
+          "confidence": 1,
+          "details": "Exact address match"
+        },
+        {
+          "fieldName": "Gov Warning — Present",
+          "applicationValue": "Required",
+          "extractedValue": "Found",
+          "status": "PASS",
+          "matchType": "strict",
+          "confidence": 1,
+          "details": "Warning statement found on label"
+        },
+        {
+          "fieldName": "Gov Warning — Header Caps",
+          "applicationValue": "ALL CAPS required",
+          "extractedValue": "ALL_CAPS",
+          "status": "PASS",
+          "matchType": "strict",
+          "confidence": 1,
+          "details": "Header in ALL CAPS ✓"
+        },
+        {
+          "fieldName": "Gov Warning — Header Bold",
+          "applicationValue": "Bold required",
+          "extractedValue": "APPEARS_BOLD_OR_HEAVY",
+          "status": "WARNING",
+          "matchType": "strict",
+          "confidence": 0.5,
+          "details": "Header appears visually emphasized (best-effort assessment) — agent should visually confirm bold formatting"
+        },
+        {
+          "fieldName": "Gov Warning — Text Accuracy",
+          "applicationValue": "GOVERNMENT WARNING: (1) According to the Surgeo...",
+          "extractedValue": "GOVERNMENT WARNING: (1) According to the Surgeo...",
+          "status": "PASS",
+          "matchType": "strict",
+          "confidence": 1,
+          "details": "Exact match"
+        }
+      ],
+      "rawResponse": {
+        "overallStatus": "REVIEW",
+        "processingTimeMs": 5569,
+        "extractedFields": {
+          "brandName": "OLD TOM DISTILLERY",
+          "classType": "Kentucky Straight Bourbon Whiskey",
+          "alcoholContent": "45% Alc./Vol. (90 Proof)",
+          "netContents": "750 mL",
+          "nameAddress": "Old Tom Distillery, Louisville, Kentucky",
+          "countryOfOrigin": "null",
+          "governmentWarning": "GOVERNMENT WARNING: (1) According to the Surgeon General, women should not drink alcoholic beverages during pregnancy because of the risk of birth defects. (2) Consumption of alcoholic beverages impairs your ability to drive a car or operate machinery, and may cause health problems.",
+          "governmentWarningHeaderFormat": "ALL_CAPS",
+          "governmentWarningHeaderEmphasis": "APPEARS_BOLD_OR_HEAVY",
+          "additionalObservations": "null"
+        },
+        "fieldResults": [
+          {
+            "fieldName": "Brand Name",
+            "applicationValue": "Old Tom Distillery",
+            "extractedValue": "OLD TOM DISTILLERY",
+            "status": "PASS",
+            "matchType": "fuzzy",
+            "confidence": 1,
+            "details": "Match (after normalization)"
+          },
+          {
+            "fieldName": "Class/Type",
+            "applicationValue": "Kentucky Straight Bourbon Whiskey",
+            "extractedValue": "Kentucky Straight Bourbon Whiskey",
+            "status": "PASS",
+            "matchType": "fuzzy",
+            "confidence": 1,
+            "details": "Match (after normalization)"
+          },
+          {
+            "fieldName": "Alcohol Content",
+            "applicationValue": "45% Alc./Vol. (90 Proof)",
+            "extractedValue": "45% Alc./Vol. (90 Proof)",
+            "status": "PASS",
+            "matchType": "abv",
+            "confidence": 1,
+            "details": "ABV match: 45%"
+          },
+          {
+            "fieldName": "Net Contents",
+            "applicationValue": "750 mL",
+            "extractedValue": "750 mL",
+            "status": "PASS",
+            "matchType": "volume",
+            "confidence": 1,
+            "details": "Volume match: 750 mL ≈ 750 mL (750.0 mL)"
+          },
+          {
+            "fieldName": "Name & Address",
+            "applicationValue": "Old Tom Distillery, Louisville, Kentucky",
+            "extractedValue": "Old Tom Distillery, Louisville, Kentucky",
+            "status": "PASS",
+            "matchType": "address",
+            "confidence": 1,
+            "details": "Exact address match"
+          },
+          {
+            "fieldName": "Gov Warning — Present",
+            "applicationValue": "Required",
+            "extractedValue": "Found",
+            "status": "PASS",
+            "matchType": "strict",
+            "confidence": 1,
+            "details": "Warning statement found on label"
+          },
+          {
+            "fieldName": "Gov Warning — Header Caps",
+            "applicationValue": "ALL CAPS required",
+            "extractedValue": "ALL_CAPS",
+            "status": "PASS",
+            "matchType": "strict",
+            "confidence": 1,
+            "details": "Header in ALL CAPS ✓"
+          },
+          {
+            "fieldName": "Gov Warning — Header Bold",
+            "applicationValue": "Bold required",
+            "extractedValue": "APPEARS_BOLD_OR_HEAVY",
+            "status": "WARNING",
+            "matchType": "strict",
+            "confidence": 0.5,
+            "details": "Header appears visually emphasized (best-effort assessment) — agent should visually confirm bold formatting"
+          },
+          {
+            "fieldName": "Gov Warning — Text Accuracy",
+            "applicationValue": "GOVERNMENT WARNING: (1) According to the Surgeo...",
+            "extractedValue": "GOVERNMENT WARNING: (1) According to the Surgeo...",
+            "status": "PASS",
+            "matchType": "strict",
+            "confidence": 1,
+            "details": "Exact match"
+          }
+        ]
+      },
+      "note": "REVIEW acceptable - only bold warning"
+    },
+    {
+      "id": "B2-case-mismatch",
+      "group": "basic",
+      "description": "Dave scenario - brand name case mismatch (STONE'S THROW vs Stone's Throw)",
+      "expectedResult": "PASS",
+      "expectedReason": "Fuzzy match handles case difference after normalization",
+      "actualResult": "REVIEW",
+      "passed": true,
+      "error": null,
+      "latencyMs": 4777,
+      "imagePath": "sample-labels/label-case-mismatch.png",
+      "imageExists": true,
+      "applicationData": {
+        "brandName": "Stone's Throw",
+        "classType": "Small Batch Bourbon Whiskey",
+        "alcoholContent": "46% Alc./Vol.",
+        "netContents": "750 mL",
+        "nameAddress": "Stone's Throw Distillery, Frankfort, Kentucky",
+        "countryOfOrigin": "",
+        "governmentWarning": "GOVERNMENT WARNING: (1) According to the Surgeon General, women should not drink alcoholic beverages during pregnancy because of the risk of birth defects. (2) Consumption of alcoholic beverages impairs your ability to drive a car or operate machinery, and may cause health problems."
+      },
+      "fieldResults": [
+        {
+          "fieldName": "Brand Name",
+          "applicationValue": "Stone's Throw",
+          "extractedValue": "STONE'S THROW",
+          "status": "PASS",
+          "matchType": "fuzzy",
+          "confidence": 1,
+          "details": "Match (after normalization)"
+        },
+        {
+          "fieldName": "Class/Type",
+          "applicationValue": "Small Batch Bourbon Whiskey",
+          "extractedValue": "SMALL BATCH BOURBON WHISKEY",
+          "status": "PASS",
+          "matchType": "fuzzy",
+          "confidence": 1,
+          "details": "Match (after normalization)"
+        },
+        {
+          "fieldName": "Alcohol Content",
+          "applicationValue": "46% Alc./Vol.",
+          "extractedValue": "46% Alc./Vol.",
+          "status": "PASS",
+          "matchType": "abv",
+          "confidence": 1,
+          "details": "ABV match: 46%"
+        },
+        {
+          "fieldName": "Net Contents",
+          "applicationValue": "750 mL",
+          "extractedValue": "750 mL",
+          "status": "PASS",
+          "matchType": "volume",
+          "confidence": 1,
+          "details": "Volume match: 750 mL ≈ 750 mL (750.0 mL)"
+        },
+        {
+          "fieldName": "Name & Address",
+          "applicationValue": "Stone's Throw Distillery, Frankfort, Kentucky",
+          "extractedValue": "Stone's Throw Distillery, Frankfort, Kentucky",
+          "status": "PASS",
+          "matchType": "address",
+          "confidence": 1,
+          "details": "Exact address match"
+        },
+        {
+          "fieldName": "Gov Warning — Present",
+          "applicationValue": "Required",
+          "extractedValue": "Found",
+          "status": "PASS",
+          "matchType": "strict",
+          "confidence": 1,
+          "details": "Warning statement found on label"
+        },
+        {
+          "fieldName": "Gov Warning — Header Caps",
+          "applicationValue": "ALL CAPS required",
+          "extractedValue": "ALL_CAPS",
+          "status": "PASS",
+          "matchType": "strict",
+          "confidence": 1,
+          "details": "Header in ALL CAPS ✓"
+        },
+        {
+          "fieldName": "Gov Warning — Header Bold",
+          "applicationValue": "Bold required",
+          "extractedValue": "UNCERTAIN",
+          "status": "WARNING",
+          "matchType": "strict",
+          "confidence": 0.5,
+          "details": "Could not determine if header is bold from image — agent should visually confirm"
+        },
+        {
+          "fieldName": "Gov Warning — Text Accuracy",
+          "applicationValue": "GOVERNMENT WARNING: (1) According to the Surgeo...",
+          "extractedValue": "GOVERNMENT WARNING: (1) According to the Surgeo...",
+          "status": "PASS",
+          "matchType": "strict",
+          "confidence": 1,
+          "details": "Exact match"
+        }
+      ],
+      "rawResponse": {
+        "overallStatus": "REVIEW",
+        "processingTimeMs": 4767,
+        "extractedFields": {
+          "brandName": "STONE'S THROW",
+          "classType": "SMALL BATCH BOURBON WHISKEY",
+          "alcoholContent": "46% Alc./Vol.",
+          "netContents": "750 mL",
+          "nameAddress": "Stone's Throw Distillery, Frankfort, Kentucky",
+          "countryOfOrigin": "null",
+          "governmentWarning": "GOVERNMENT WARNING: (1) According to the Surgeon General, women should not drink alcoholic beverages during pregnancy because of the risk of birth defects. (2) Consumption of alcoholic beverages impairs your ability to drive a car or operate machinery, and may cause health problems.",
+          "governmentWarningHeaderFormat": "ALL_CAPS",
+          "governmentWarningHeaderEmphasis": "UNCERTAIN",
+          "additionalObservations": "null"
+        },
+        "fieldResults": [
+          {
+            "fieldName": "Brand Name",
+            "applicationValue": "Stone's Throw",
+            "extractedValue": "STONE'S THROW",
+            "status": "PASS",
+            "matchType": "fuzzy",
+            "confidence": 1,
+            "details": "Match (after normalization)"
+          },
+          {
+            "fieldName": "Class/Type",
+            "applicationValue": "Small Batch Bourbon Whiskey",
+            "extractedValue": "SMALL BATCH BOURBON WHISKEY",
+            "status": "PASS",
+            "matchType": "fuzzy",
+            "confidence": 1,
+            "details": "Match (after normalization)"
+          },
+          {
+            "fieldName": "Alcohol Content",
+            "applicationValue": "46% Alc./Vol.",
+            "extractedValue": "46% Alc./Vol.",
+            "status": "PASS",
+            "matchType": "abv",
+            "confidence": 1,
+            "details": "ABV match: 46%"
+          },
+          {
+            "fieldName": "Net Contents",
+            "applicationValue": "750 mL",
+            "extractedValue": "750 mL",
+            "status": "PASS",
+            "matchType": "volume",
+            "confidence": 1,
+            "details": "Volume match: 750 mL ≈ 750 mL (750.0 mL)"
+          },
+          {
+            "fieldName": "Name & Address",
+            "applicationValue": "Stone's Throw Distillery, Frankfort, Kentucky",
+            "extractedValue": "Stone's Throw Distillery, Frankfort, Kentucky",
+            "status": "PASS",
+            "matchType": "address",
+            "confidence": 1,
+            "details": "Exact address match"
+          },
+          {
+            "fieldName": "Gov Warning — Present",
+            "applicationValue": "Required",
+            "extractedValue": "Found",
+            "status": "PASS",
+            "matchType": "strict",
+            "confidence": 1,
+            "details": "Warning statement found on label"
+          },
+          {
+            "fieldName": "Gov Warning — Header Caps",
+            "applicationValue": "ALL CAPS required",
+            "extractedValue": "ALL_CAPS",
+            "status": "PASS",
+            "matchType": "strict",
+            "confidence": 1,
+            "details": "Header in ALL CAPS ✓"
+          },
+          {
+            "fieldName": "Gov Warning — Header Bold",
+            "applicationValue": "Bold required",
+            "extractedValue": "UNCERTAIN",
+            "status": "WARNING",
+            "matchType": "strict",
+            "confidence": 0.5,
+            "details": "Could not determine if header is bold from image — agent should visually confirm"
+          },
+          {
+            "fieldName": "Gov Warning — Text Accuracy",
+            "applicationValue": "GOVERNMENT WARNING: (1) According to the Surgeo...",
+            "extractedValue": "GOVERNMENT WARNING: (1) According to the Surgeo...",
+            "status": "PASS",
+            "matchType": "strict",
+            "confidence": 1,
+            "details": "Exact match"
+          }
+        ]
+      },
+      "note": "REVIEW acceptable - only bold warning"
+    },
+    {
+      "id": "B3-wrong-abv",
+      "group": "basic",
+      "description": "ABV mismatch - label shows 14.5% but application has 13.5%",
+      "expectedResult": "FAIL",
+      "expectedReason": "Numeric mismatch on ABV (1% difference)",
+      "actualResult": "FAIL",
+      "passed": true,
+      "error": null,
+      "latencyMs": 5092,
+      "imagePath": "sample-labels/label-wrong-abv.png",
+      "imageExists": true,
+      "applicationData": {
+        "brandName": "Chateau Margaux",
+        "classType": "Cabernet Sauvignon",
+        "alcoholContent": "13.5% Alc./Vol.",
+        "netContents": "750 mL",
+        "nameAddress": "Chateau Margaux Winery, Napa, California",
+        "countryOfOrigin": "",
+        "governmentWarning": "GOVERNMENT WARNING: (1) According to the Surgeon General, women should not drink alcoholic beverages during pregnancy because of the risk of birth defects. (2) Consumption of alcoholic beverages impairs your ability to drive a car or operate machinery, and may cause health problems."
+      },
+      "fieldResults": [
+        {
+          "fieldName": "Brand Name",
+          "applicationValue": "Chateau Margaux",
+          "extractedValue": "Chateau Margaux",
+          "status": "PASS",
+          "matchType": "fuzzy",
+          "confidence": 1,
+          "details": "Match (after normalization)"
+        },
+        {
+          "fieldName": "Class/Type",
+          "applicationValue": "Cabernet Sauvignon",
+          "extractedValue": "Cabernet Sauvignon",
+          "status": "PASS",
+          "matchType": "fuzzy",
+          "confidence": 1,
+          "details": "Match (after normalization)"
+        },
+        {
+          "fieldName": "Alcohol Content",
+          "applicationValue": "13.5% Alc./Vol.",
+          "extractedValue": "14.5% Alc./Vol.",
+          "status": "FAIL",
+          "matchType": "abv",
+          "confidence": 0.9,
+          "details": "ABV mismatch: label=14.5% vs application=13.5%"
+        },
+        {
+          "fieldName": "Net Contents",
+          "applicationValue": "750 mL",
+          "extractedValue": "750 mL",
+          "status": "PASS",
+          "matchType": "volume",
+          "confidence": 1,
+          "details": "Volume match: 750 mL ≈ 750 mL (750.0 mL)"
+        },
+        {
+          "fieldName": "Name & Address",
+          "applicationValue": "Chateau Margaux Winery, Napa, California",
+          "extractedValue": "Vinted and Bottled by Chateau Margaux Winery\nNapa, California",
+          "status": "WARNING",
+          "matchType": "address",
+          "confidence": 0.7198830409356725,
+          "details": "Address partial match (72%) — agent review recommended. Labels often abbreviate or omit parts of the full address."
+        },
+        {
+          "fieldName": "Gov Warning — Present",
+          "applicationValue": "Required",
+          "extractedValue": "Found",
+          "status": "PASS",
+          "matchType": "strict",
+          "confidence": 1,
+          "details": "Warning statement found on label"
+        },
+        {
+          "fieldName": "Gov Warning — Header Caps",
+          "applicationValue": "ALL CAPS required",
+          "extractedValue": "ALL_CAPS",
+          "status": "PASS",
+          "matchType": "strict",
+          "confidence": 1,
+          "details": "Header in ALL CAPS ✓"
+        },
+        {
+          "fieldName": "Gov Warning — Header Bold",
+          "applicationValue": "Bold required",
+          "extractedValue": "APPEARS_BOLD_OR_HEAVY",
+          "status": "WARNING",
+          "matchType": "strict",
+          "confidence": 0.5,
+          "details": "Header appears visually emphasized (best-effort assessment) — agent should visually confirm bold formatting"
+        },
+        {
+          "fieldName": "Gov Warning — Text Accuracy",
+          "applicationValue": "GOVERNMENT WARNING: (1) According to the Surgeo...",
+          "extractedValue": "GOVERNMENT WARNING: (1) According to the Surgeo...",
+          "status": "PASS",
+          "matchType": "strict",
+          "confidence": 1,
+          "details": "Exact match"
+        }
+      ],
+      "rawResponse": {
+        "overallStatus": "FAIL",
+        "processingTimeMs": 5084,
+        "extractedFields": {
+          "brandName": "Chateau Margaux",
+          "classType": "Cabernet Sauvignon",
+          "alcoholContent": "14.5% Alc./Vol.",
+          "netContents": "750 mL",
+          "nameAddress": "Vinted and Bottled by Chateau Margaux Winery\nNapa, California",
+          "countryOfOrigin": "null",
+          "governmentWarning": "GOVERNMENT WARNING: (1) According to the Surgeon General, women should not drink alcoholic beverages during pregnancy because of the risk of birth defects. (2) Consumption of alcoholic beverages impairs your ability to drive a car or operate machinery, and may cause health problems.",
+          "governmentWarningHeaderFormat": "ALL_CAPS",
+          "governmentWarningHeaderEmphasis": "APPEARS_BOLD_OR_HEAVY",
+          "additionalObservations": "null"
+        },
+        "fieldResults": [
+          {
+            "fieldName": "Brand Name",
+            "applicationValue": "Chateau Margaux",
+            "extractedValue": "Chateau Margaux",
+            "status": "PASS",
+            "matchType": "fuzzy",
+            "confidence": 1,
+            "details": "Match (after normalization)"
+          },
+          {
+            "fieldName": "Class/Type",
+            "applicationValue": "Cabernet Sauvignon",
+            "extractedValue": "Cabernet Sauvignon",
+            "status": "PASS",
+            "matchType": "fuzzy",
+            "confidence": 1,
+            "details": "Match (after normalization)"
+          },
+          {
+            "fieldName": "Alcohol Content",
+            "applicationValue": "13.5% Alc./Vol.",
+            "extractedValue": "14.5% Alc./Vol.",
+            "status": "FAIL",
+            "matchType": "abv",
+            "confidence": 0.9,
+            "details": "ABV mismatch: label=14.5% vs application=13.5%"
+          },
+          {
+            "fieldName": "Net Contents",
+            "applicationValue": "750 mL",
+            "extractedValue": "750 mL",
+            "status": "PASS",
+            "matchType": "volume",
+            "confidence": 1,
+            "details": "Volume match: 750 mL ≈ 750 mL (750.0 mL)"
+          },
+          {
+            "fieldName": "Name & Address",
+            "applicationValue": "Chateau Margaux Winery, Napa, California",
+            "extractedValue": "Vinted and Bottled by Chateau Margaux Winery\nNapa, California",
+            "status": "WARNING",
+            "matchType": "address",
+            "confidence": 0.7198830409356725,
+            "details": "Address partial match (72%) — agent review recommended. Labels often abbreviate or omit parts of the full address."
+          },
+          {
+            "fieldName": "Gov Warning — Present",
+            "applicationValue": "Required",
+            "extractedValue": "Found",
+            "status": "PASS",
+            "matchType": "strict",
+            "confidence": 1,
+            "details": "Warning statement found on label"
+          },
+          {
+            "fieldName": "Gov Warning — Header Caps",
+            "applicationValue": "ALL CAPS required",
+            "extractedValue": "ALL_CAPS",
+            "status": "PASS",
+            "matchType": "strict",
+            "confidence": 1,
+            "details": "Header in ALL CAPS ✓"
+          },
+          {
+            "fieldName": "Gov Warning — Header Bold",
+            "applicationValue": "Bold required",
+            "extractedValue": "APPEARS_BOLD_OR_HEAVY",
+            "status": "WARNING",
+            "matchType": "strict",
+            "confidence": 0.5,
+            "details": "Header appears visually emphasized (best-effort assessment) — agent should visually confirm bold formatting"
+          },
+          {
+            "fieldName": "Gov Warning — Text Accuracy",
+            "applicationValue": "GOVERNMENT WARNING: (1) According to the Surgeo...",
+            "extractedValue": "GOVERNMENT WARNING: (1) According to the Surgeo...",
+            "status": "PASS",
+            "matchType": "strict",
+            "confidence": 1,
+            "details": "Exact match"
+          }
+        ]
+      }
+    },
+    {
+      "id": "B4-warning-titlecase",
+      "group": "basic",
+      "description": "Jenny scenario - Government Warning in title case instead of ALL CAPS",
+      "expectedResult": "FAIL",
+      "expectedReason": "Header format violation - must be ALL CAPS per 27 CFR Part 16",
+      "actualResult": "FAIL",
+      "passed": true,
+      "error": null,
+      "latencyMs": 5835,
+      "imagePath": "sample-labels/label-warning-titlecase.png",
+      "imageExists": true,
+      "applicationData": {
+        "brandName": "HopMaster",
+        "classType": "India Pale Ale",
+        "alcoholContent": "6.5%",
+        "netContents": "12 FL. OZ.",
+        "nameAddress": "HopMaster Brewing Co., Portland, Oregon",
+        "countryOfOrigin": "",
+        "governmentWarning": "GOVERNMENT WARNING: (1) According to the Surgeon General, women should not drink alcoholic beverages during pregnancy because of the risk of birth defects. (2) Consumption of alcoholic beverages impairs your ability to drive a car or operate machinery, and may cause health problems."
+      },
+      "fieldResults": [
+        {
+          "fieldName": "Brand Name",
+          "applicationValue": "HopMaster",
+          "extractedValue": "HOPMASTER",
+          "status": "PASS",
+          "matchType": "fuzzy",
+          "confidence": 1,
+          "details": "Match (after normalization)"
+        },
+        {
+          "fieldName": "Class/Type",
+          "applicationValue": "India Pale Ale",
+          "extractedValue": "India Pale Ale",
+          "status": "PASS",
+          "matchType": "fuzzy",
+          "confidence": 1,
+          "details": "Match (after normalization)"
+        },
+        {
+          "fieldName": "Alcohol Content",
+          "applicationValue": "6.5%",
+          "extractedValue": "6.5%",
+          "status": "PASS",
+          "matchType": "abv",
+          "confidence": 1,
+          "details": "ABV match: 6.5%"
+        },
+        {
+          "fieldName": "Net Contents",
+          "applicationValue": "12 FL. OZ.",
+          "extractedValue": "12 FL. OZ.",
+          "status": "PASS",
+          "matchType": "volume",
+          "confidence": 1,
+          "details": "Volume match: 12 FL. OZ. ≈ 12 FL. OZ. (354.9 mL)"
+        },
+        {
+          "fieldName": "Name & Address",
+          "applicationValue": "HopMaster Brewing Co., Portland, Oregon",
+          "extractedValue": "Brewed by HopMaster Brewing Co.\nPortland, Oregon",
+          "status": "WARNING",
+          "matchType": "address",
+          "confidence": 0.7747584541062801,
+          "details": "Address partial match (77%) — agent review recommended. Labels often abbreviate or omit parts of the full address."
+        },
+        {
+          "fieldName": "Gov Warning — Present",
+          "applicationValue": "Required",
+          "extractedValue": "Found",
+          "status": "PASS",
+          "matchType": "strict",
+          "confidence": 1,
+          "details": "Warning statement found on label"
+        },
+        {
+          "fieldName": "Gov Warning — Header Caps",
+          "applicationValue": "ALL CAPS required",
+          "extractedValue": "MIXED_CASE",
+          "status": "FAIL",
+          "matchType": "strict",
+          "confidence": 0,
+          "details": "Header format: MIXED_CASE — must be ALL CAPS per 27 CFR Part 16"
+        },
+        {
+          "fieldName": "Gov Warning — Header Bold",
+          "applicationValue": "Bold required",
+          "extractedValue": "APPEARS_NORMAL_WEIGHT",
+          "status": "WARNING",
+          "matchType": "strict",
+          "confidence": 0.5,
+          "details": "Header does not appear bold — agent should visually confirm. Per 27 CFR Part 16, 'GOVERNMENT WARNING' must be in bold."
+        },
+        {
+          "fieldName": "Gov Warning — Text Accuracy",
+          "applicationValue": "GOVERNMENT WARNING: (1) According to the Surgeo...",
+          "extractedValue": "Government Warning: (1) According to the Surgeo...",
+          "status": "PASS",
+          "matchType": "strict",
+          "confidence": 0.95,
+          "details": "Match (case difference only)"
+        }
+      ],
+      "rawResponse": {
+        "overallStatus": "FAIL",
+        "processingTimeMs": 5826,
+        "extractedFields": {
+          "brandName": "HOPMASTER",
+          "classType": "India Pale Ale",
+          "alcoholContent": "6.5%",
+          "netContents": "12 FL. OZ.",
+          "nameAddress": "Brewed by HopMaster Brewing Co.\nPortland, Oregon",
+          "countryOfOrigin": "null",
+          "governmentWarning": "Government Warning: (1) According to the Surgeon General, women should not drink alcoholic beverages during pregnancy because of the risk of birth defects. (2) Consumption of alcoholic beverages impairs your ability to drive a car or operate machinery, and may cause health problems.",
+          "governmentWarningHeaderFormat": "MIXED_CASE",
+          "governmentWarningHeaderEmphasis": "APPEARS_NORMAL_WEIGHT",
+          "additionalObservations": "The alcohol content appears to be missing the volume designation (e.g., \"Alc./Vol.\"). The label is clear and readable."
+        },
+        "fieldResults": [
+          {
+            "fieldName": "Brand Name",
+            "applicationValue": "HopMaster",
+            "extractedValue": "HOPMASTER",
+            "status": "PASS",
+            "matchType": "fuzzy",
+            "confidence": 1,
+            "details": "Match (after normalization)"
+          },
+          {
+            "fieldName": "Class/Type",
+            "applicationValue": "India Pale Ale",
+            "extractedValue": "India Pale Ale",
+            "status": "PASS",
+            "matchType": "fuzzy",
+            "confidence": 1,
+            "details": "Match (after normalization)"
+          },
+          {
+            "fieldName": "Alcohol Content",
+            "applicationValue": "6.5%",
+            "extractedValue": "6.5%",
+            "status": "PASS",
+            "matchType": "abv",
+            "confidence": 1,
+            "details": "ABV match: 6.5%"
+          },
+          {
+            "fieldName": "Net Contents",
+            "applicationValue": "12 FL. OZ.",
+            "extractedValue": "12 FL. OZ.",
+            "status": "PASS",
+            "matchType": "volume",
+            "confidence": 1,
+            "details": "Volume match: 12 FL. OZ. ≈ 12 FL. OZ. (354.9 mL)"
+          },
+          {
+            "fieldName": "Name & Address",
+            "applicationValue": "HopMaster Brewing Co., Portland, Oregon",
+            "extractedValue": "Brewed by HopMaster Brewing Co.\nPortland, Oregon",
+            "status": "WARNING",
+            "matchType": "address",
+            "confidence": 0.7747584541062801,
+            "details": "Address partial match (77%) — agent review recommended. Labels often abbreviate or omit parts of the full address."
+          },
+          {
+            "fieldName": "Gov Warning — Present",
+            "applicationValue": "Required",
+            "extractedValue": "Found",
+            "status": "PASS",
+            "matchType": "strict",
+            "confidence": 1,
+            "details": "Warning statement found on label"
+          },
+          {
+            "fieldName": "Gov Warning — Header Caps",
+            "applicationValue": "ALL CAPS required",
+            "extractedValue": "MIXED_CASE",
+            "status": "FAIL",
+            "matchType": "strict",
+            "confidence": 0,
+            "details": "Header format: MIXED_CASE — must be ALL CAPS per 27 CFR Part 16"
+          },
+          {
+            "fieldName": "Gov Warning — Header Bold",
+            "applicationValue": "Bold required",
+            "extractedValue": "APPEARS_NORMAL_WEIGHT",
+            "status": "WARNING",
+            "matchType": "strict",
+            "confidence": 0.5,
+            "details": "Header does not appear bold — agent should visually confirm. Per 27 CFR Part 16, 'GOVERNMENT WARNING' must be in bold."
+          },
+          {
+            "fieldName": "Gov Warning — Text Accuracy",
+            "applicationValue": "GOVERNMENT WARNING: (1) According to the Surgeo...",
+            "extractedValue": "Government Warning: (1) According to the Surgeo...",
+            "status": "PASS",
+            "matchType": "strict",
+            "confidence": 0.95,
+            "details": "Match (case difference only)"
+          }
+        ]
+      }
+    },
+    {
+      "id": "B5-no-warning",
+      "group": "basic",
+      "description": "Missing government warning entirely",
+      "expectedResult": "FAIL",
+      "expectedReason": "Government warning not found on label",
+      "actualResult": "FAIL",
+      "passed": true,
+      "error": null,
+      "latencyMs": 4882,
+      "imagePath": "sample-labels/label-no-warning.png",
+      "imageExists": true,
+      "applicationData": {
+        "brandName": "Blue Fjord",
+        "classType": "Premium Vodka",
+        "alcoholContent": "40% Alc./Vol.",
+        "netContents": "750 mL",
+        "nameAddress": "Nordic Spirits, Inc., Minneapolis, Minnesota",
+        "countryOfOrigin": "USA",
+        "governmentWarning": "GOVERNMENT WARNING: (1) According to the Surgeon General, women should not drink alcoholic beverages during pregnancy because of the risk of birth defects. (2) Consumption of alcoholic beverages impairs your ability to drive a car or operate machinery, and may cause health problems."
+      },
+      "fieldResults": [
+        {
+          "fieldName": "Brand Name",
+          "applicationValue": "Blue Fjord",
+          "extractedValue": "Blue Fjord",
+          "status": "PASS",
+          "matchType": "fuzzy",
+          "confidence": 1,
+          "details": "Match (after normalization)"
+        },
+        {
+          "fieldName": "Class/Type",
+          "applicationValue": "Premium Vodka",
+          "extractedValue": "PREMIUM VODKA",
+          "status": "PASS",
+          "matchType": "fuzzy",
+          "confidence": 1,
+          "details": "Match (after normalization)"
+        },
+        {
+          "fieldName": "Alcohol Content",
+          "applicationValue": "40% Alc./Vol.",
+          "extractedValue": "40% Alc./Vol.",
+          "status": "PASS",
+          "matchType": "abv",
+          "confidence": 1,
+          "details": "ABV match: 40%"
+        },
+        {
+          "fieldName": "Net Contents",
+          "applicationValue": "750 mL",
+          "extractedValue": "750 mL",
+          "status": "PASS",
+          "matchType": "volume",
+          "confidence": 1,
+          "details": "Volume match: 750 mL ≈ 750 mL (750.0 mL)"
+        },
+        {
+          "fieldName": "Name & Address",
+          "applicationValue": "Nordic Spirits, Inc., Minneapolis, Minnesota",
+          "extractedValue": "Distilled and Bottled by Nordic Spirits, Inc.\nMinneapolis, Minnesota",
+          "status": "WARNING",
+          "matchType": "address",
+          "confidence": 0.7259615384615384,
+          "details": "Address partial match (73%) — agent review recommended. Labels often abbreviate or omit parts of the full address."
+        },
+        {
+          "fieldName": "Country of Origin",
+          "applicationValue": "USA",
+          "extractedValue": "Product of USA",
+          "status": "FAIL",
+          "matchType": "strict",
+          "confidence": 0,
+          "details": "Extra: \"Product, of\""
+        },
+        {
+          "fieldName": "Gov Warning — Present",
+          "applicationValue": "Required",
+          "extractedValue": "Found",
+          "status": "PASS",
+          "matchType": "strict",
+          "confidence": 1,
+          "details": "Warning statement found on label"
+        },
+        {
+          "fieldName": "Gov Warning — Header Caps",
+          "applicationValue": "ALL CAPS required",
+          "extractedValue": "NOT_FOUND",
+          "status": "NOT_FOUND",
+          "matchType": "strict",
+          "confidence": 0,
+          "details": "Warning header not found"
+        },
+        {
+          "fieldName": "Gov Warning — Header Bold",
+          "applicationValue": "Bold required",
+          "extractedValue": "UNCERTAIN",
+          "status": "WARNING",
+          "matchType": "strict",
+          "confidence": 0.5,
+          "details": "Could not determine if header is bold from image — agent should visually confirm"
+        },
+        {
+          "fieldName": "Gov Warning — Text Accuracy",
+          "applicationValue": "GOVERNMENT WARNING: (1) According to the Surgeo...",
+          "extractedValue": "null",
+          "status": "FAIL",
+          "matchType": "strict",
+          "confidence": 0,
+          "details": "Missing: \"GOVERNMENT, WARNING:, (1), According, to, the, Surgeon, General,, women, should, not, drink, alcoholic, beverages, during, pregnancy, because, of, the, risk, of, birth, defects., (2), Consumption, of, alcoholic, beverages, impairs, your, ability, to, drive, a, car, or, operate, machinery,, and, may, cause, health, problems.\"; Extra: \"null\""
+        }
+      ],
+      "rawResponse": {
+        "overallStatus": "FAIL",
+        "processingTimeMs": 4872,
+        "extractedFields": {
+          "brandName": "Blue Fjord",
+          "classType": "PREMIUM VODKA",
+          "alcoholContent": "40% Alc./Vol.",
+          "netContents": "750 mL",
+          "nameAddress": "Distilled and Bottled by Nordic Spirits, Inc.\nMinneapolis, Minnesota",
+          "countryOfOrigin": "Product of USA",
+          "governmentWarning": "null",
+          "governmentWarningHeaderFormat": "NOT_FOUND",
+          "governmentWarningHeaderEmphasis": "UNCERTAIN",
+          "additionalObservations": "Government warning statement is not visible on this label view. This appears to be the front label only - the required government warning may be on the back label or another panel not shown in this image."
+        },
+        "fieldResults": [
+          {
+            "fieldName": "Brand Name",
+            "applicationValue": "Blue Fjord",
+            "extractedValue": "Blue Fjord",
+            "status": "PASS",
+            "matchType": "fuzzy",
+            "confidence": 1,
+            "details": "Match (after normalization)"
+          },
+          {
+            "fieldName": "Class/Type",
+            "applicationValue": "Premium Vodka",
+            "extractedValue": "PREMIUM VODKA",
+            "status": "PASS",
+            "matchType": "fuzzy",
+            "confidence": 1,
+            "details": "Match (after normalization)"
+          },
+          {
+            "fieldName": "Alcohol Content",
+            "applicationValue": "40% Alc./Vol.",
+            "extractedValue": "40% Alc./Vol.",
+            "status": "PASS",
+            "matchType": "abv",
+            "confidence": 1,
+            "details": "ABV match: 40%"
+          },
+          {
+            "fieldName": "Net Contents",
+            "applicationValue": "750 mL",
+            "extractedValue": "750 mL",
+            "status": "PASS",
+            "matchType": "volume",
+            "confidence": 1,
+            "details": "Volume match: 750 mL ≈ 750 mL (750.0 mL)"
+          },
+          {
+            "fieldName": "Name & Address",
+            "applicationValue": "Nordic Spirits, Inc., Minneapolis, Minnesota",
+            "extractedValue": "Distilled and Bottled by Nordic Spirits, Inc.\nMinneapolis, Minnesota",
+            "status": "WARNING",
+            "matchType": "address",
+            "confidence": 0.7259615384615384,
+            "details": "Address partial match (73%) — agent review recommended. Labels often abbreviate or omit parts of the full address."
+          },
+          {
+            "fieldName": "Country of Origin",
+            "applicationValue": "USA",
+            "extractedValue": "Product of USA",
+            "status": "FAIL",
+            "matchType": "strict",
+            "confidence": 0,
+            "details": "Extra: \"Product, of\""
+          },
+          {
+            "fieldName": "Gov Warning — Present",
+            "applicationValue": "Required",
+            "extractedValue": "Found",
+            "status": "PASS",
+            "matchType": "strict",
+            "confidence": 1,
+            "details": "Warning statement found on label"
+          },
+          {
+            "fieldName": "Gov Warning — Header Caps",
+            "applicationValue": "ALL CAPS required",
+            "extractedValue": "NOT_FOUND",
+            "status": "NOT_FOUND",
+            "matchType": "strict",
+            "confidence": 0,
+            "details": "Warning header not found"
+          },
+          {
+            "fieldName": "Gov Warning — Header Bold",
+            "applicationValue": "Bold required",
+            "extractedValue": "UNCERTAIN",
+            "status": "WARNING",
+            "matchType": "strict",
+            "confidence": 0.5,
+            "details": "Could not determine if header is bold from image — agent should visually confirm"
+          },
+          {
+            "fieldName": "Gov Warning — Text Accuracy",
+            "applicationValue": "GOVERNMENT WARNING: (1) According to the Surgeo...",
+            "extractedValue": "null",
+            "status": "FAIL",
+            "matchType": "strict",
+            "confidence": 0,
+            "details": "Missing: \"GOVERNMENT, WARNING:, (1), According, to, the, Surgeon, General,, women, should, not, drink, alcoholic, beverages, during, pregnancy, because, of, the, risk, of, birth, defects., (2), Consumption, of, alcoholic, beverages, impairs, your, ability, to, drive, a, car, or, operate, machinery,, and, may, cause, health, problems.\"; Extra: \"null\""
+          }
+        ]
+      }
+    },
+    {
+      "id": "B6-imported",
+      "group": "basic",
+      "description": "Imported spirit with country of origin - full field coverage",
+      "expectedResult": "PASS",
+      "expectedReason": "All fields match including country of origin",
+      "actualResult": "FAIL",
+      "passed": false,
+      "error": null,
+      "latencyMs": 5603,
+      "imagePath": "sample-labels/label-imported.png",
+      "imageExists": true,
+      "applicationData": {
+        "brandName": "Glenfiddich",
+        "classType": "Single Malt Scotch Whisky",
+        "alcoholContent": "40% Alc./Vol. (80 Proof)",
+        "netContents": "750 mL",
+        "nameAddress": "William Grant & Sons, Dufftown, Banffshire, Scotland",
+        "countryOfOrigin": "Scotland",
+        "governmentWarning": "GOVERNMENT WARNING: (1) According to the Surgeon General, women should not drink alcoholic beverages during pregnancy because of the risk of birth defects. (2) Consumption of alcoholic beverages impairs your ability to drive a car or operate machinery, and may cause health problems."
+      },
+      "fieldResults": [
+        {
+          "fieldName": "Brand Name",
+          "applicationValue": "Glenfiddich",
+          "extractedValue": "Glenfiddich",
+          "status": "PASS",
+          "matchType": "fuzzy",
+          "confidence": 1,
+          "details": "Match (after normalization)"
+        },
+        {
+          "fieldName": "Class/Type",
+          "applicationValue": "Single Malt Scotch Whisky",
+          "extractedValue": "Single Malt Scotch Whisky",
+          "status": "PASS",
+          "matchType": "fuzzy",
+          "confidence": 1,
+          "details": "Match (after normalization)"
+        },
+        {
+          "fieldName": "Alcohol Content",
+          "applicationValue": "40% Alc./Vol. (80 Proof)",
+          "extractedValue": "40% Alc./Vol. (80 Proof)",
+          "status": "PASS",
+          "matchType": "abv",
+          "confidence": 1,
+          "details": "ABV match: 40%"
+        },
+        {
+          "fieldName": "Net Contents",
+          "applicationValue": "750 mL",
+          "extractedValue": "750 mL",
+          "status": "PASS",
+          "matchType": "volume",
+          "confidence": 1,
+          "details": "Volume match: 750 mL ≈ 750 mL (750.0 mL)"
+        },
+        {
+          "fieldName": "Name & Address",
+          "applicationValue": "William Grant & Sons, Dufftown, Banffshire, Scotland",
+          "extractedValue": "William Grant & Sons, Dufftown, Banffshire",
+          "status": "PASS",
+          "matchType": "address",
+          "confidence": 0.963265306122449,
+          "details": "Address match (96%)"
+        },
+        {
+          "fieldName": "Country of Origin",
+          "applicationValue": "Scotland",
+          "extractedValue": "Product of Scotland",
+          "status": "FAIL",
+          "matchType": "strict",
+          "confidence": 0,
+          "details": "Extra: \"Product, of\""
+        },
+        {
+          "fieldName": "Gov Warning — Present",
+          "applicationValue": "Required",
+          "extractedValue": "Found",
+          "status": "PASS",
+          "matchType": "strict",
+          "confidence": 1,
+          "details": "Warning statement found on label"
+        },
+        {
+          "fieldName": "Gov Warning — Header Caps",
+          "applicationValue": "ALL CAPS required",
+          "extractedValue": "ALL_CAPS",
+          "status": "PASS",
+          "matchType": "strict",
+          "confidence": 1,
+          "details": "Header in ALL CAPS ✓"
+        },
+        {
+          "fieldName": "Gov Warning — Header Bold",
+          "applicationValue": "Bold required",
+          "extractedValue": "APPEARS_BOLD_OR_HEAVY",
+          "status": "WARNING",
+          "matchType": "strict",
+          "confidence": 0.5,
+          "details": "Header appears visually emphasized (best-effort assessment) — agent should visually confirm bold formatting"
+        },
+        {
+          "fieldName": "Gov Warning — Text Accuracy",
+          "applicationValue": "GOVERNMENT WARNING: (1) According to the Surgeo...",
+          "extractedValue": "GOVERNMENT WARNING: (1) According to the Surgeo...",
+          "status": "PASS",
+          "matchType": "strict",
+          "confidence": 1,
+          "details": "Exact match"
+        }
+      ],
+      "rawResponse": {
+        "overallStatus": "FAIL",
+        "processingTimeMs": 5596,
+        "extractedFields": {
+          "brandName": "Glenfiddich",
+          "classType": "Single Malt Scotch Whisky",
+          "alcoholContent": "40% Alc./Vol. (80 Proof)",
+          "netContents": "750 mL",
+          "nameAddress": "William Grant & Sons, Dufftown, Banffshire",
+          "countryOfOrigin": "Product of Scotland",
+          "governmentWarning": "GOVERNMENT WARNING: (1) According to the Surgeon General, women should not drink alcoholic beverages during pregnancy because of the risk of birth defects. (2) Consumption of alcoholic beverages impairs your ability to drive a car or operate machinery, and may cause health problems.",
+          "governmentWarningHeaderFormat": "ALL_CAPS",
+          "governmentWarningHeaderEmphasis": "APPEARS_BOLD_OR_HEAVY",
+          "additionalObservations": "The label also includes \"12 Years Old\" as an age statement. The text is clearly readable with good contrast against the cream/tan colored background."
+        },
+        "fieldResults": [
+          {
+            "fieldName": "Brand Name",
+            "applicationValue": "Glenfiddich",
+            "extractedValue": "Glenfiddich",
+            "status": "PASS",
+            "matchType": "fuzzy",
+            "confidence": 1,
+            "details": "Match (after normalization)"
+          },
+          {
+            "fieldName": "Class/Type",
+            "applicationValue": "Single Malt Scotch Whisky",
+            "extractedValue": "Single Malt Scotch Whisky",
+            "status": "PASS",
+            "matchType": "fuzzy",
+            "confidence": 1,
+            "details": "Match (after normalization)"
+          },
+          {
+            "fieldName": "Alcohol Content",
+            "applicationValue": "40% Alc./Vol. (80 Proof)",
+            "extractedValue": "40% Alc./Vol. (80 Proof)",
+            "status": "PASS",
+            "matchType": "abv",
+            "confidence": 1,
+            "details": "ABV match: 40%"
+          },
+          {
+            "fieldName": "Net Contents",
+            "applicationValue": "750 mL",
+            "extractedValue": "750 mL",
+            "status": "PASS",
+            "matchType": "volume",
+            "confidence": 1,
+            "details": "Volume match: 750 mL ≈ 750 mL (750.0 mL)"
+          },
+          {
+            "fieldName": "Name & Address",
+            "applicationValue": "William Grant & Sons, Dufftown, Banffshire, Scotland",
+            "extractedValue": "William Grant & Sons, Dufftown, Banffshire",
+            "status": "PASS",
+            "matchType": "address",
+            "confidence": 0.963265306122449,
+            "details": "Address match (96%)"
+          },
+          {
+            "fieldName": "Country of Origin",
+            "applicationValue": "Scotland",
+            "extractedValue": "Product of Scotland",
+            "status": "FAIL",
+            "matchType": "strict",
+            "confidence": 0,
+            "details": "Extra: \"Product, of\""
+          },
+          {
+            "fieldName": "Gov Warning — Present",
+            "applicationValue": "Required",
+            "extractedValue": "Found",
+            "status": "PASS",
+            "matchType": "strict",
+            "confidence": 1,
+            "details": "Warning statement found on label"
+          },
+          {
+            "fieldName": "Gov Warning — Header Caps",
+            "applicationValue": "ALL CAPS required",
+            "extractedValue": "ALL_CAPS",
+            "status": "PASS",
+            "matchType": "strict",
+            "confidence": 1,
+            "details": "Header in ALL CAPS ✓"
+          },
+          {
+            "fieldName": "Gov Warning — Header Bold",
+            "applicationValue": "Bold required",
+            "extractedValue": "APPEARS_BOLD_OR_HEAVY",
+            "status": "WARNING",
+            "matchType": "strict",
+            "confidence": 0.5,
+            "details": "Header appears visually emphasized (best-effort assessment) — agent should visually confirm bold formatting"
+          },
+          {
+            "fieldName": "Gov Warning — Text Accuracy",
+            "applicationValue": "GOVERNMENT WARNING: (1) According to the Surgeo...",
+            "extractedValue": "GOVERNMENT WARNING: (1) According to the Surgeo...",
+            "status": "PASS",
+            "matchType": "strict",
+            "confidence": 1,
+            "details": "Exact match"
+          }
+        ]
+      }
+    },
+    {
+      "id": "I1-proof-to-abv",
+      "group": "intermediate",
+      "description": "Proof to ABV conversion - label shows 90 Proof, app has 45%",
+      "expectedResult": "PASS",
+      "expectedReason": "90 Proof = 45% ABV via conversion",
+      "actualResult": "REVIEW",
+      "passed": true,
+      "error": null,
+      "latencyMs": 4820,
+      "imagePath": "sample-labels/label-proof-to-abv.png",
+      "imageExists": true,
+      "applicationData": {
+        "brandName": "Copper Still",
+        "classType": "Tennessee Whiskey",
+        "alcoholContent": "45%",
+        "netContents": "750 mL",
+        "nameAddress": "Copper Still Distillery, Lynchburg, Tennessee",
+        "countryOfOrigin": "",
+        "governmentWarning": "GOVERNMENT WARNING: (1) According to the Surgeon General, women should not drink alcoholic beverages during pregnancy because of the risk of birth defects. (2) Consumption of alcoholic beverages impairs your ability to drive a car or operate machinery, and may cause health problems."
+      },
+      "fieldResults": [
+        {
+          "fieldName": "Brand Name",
+          "applicationValue": "Copper Still",
+          "extractedValue": "COPPER STILL",
+          "status": "PASS",
+          "matchType": "fuzzy",
+          "confidence": 1,
+          "details": "Match (after normalization)"
+        },
+        {
+          "fieldName": "Class/Type",
+          "applicationValue": "Tennessee Whiskey",
+          "extractedValue": "Tennessee Whiskey",
+          "status": "PASS",
+          "matchType": "fuzzy",
+          "confidence": 1,
+          "details": "Match (after normalization)"
+        },
+        {
+          "fieldName": "Alcohol Content",
+          "applicationValue": "45%",
+          "extractedValue": "90 Proof",
+          "status": "PASS",
+          "matchType": "abv",
+          "confidence": 1,
+          "details": "ABV match: 45% (converted: proof on label, percentage on application)"
+        },
+        {
+          "fieldName": "Net Contents",
+          "applicationValue": "750 mL",
+          "extractedValue": "750 mL",
+          "status": "PASS",
+          "matchType": "volume",
+          "confidence": 1,
+          "details": "Volume match: 750 mL ≈ 750 mL (750.0 mL)"
+        },
+        {
+          "fieldName": "Name & Address",
+          "applicationValue": "Copper Still Distillery, Lynchburg, Tennessee",
+          "extractedValue": "Copper Still Distillery, Lynchburg, Tennessee",
+          "status": "PASS",
+          "matchType": "address",
+          "confidence": 1,
+          "details": "Exact address match"
+        },
+        {
+          "fieldName": "Gov Warning — Present",
+          "applicationValue": "Required",
+          "extractedValue": "Found",
+          "status": "PASS",
+          "matchType": "strict",
+          "confidence": 1,
+          "details": "Warning statement found on label"
+        },
+        {
+          "fieldName": "Gov Warning — Header Caps",
+          "applicationValue": "ALL CAPS required",
+          "extractedValue": "ALL_CAPS",
+          "status": "PASS",
+          "matchType": "strict",
+          "confidence": 1,
+          "details": "Header in ALL CAPS ✓"
+        },
+        {
+          "fieldName": "Gov Warning — Header Bold",
+          "applicationValue": "Bold required",
+          "extractedValue": "APPEARS_BOLD_OR_HEAVY",
+          "status": "WARNING",
+          "matchType": "strict",
+          "confidence": 0.5,
+          "details": "Header appears visually emphasized (best-effort assessment) — agent should visually confirm bold formatting"
+        },
+        {
+          "fieldName": "Gov Warning — Text Accuracy",
+          "applicationValue": "GOVERNMENT WARNING: (1) According to the Surgeo...",
+          "extractedValue": "GOVERNMENT WARNING: (1) According to the Surgeo...",
+          "status": "PASS",
+          "matchType": "strict",
+          "confidence": 1,
+          "details": "Exact match"
+        }
+      ],
+      "rawResponse": {
+        "overallStatus": "REVIEW",
+        "processingTimeMs": 4813,
+        "extractedFields": {
+          "brandName": "COPPER STILL",
+          "classType": "Tennessee Whiskey",
+          "alcoholContent": "90 Proof",
+          "netContents": "750 mL",
+          "nameAddress": "Copper Still Distillery, Lynchburg, Tennessee",
+          "countryOfOrigin": "null",
+          "governmentWarning": "GOVERNMENT WARNING: (1) According to the Surgeon General, women should not drink alcoholic beverages during pregnancy because of the risk of birth defects. (2) Consumption of alcoholic beverages impairs your ability to drive a car or operate machinery, and may cause health problems.",
+          "governmentWarningHeaderFormat": "ALL_CAPS",
+          "governmentWarningHeaderEmphasis": "APPEARS_BOLD_OR_HEAVY",
+          "additionalObservations": "null"
+        },
+        "fieldResults": [
+          {
+            "fieldName": "Brand Name",
+            "applicationValue": "Copper Still",
+            "extractedValue": "COPPER STILL",
+            "status": "PASS",
+            "matchType": "fuzzy",
+            "confidence": 1,
+            "details": "Match (after normalization)"
+          },
+          {
+            "fieldName": "Class/Type",
+            "applicationValue": "Tennessee Whiskey",
+            "extractedValue": "Tennessee Whiskey",
+            "status": "PASS",
+            "matchType": "fuzzy",
+            "confidence": 1,
+            "details": "Match (after normalization)"
+          },
+          {
+            "fieldName": "Alcohol Content",
+            "applicationValue": "45%",
+            "extractedValue": "90 Proof",
+            "status": "PASS",
+            "matchType": "abv",
+            "confidence": 1,
+            "details": "ABV match: 45% (converted: proof on label, percentage on application)"
+          },
+          {
+            "fieldName": "Net Contents",
+            "applicationValue": "750 mL",
+            "extractedValue": "750 mL",
+            "status": "PASS",
+            "matchType": "volume",
+            "confidence": 1,
+            "details": "Volume match: 750 mL ≈ 750 mL (750.0 mL)"
+          },
+          {
+            "fieldName": "Name & Address",
+            "applicationValue": "Copper Still Distillery, Lynchburg, Tennessee",
+            "extractedValue": "Copper Still Distillery, Lynchburg, Tennessee",
+            "status": "PASS",
+            "matchType": "address",
+            "confidence": 1,
+            "details": "Exact address match"
+          },
+          {
+            "fieldName": "Gov Warning — Present",
+            "applicationValue": "Required",
+            "extractedValue": "Found",
+            "status": "PASS",
+            "matchType": "strict",
+            "confidence": 1,
+            "details": "Warning statement found on label"
+          },
+          {
+            "fieldName": "Gov Warning — Header Caps",
+            "applicationValue": "ALL CAPS required",
+            "extractedValue": "ALL_CAPS",
+            "status": "PASS",
+            "matchType": "strict",
+            "confidence": 1,
+            "details": "Header in ALL CAPS ✓"
+          },
+          {
+            "fieldName": "Gov Warning — Header Bold",
+            "applicationValue": "Bold required",
+            "extractedValue": "APPEARS_BOLD_OR_HEAVY",
+            "status": "WARNING",
+            "matchType": "strict",
+            "confidence": 0.5,
+            "details": "Header appears visually emphasized (best-effort assessment) — agent should visually confirm bold formatting"
+          },
+          {
+            "fieldName": "Gov Warning — Text Accuracy",
+            "applicationValue": "GOVERNMENT WARNING: (1) According to the Surgeo...",
+            "extractedValue": "GOVERNMENT WARNING: (1) According to the Surgeo...",
+            "status": "PASS",
+            "matchType": "strict",
+            "confidence": 1,
+            "details": "Exact match"
+          }
+        ]
+      },
+      "note": "REVIEW acceptable - only bold warning"
+    },
+    {
+      "id": "I2-ml-to-floz",
+      "group": "intermediate",
+      "description": "mL to fl oz conversion - label shows 750 mL, app has 25.4 fl oz",
+      "expectedResult": "PASS",
+      "expectedReason": "750 mL ≈ 25.4 fl oz via conversion (within 0.5% tolerance)",
+      "actualResult": "REVIEW",
+      "passed": false,
+      "error": null,
+      "latencyMs": 6023,
+      "imagePath": "sample-labels/label-ml-to-floz.png",
+      "imageExists": true,
+      "applicationData": {
+        "brandName": "Verde",
+        "classType": "London Dry Gin",
+        "alcoholContent": "47% Alc./Vol.",
+        "netContents": "25.4 fl oz",
+        "nameAddress": "Verde Spirits Co., Portland, Oregon",
+        "countryOfOrigin": "",
+        "governmentWarning": "GOVERNMENT WARNING: (1) According to the Surgeon General, women should not drink alcoholic beverages during pregnancy because of the risk of birth defects. (2) Consumption of alcoholic beverages impairs your ability to drive a car or operate machinery, and may cause health problems."
+      },
+      "fieldResults": [
+        {
+          "fieldName": "Brand Name",
+          "applicationValue": "Verde",
+          "extractedValue": "VERDE",
+          "status": "PASS",
+          "matchType": "fuzzy",
+          "confidence": 1,
+          "details": "Match (after normalization)"
+        },
+        {
+          "fieldName": "Class/Type",
+          "applicationValue": "London Dry Gin",
+          "extractedValue": "London Dry Gin",
+          "status": "PASS",
+          "matchType": "fuzzy",
+          "confidence": 1,
+          "details": "Match (after normalization)"
+        },
+        {
+          "fieldName": "Alcohol Content",
+          "applicationValue": "47% Alc./Vol.",
+          "extractedValue": "47% Alc./Vol.",
+          "status": "PASS",
+          "matchType": "abv",
+          "confidence": 1,
+          "details": "ABV match: 47%"
+        },
+        {
+          "fieldName": "Net Contents",
+          "applicationValue": "25.4 fl oz",
+          "extractedValue": "750 mL",
+          "status": "PASS",
+          "matchType": "volume",
+          "confidence": 1,
+          "details": "Volume match: 750 mL ≈ 25.4 fl oz (750.0 mL)"
+        },
+        {
+          "fieldName": "Name & Address",
+          "applicationValue": "Verde Spirits Co., Portland, Oregon",
+          "extractedValue": "Distilled and Bottled by Verde Spirits Co.\nPortland, Oregon",
+          "status": "WARNING",
+          "matchType": "address",
+          "confidence": 0.70796783625731,
+          "details": "Address partial match (71%) — agent review recommended. Labels often abbreviate or omit parts of the full address."
+        },
+        {
+          "fieldName": "Gov Warning — Present",
+          "applicationValue": "Required",
+          "extractedValue": "Found",
+          "status": "PASS",
+          "matchType": "strict",
+          "confidence": 1,
+          "details": "Warning statement found on label"
+        },
+        {
+          "fieldName": "Gov Warning — Header Caps",
+          "applicationValue": "ALL CAPS required",
+          "extractedValue": "ALL_CAPS",
+          "status": "PASS",
+          "matchType": "strict",
+          "confidence": 1,
+          "details": "Header in ALL CAPS ✓"
+        },
+        {
+          "fieldName": "Gov Warning — Header Bold",
+          "applicationValue": "Bold required",
+          "extractedValue": "APPEARS_BOLD_OR_HEAVY",
+          "status": "WARNING",
+          "matchType": "strict",
+          "confidence": 0.5,
+          "details": "Header appears visually emphasized (best-effort assessment) — agent should visually confirm bold formatting"
+        },
+        {
+          "fieldName": "Gov Warning — Text Accuracy",
+          "applicationValue": "GOVERNMENT WARNING: (1) According to the Surgeo...",
+          "extractedValue": "GOVERNMENT WARNING: (1) According to the Surgeo...",
+          "status": "PASS",
+          "matchType": "strict",
+          "confidence": 1,
+          "details": "Exact match"
+        }
+      ],
+      "rawResponse": {
+        "overallStatus": "REVIEW",
+        "processingTimeMs": 6017,
+        "extractedFields": {
+          "brandName": "VERDE",
+          "classType": "London Dry Gin",
+          "alcoholContent": "47% Alc./Vol.",
+          "netContents": "750 mL",
+          "nameAddress": "Distilled and Bottled by Verde Spirits Co.\nPortland, Oregon",
+          "countryOfOrigin": "null",
+          "governmentWarning": "GOVERNMENT WARNING: (1) According to the Surgeon General, women should not drink alcoholic beverages during pregnancy because of the risk of birth defects. (2) Consumption of alcoholic beverages impairs your ability to drive a car or operate machinery, and may cause health problems.",
+          "governmentWarningHeaderFormat": "ALL_CAPS",
+          "governmentWarningHeaderEmphasis": "APPEARS_BOLD_OR_HEAVY",
+          "additionalObservations": "null"
+        },
+        "fieldResults": [
+          {
+            "fieldName": "Brand Name",
+            "applicationValue": "Verde",
+            "extractedValue": "VERDE",
+            "status": "PASS",
+            "matchType": "fuzzy",
+            "confidence": 1,
+            "details": "Match (after normalization)"
+          },
+          {
+            "fieldName": "Class/Type",
+            "applicationValue": "London Dry Gin",
+            "extractedValue": "London Dry Gin",
+            "status": "PASS",
+            "matchType": "fuzzy",
+            "confidence": 1,
+            "details": "Match (after normalization)"
+          },
+          {
+            "fieldName": "Alcohol Content",
+            "applicationValue": "47% Alc./Vol.",
+            "extractedValue": "47% Alc./Vol.",
+            "status": "PASS",
+            "matchType": "abv",
+            "confidence": 1,
+            "details": "ABV match: 47%"
+          },
+          {
+            "fieldName": "Net Contents",
+            "applicationValue": "25.4 fl oz",
+            "extractedValue": "750 mL",
+            "status": "PASS",
+            "matchType": "volume",
+            "confidence": 1,
+            "details": "Volume match: 750 mL ≈ 25.4 fl oz (750.0 mL)"
+          },
+          {
+            "fieldName": "Name & Address",
+            "applicationValue": "Verde Spirits Co., Portland, Oregon",
+            "extractedValue": "Distilled and Bottled by Verde Spirits Co.\nPortland, Oregon",
+            "status": "WARNING",
+            "matchType": "address",
+            "confidence": 0.70796783625731,
+            "details": "Address partial match (71%) — agent review recommended. Labels often abbreviate or omit parts of the full address."
+          },
+          {
+            "fieldName": "Gov Warning — Present",
+            "applicationValue": "Required",
+            "extractedValue": "Found",
+            "status": "PASS",
+            "matchType": "strict",
+            "confidence": 1,
+            "details": "Warning statement found on label"
+          },
+          {
+            "fieldName": "Gov Warning — Header Caps",
+            "applicationValue": "ALL CAPS required",
+            "extractedValue": "ALL_CAPS",
+            "status": "PASS",
+            "matchType": "strict",
+            "confidence": 1,
+            "details": "Header in ALL CAPS ✓"
+          },
+          {
+            "fieldName": "Gov Warning — Header Bold",
+            "applicationValue": "Bold required",
+            "extractedValue": "APPEARS_BOLD_OR_HEAVY",
+            "status": "WARNING",
+            "matchType": "strict",
+            "confidence": 0.5,
+            "details": "Header appears visually emphasized (best-effort assessment) — agent should visually confirm bold formatting"
+          },
+          {
+            "fieldName": "Gov Warning — Text Accuracy",
+            "applicationValue": "GOVERNMENT WARNING: (1) According to the Surgeo...",
+            "extractedValue": "GOVERNMENT WARNING: (1) According to the Surgeo...",
+            "status": "PASS",
+            "matchType": "strict",
+            "confidence": 1,
+            "details": "Exact match"
+          }
+        ]
+      }
+    },
+    {
+      "id": "I3-address-abbrev",
+      "group": "intermediate",
+      "description": "Address abbreviations - label has St./Ste./KY, app has full words",
+      "expectedResult": "PASS",
+      "expectedReason": "Address normalization expands abbreviations before comparison",
+      "actualResult": "REVIEW",
+      "passed": false,
+      "error": null,
+      "latencyMs": 7103,
+      "imagePath": "sample-labels/label-address-abbrev.png",
+      "imageExists": true,
+      "applicationData": {
+        "brandName": "Midnight Reserve",
+        "classType": "Small Batch Bourbon",
+        "alcoholContent": "46% Alc./Vol.",
+        "netContents": "750 mL",
+        "nameAddress": "Midnight Reserve Distillery, 456 Oak Street, Suite 100, Lexington, Kentucky 40507",
+        "countryOfOrigin": "",
+        "governmentWarning": "GOVERNMENT WARNING: (1) According to the Surgeon General, women should not drink alcoholic beverages during pregnancy because of the risk of birth defects. (2) Consumption of alcoholic beverages impairs your ability to drive a car or operate machinery, and may cause health problems."
+      },
+      "fieldResults": [
+        {
+          "fieldName": "Brand Name",
+          "applicationValue": "Midnight Reserve",
+          "extractedValue": "Midnight Reserve",
+          "status": "PASS",
+          "matchType": "fuzzy",
+          "confidence": 1,
+          "details": "Match (after normalization)"
+        },
+        {
+          "fieldName": "Class/Type",
+          "applicationValue": "Small Batch Bourbon",
+          "extractedValue": "Small Batch Bourbon",
+          "status": "PASS",
+          "matchType": "fuzzy",
+          "confidence": 1,
+          "details": "Match (after normalization)"
+        },
+        {
+          "fieldName": "Alcohol Content",
+          "applicationValue": "46% Alc./Vol.",
+          "extractedValue": "46% Alc./Vol.",
+          "status": "PASS",
+          "matchType": "abv",
+          "confidence": 1,
+          "details": "ABV match: 46%"
+        },
+        {
+          "fieldName": "Net Contents",
+          "applicationValue": "750 mL",
+          "extractedValue": "750 mL",
+          "status": "PASS",
+          "matchType": "volume",
+          "confidence": 1,
+          "details": "Volume match: 750 mL ≈ 750 mL (750.0 mL)"
+        },
+        {
+          "fieldName": "Name & Address",
+          "applicationValue": "Midnight Reserve Distillery, 456 Oak Street, Suite 100, Lexington, Kentucky 40507",
+          "extractedValue": "Bottled by Midnight Reserve Distillery\n456 Oak St., Ste. 100\nLexington, KY 40507",
+          "status": "WARNING",
+          "matchType": "address",
+          "confidence": 0.7999798953691369,
+          "details": "Address partial match (80%) — agent review recommended. Labels often abbreviate or omit parts of the full address."
+        },
+        {
+          "fieldName": "Gov Warning — Present",
+          "applicationValue": "Required",
+          "extractedValue": "Found",
+          "status": "PASS",
+          "matchType": "strict",
+          "confidence": 1,
+          "details": "Warning statement found on label"
+        },
+        {
+          "fieldName": "Gov Warning — Header Caps",
+          "applicationValue": "ALL CAPS required",
+          "extractedValue": "ALL_CAPS",
+          "status": "PASS",
+          "matchType": "strict",
+          "confidence": 1,
+          "details": "Header in ALL CAPS ✓"
+        },
+        {
+          "fieldName": "Gov Warning — Header Bold",
+          "applicationValue": "Bold required",
+          "extractedValue": "APPEARS_BOLD_OR_HEAVY",
+          "status": "WARNING",
+          "matchType": "strict",
+          "confidence": 0.5,
+          "details": "Header appears visually emphasized (best-effort assessment) — agent should visually confirm bold formatting"
+        },
+        {
+          "fieldName": "Gov Warning — Text Accuracy",
+          "applicationValue": "GOVERNMENT WARNING: (1) According to the Surgeo...",
+          "extractedValue": "GOVERNMENT WARNING: (1) According to the Surgeo...",
+          "status": "PASS",
+          "matchType": "strict",
+          "confidence": 1,
+          "details": "Exact match"
+        }
+      ],
+      "rawResponse": {
+        "overallStatus": "REVIEW",
+        "processingTimeMs": 7095,
+        "extractedFields": {
+          "brandName": "Midnight Reserve",
+          "classType": "Small Batch Bourbon",
+          "alcoholContent": "46% Alc./Vol.",
+          "netContents": "750 mL",
+          "nameAddress": "Bottled by Midnight Reserve Distillery\n456 Oak St., Ste. 100\nLexington, KY 40507",
+          "countryOfOrigin": "null",
+          "governmentWarning": "GOVERNMENT WARNING: (1) According to the Surgeon General, women should not drink alcoholic beverages during pregnancy because of the risk of birth defects. (2) Consumption of alcoholic beverages impairs your ability to drive a car or operate machinery, and may cause health problems.",
+          "governmentWarningHeaderFormat": "ALL_CAPS",
+          "governmentWarningHeaderEmphasis": "APPEARS_BOLD_OR_HEAVY",
+          "additionalObservations": "null"
+        },
+        "fieldResults": [
+          {
+            "fieldName": "Brand Name",
+            "applicationValue": "Midnight Reserve",
+            "extractedValue": "Midnight Reserve",
+            "status": "PASS",
+            "matchType": "fuzzy",
+            "confidence": 1,
+            "details": "Match (after normalization)"
+          },
+          {
+            "fieldName": "Class/Type",
+            "applicationValue": "Small Batch Bourbon",
+            "extractedValue": "Small Batch Bourbon",
+            "status": "PASS",
+            "matchType": "fuzzy",
+            "confidence": 1,
+            "details": "Match (after normalization)"
+          },
+          {
+            "fieldName": "Alcohol Content",
+            "applicationValue": "46% Alc./Vol.",
+            "extractedValue": "46% Alc./Vol.",
+            "status": "PASS",
+            "matchType": "abv",
+            "confidence": 1,
+            "details": "ABV match: 46%"
+          },
+          {
+            "fieldName": "Net Contents",
+            "applicationValue": "750 mL",
+            "extractedValue": "750 mL",
+            "status": "PASS",
+            "matchType": "volume",
+            "confidence": 1,
+            "details": "Volume match: 750 mL ≈ 750 mL (750.0 mL)"
+          },
+          {
+            "fieldName": "Name & Address",
+            "applicationValue": "Midnight Reserve Distillery, 456 Oak Street, Suite 100, Lexington, Kentucky 40507",
+            "extractedValue": "Bottled by Midnight Reserve Distillery\n456 Oak St., Ste. 100\nLexington, KY 40507",
+            "status": "WARNING",
+            "matchType": "address",
+            "confidence": 0.7999798953691369,
+            "details": "Address partial match (80%) — agent review recommended. Labels often abbreviate or omit parts of the full address."
+          },
+          {
+            "fieldName": "Gov Warning — Present",
+            "applicationValue": "Required",
+            "extractedValue": "Found",
+            "status": "PASS",
+            "matchType": "strict",
+            "confidence": 1,
+            "details": "Warning statement found on label"
+          },
+          {
+            "fieldName": "Gov Warning — Header Caps",
+            "applicationValue": "ALL CAPS required",
+            "extractedValue": "ALL_CAPS",
+            "status": "PASS",
+            "matchType": "strict",
+            "confidence": 1,
+            "details": "Header in ALL CAPS ✓"
+          },
+          {
+            "fieldName": "Gov Warning — Header Bold",
+            "applicationValue": "Bold required",
+            "extractedValue": "APPEARS_BOLD_OR_HEAVY",
+            "status": "WARNING",
+            "matchType": "strict",
+            "confidence": 0.5,
+            "details": "Header appears visually emphasized (best-effort assessment) — agent should visually confirm bold formatting"
+          },
+          {
+            "fieldName": "Gov Warning — Text Accuracy",
+            "applicationValue": "GOVERNMENT WARNING: (1) According to the Surgeo...",
+            "extractedValue": "GOVERNMENT WARNING: (1) According to the Surgeo...",
+            "status": "PASS",
+            "matchType": "strict",
+            "confidence": 1,
+            "details": "Exact match"
+          }
+        ]
+      }
+    },
+    {
+      "id": "I4-punctuation",
+      "group": "intermediate",
+      "description": "Punctuation variance - label has apostrophe, app doesn't",
+      "expectedResult": "PASS",
+      "expectedReason": "Normalization handles apostrophe differences",
+      "actualResult": "REVIEW",
+      "passed": false,
+      "error": null,
+      "latencyMs": 5250,
+      "imagePath": "sample-labels/label-punctuation.png",
+      "imageExists": true,
+      "applicationData": {
+        "brandName": "Makers Mark",
+        "classType": "Kentucky Bourbon Whisky",
+        "alcoholContent": "45% Alc./Vol. (90 Proof)",
+        "netContents": "750 mL",
+        "nameAddress": "Makers Mark Distillery, Inc., Loretto, Kentucky",
+        "countryOfOrigin": "",
+        "governmentWarning": "GOVERNMENT WARNING: (1) According to the Surgeon General, women should not drink alcoholic beverages during pregnancy because of the risk of birth defects. (2) Consumption of alcoholic beverages impairs your ability to drive a car or operate machinery, and may cause health problems."
+      },
+      "fieldResults": [
+        {
+          "fieldName": "Brand Name",
+          "applicationValue": "Makers Mark",
+          "extractedValue": "Maker's Mark",
+          "status": "PASS",
+          "matchType": "fuzzy",
+          "confidence": 0.9833333333333333,
+          "details": "High similarity (98%) — minor formatting differences"
+        },
+        {
+          "fieldName": "Class/Type",
+          "applicationValue": "Kentucky Bourbon Whisky",
+          "extractedValue": "KENTUCKY BOURBON WHISKY",
+          "status": "PASS",
+          "matchType": "fuzzy",
+          "confidence": 1,
+          "details": "Match (after normalization)"
+        },
+        {
+          "fieldName": "Alcohol Content",
+          "applicationValue": "45% Alc./Vol. (90 Proof)",
+          "extractedValue": "45% Alc./Vol. (90 Proof)",
+          "status": "PASS",
+          "matchType": "abv",
+          "confidence": 1,
+          "details": "ABV match: 45%"
+        },
+        {
+          "fieldName": "Net Contents",
+          "applicationValue": "750 mL",
+          "extractedValue": "750 mL",
+          "status": "PASS",
+          "matchType": "volume",
+          "confidence": 1,
+          "details": "Volume match: 750 mL ≈ 750 mL (750.0 mL)"
+        },
+        {
+          "fieldName": "Name & Address",
+          "applicationValue": "Makers Mark Distillery, Inc., Loretto, Kentucky",
+          "extractedValue": "Distilled and Bottled by\nMaker's Mark Distillery, Inc.\nLoretto, Kentucky",
+          "status": "WARNING",
+          "matchType": "address",
+          "confidence": 0.7193573755757781,
+          "details": "Address partial match (72%) — agent review recommended. Labels often abbreviate or omit parts of the full address."
+        },
+        {
+          "fieldName": "Gov Warning — Present",
+          "applicationValue": "Required",
+          "extractedValue": "Found",
+          "status": "PASS",
+          "matchType": "strict",
+          "confidence": 1,
+          "details": "Warning statement found on label"
+        },
+        {
+          "fieldName": "Gov Warning — Header Caps",
+          "applicationValue": "ALL CAPS required",
+          "extractedValue": "ALL_CAPS",
+          "status": "PASS",
+          "matchType": "strict",
+          "confidence": 1,
+          "details": "Header in ALL CAPS ✓"
+        },
+        {
+          "fieldName": "Gov Warning — Header Bold",
+          "applicationValue": "Bold required",
+          "extractedValue": "APPEARS_BOLD_OR_HEAVY",
+          "status": "WARNING",
+          "matchType": "strict",
+          "confidence": 0.5,
+          "details": "Header appears visually emphasized (best-effort assessment) — agent should visually confirm bold formatting"
+        },
+        {
+          "fieldName": "Gov Warning — Text Accuracy",
+          "applicationValue": "GOVERNMENT WARNING: (1) According to the Surgeo...",
+          "extractedValue": "GOVERNMENT WARNING: (1) According to the Surgeo...",
+          "status": "PASS",
+          "matchType": "strict",
+          "confidence": 1,
+          "details": "Exact match"
+        }
+      ],
+      "rawResponse": {
+        "overallStatus": "REVIEW",
+        "processingTimeMs": 5241,
+        "extractedFields": {
+          "brandName": "Maker's Mark",
+          "classType": "KENTUCKY BOURBON WHISKY",
+          "alcoholContent": "45% Alc./Vol. (90 Proof)",
+          "netContents": "750 mL",
+          "nameAddress": "Distilled and Bottled by\nMaker's Mark Distillery, Inc.\nLoretto, Kentucky",
+          "countryOfOrigin": "null",
+          "governmentWarning": "GOVERNMENT WARNING: (1) According to the Surgeon General, women should not drink alcoholic beverages during pregnancy because of the risk of birth defects. (2) Consumption of alcoholic beverages impairs your ability to drive a car or operate machinery, and may cause health problems.",
+          "governmentWarningHeaderFormat": "ALL_CAPS",
+          "governmentWarningHeaderEmphasis": "APPEARS_BOLD_OR_HEAVY",
+          "additionalObservations": "null"
+        },
+        "fieldResults": [
+          {
+            "fieldName": "Brand Name",
+            "applicationValue": "Makers Mark",
+            "extractedValue": "Maker's Mark",
+            "status": "PASS",
+            "matchType": "fuzzy",
+            "confidence": 0.9833333333333333,
+            "details": "High similarity (98%) — minor formatting differences"
+          },
+          {
+            "fieldName": "Class/Type",
+            "applicationValue": "Kentucky Bourbon Whisky",
+            "extractedValue": "KENTUCKY BOURBON WHISKY",
+            "status": "PASS",
+            "matchType": "fuzzy",
+            "confidence": 1,
+            "details": "Match (after normalization)"
+          },
+          {
+            "fieldName": "Alcohol Content",
+            "applicationValue": "45% Alc./Vol. (90 Proof)",
+            "extractedValue": "45% Alc./Vol. (90 Proof)",
+            "status": "PASS",
+            "matchType": "abv",
+            "confidence": 1,
+            "details": "ABV match: 45%"
+          },
+          {
+            "fieldName": "Net Contents",
+            "applicationValue": "750 mL",
+            "extractedValue": "750 mL",
+            "status": "PASS",
+            "matchType": "volume",
+            "confidence": 1,
+            "details": "Volume match: 750 mL ≈ 750 mL (750.0 mL)"
+          },
+          {
+            "fieldName": "Name & Address",
+            "applicationValue": "Makers Mark Distillery, Inc., Loretto, Kentucky",
+            "extractedValue": "Distilled and Bottled by\nMaker's Mark Distillery, Inc.\nLoretto, Kentucky",
+            "status": "WARNING",
+            "matchType": "address",
+            "confidence": 0.7193573755757781,
+            "details": "Address partial match (72%) — agent review recommended. Labels often abbreviate or omit parts of the full address."
+          },
+          {
+            "fieldName": "Gov Warning — Present",
+            "applicationValue": "Required",
+            "extractedValue": "Found",
+            "status": "PASS",
+            "matchType": "strict",
+            "confidence": 1,
+            "details": "Warning statement found on label"
+          },
+          {
+            "fieldName": "Gov Warning — Header Caps",
+            "applicationValue": "ALL CAPS required",
+            "extractedValue": "ALL_CAPS",
+            "status": "PASS",
+            "matchType": "strict",
+            "confidence": 1,
+            "details": "Header in ALL CAPS ✓"
+          },
+          {
+            "fieldName": "Gov Warning — Header Bold",
+            "applicationValue": "Bold required",
+            "extractedValue": "APPEARS_BOLD_OR_HEAVY",
+            "status": "WARNING",
+            "matchType": "strict",
+            "confidence": 0.5,
+            "details": "Header appears visually emphasized (best-effort assessment) — agent should visually confirm bold formatting"
+          },
+          {
+            "fieldName": "Gov Warning — Text Accuracy",
+            "applicationValue": "GOVERNMENT WARNING: (1) According to the Surgeo...",
+            "extractedValue": "GOVERNMENT WARNING: (1) According to the Surgeo...",
+            "status": "PASS",
+            "matchType": "strict",
+            "confidence": 1,
+            "details": "Exact match"
+          }
+        ]
+      }
+    }
+  ]
+}
