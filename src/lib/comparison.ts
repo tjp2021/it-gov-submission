@@ -4,6 +4,7 @@ import {
   normalizeText,
   normalizeWhitespace,
   normalizeAddress,
+  normalizeCountryOfOrigin,
   parseABV,
   parseVolume,
   wordDiff,
@@ -271,6 +272,49 @@ export function addressMatch(
 }
 
 /**
+ * Country of origin matching
+ * Normalizes "Product of X" format to just "X"
+ */
+export function countryMatch(
+  extracted: string | null,
+  expected: string
+): MatchResult {
+  if (!extracted) {
+    return {
+      status: "NOT_FOUND",
+      confidence: 0,
+      details: "Country of origin not found on label",
+    };
+  }
+
+  const a = normalizeCountryOfOrigin(extracted).toLowerCase();
+  const b = normalizeCountryOfOrigin(expected).toLowerCase();
+
+  if (a === b) {
+    return {
+      status: "PASS",
+      confidence: 1.0,
+      details: "Country of origin match",
+    };
+  }
+
+  // Check if one contains the other (e.g., "Scotland" in "Product of Scotland")
+  if (a.includes(b) || b.includes(a)) {
+    return {
+      status: "PASS",
+      confidence: 0.95,
+      details: "Country of origin match (format variation)",
+    };
+  }
+
+  return {
+    status: "FAIL",
+    confidence: 0,
+    details: `Country mismatch: label="${extracted}" vs application="${expected}"`,
+  };
+}
+
+/**
  * Route field comparison to appropriate matching function
  */
 export function compareField(
@@ -282,6 +326,8 @@ export function compareField(
   switch (matchType) {
     case "strict":
       return strictMatch(extracted, expected);
+    case "country":
+      return countryMatch(extracted, expected);
     case "abv":
       return matchABV(extracted, expected);
     case "volume":

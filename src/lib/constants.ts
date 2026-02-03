@@ -49,7 +49,7 @@ export const FIELD_CONFIG = {
   },
   countryOfOrigin: {
     displayName: "Country of Origin",
-    matchType: "strict" as const,
+    matchType: "country" as const,
     required: false,
   },
   governmentWarning: {
@@ -59,19 +59,91 @@ export const FIELD_CONFIG = {
   },
 } as const;
 
-// Address abbreviation normalizations
-export const ADDRESS_ABBREVIATIONS: Record<string, string> = {
+// Street type abbreviations
+export const STREET_ABBREVIATIONS: Record<string, string> = {
   st: "street",
   ave: "avenue",
   blvd: "boulevard",
   dr: "drive",
   rd: "road",
   ln: "lane",
-  ct: "court",
   pl: "place",
   cir: "circle",
   hwy: "highway",
   ste: "suite",
   apt: "apartment",
-  fl: "floor",
 };
+
+// US state abbreviations (2-letter postal codes)
+export const STATE_ABBREVIATIONS: Record<string, string> = {
+  al: "alabama",
+  ak: "alaska",
+  az: "arizona",
+  ar: "arkansas",
+  ca: "california",
+  co: "colorado",
+  ct: "connecticut",
+  de: "delaware",
+  fl: "florida",
+  ga: "georgia",
+  hi: "hawaii",
+  id: "idaho",
+  il: "illinois",
+  in: "indiana",
+  ia: "iowa",
+  ks: "kansas",
+  ky: "kentucky",
+  la: "louisiana",
+  me: "maine",
+  md: "maryland",
+  ma: "massachusetts",
+  mi: "michigan",
+  mn: "minnesota",
+  ms: "mississippi",
+  mo: "missouri",
+  mt: "montana",
+  ne: "nebraska",
+  nv: "nevada",
+  nh: "new hampshire",
+  nj: "new jersey",
+  nm: "new mexico",
+  ny: "new york",
+  nc: "north carolina",
+  nd: "north dakota",
+  oh: "ohio",
+  ok: "oklahoma",
+  or: "oregon",
+  pa: "pennsylvania",
+  ri: "rhode island",
+  sc: "south carolina",
+  sd: "south dakota",
+  tn: "tennessee",
+  tx: "texas",
+  ut: "utah",
+  vt: "vermont",
+  va: "virginia",
+  wa: "washington",
+  wv: "west virginia",
+  wi: "wisconsin",
+  wy: "wyoming",
+  dc: "district of columbia",
+};
+
+// Combined for backward compatibility (states take precedence for ambiguous cases like CT, FL)
+export const ADDRESS_ABBREVIATIONS: Record<string, string> = {
+  ...STREET_ABBREVIATIONS,
+  ...STATE_ABBREVIATIONS,
+};
+
+// Common production phrases to strip from addresses
+export const ADDRESS_PREFIXES_TO_STRIP = [
+  "distilled and bottled by",
+  "bottled by",
+  "vinted and bottled by",
+  "brewed by",
+  "produced by",
+  "made by",
+  "blended and bottled by",
+  "imported by",
+  "cellared and bottled by",
+];

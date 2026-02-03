@@ -181,12 +181,21 @@ export function parseVolume(s: string): ParsedVolume | null {
 
 /**
  * Normalize address for comparison
- * Expands common abbreviations
+ * Expands common abbreviations and strips production phrases
  */
-import { ADDRESS_ABBREVIATIONS } from "./constants";
+import { ADDRESS_ABBREVIATIONS, ADDRESS_PREFIXES_TO_STRIP } from "./constants";
 
 export function normalizeAddress(s: string): string {
   let normalized = s.toLowerCase();
+
+  // Strip common production phrases (e.g., "Distilled and Bottled by")
+  for (const prefix of ADDRESS_PREFIXES_TO_STRIP) {
+    const regex = new RegExp(`^${prefix}\\s*`, "i");
+    normalized = normalized.replace(regex, "");
+  }
+
+  // Remove newlines (label extraction often includes them)
+  normalized = normalized.replace(/\n/g, " ");
 
   // Expand abbreviations
   for (const [abbr, full] of Object.entries(ADDRESS_ABBREVIATIONS)) {
@@ -196,6 +205,19 @@ export function normalizeAddress(s: string): string {
 
   // Remove punctuation and collapse whitespace
   normalized = normalized.replace(/[.,]/g, "").replace(/\s+/g, " ").trim();
+
+  return normalized;
+}
+
+/**
+ * Normalize country of origin for comparison
+ * Handles "Product of X" format
+ */
+export function normalizeCountryOfOrigin(s: string): string {
+  let normalized = s.trim();
+
+  // Strip "Product of" prefix (case insensitive)
+  normalized = normalized.replace(/^product\s+of\s+/i, "");
 
   return normalized;
 }
