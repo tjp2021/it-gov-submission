@@ -3,6 +3,18 @@ import type { ExtractedFields } from "./types";
 
 const client = new Anthropic();
 
+// Model configuration - use CLAUDE_MODEL env var to switch
+// Options: "sonnet" (default, most accurate) or "haiku" (faster, lower cost)
+const MODEL_MAP = {
+  sonnet: "claude-sonnet-4-20250514",
+  haiku: "claude-haiku-3-5-20241022",
+} as const;
+
+function getModel(): string {
+  const modelKey = (process.env.CLAUDE_MODEL || "sonnet").toLowerCase();
+  return MODEL_MAP[modelKey as keyof typeof MODEL_MAP] || MODEL_MAP.sonnet;
+}
+
 // Tool definition for structured label extraction
 const extractLabelFieldsTool: Anthropic.Tool = {
   name: "extract_label_fields",
@@ -104,8 +116,9 @@ export async function extractLabelFields(
   mediaType: "image/jpeg" | "image/png" | "image/webp" | "image/gif"
 ): Promise<ExtractionResponse> {
   try {
+    const model = getModel();
     const response = await client.messages.create({
-      model: "claude-sonnet-4-20250514",
+      model,
       max_tokens: 1024,
       system: SYSTEM_PROMPT,
       tools: [extractLabelFieldsTool],
