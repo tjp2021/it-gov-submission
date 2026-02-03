@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>Test Label - Warning Title Case (Jenny Scenario)</title>
+  <style>
+    body {
+      margin: 0;
+      padding: 40px;
+      background: #1a1a1a;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      font-family: Arial, sans-serif;
+    }
+    .label {
+      width: 350px;
+      background: linear-gradient(180deg, #f7b32b 0%, #e09f1f 100%);
+      border: 3px solid #1a1a1a;
+      border-radius: 12px;
+      padding: 25px;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+    }
+    .brand {
+      text-align: center;
+      font-size: 42px;
+      font-weight: 900;
+      color: #1a1a1a;
+      margin-bottom: 5px;
+      text-transform: uppercase;
+    }
+    .class-type {
+      text-align: center;
+      font-size: 18px;
+      color: #333;
+      margin-bottom: 20px;
+      font-weight: bold;
+    }
+    .details {
+      display: flex;
+      justify-content: center;
+      gap: 40px;
+      margin: 20px 0;
+      padding: 15px;
+      background: rgba(0,0,0,0.1);
+      border-radius: 8px;
+    }
+    .detail-item {
+      text-align: center;
+    }
+    .detail-label {
+      font-size: 10px;
+      color: #555;
+      text-transform: uppercase;
+    }
+    .detail-value {
+      font-size: 16px;
+      font-weight: bold;
+      color: #1a1a1a;
+    }
+    .producer {
+      text-align: center;
+      font-size: 11px;
+      color: #444;
+      margin: 15px 0;
+    }
+    .warning {
+      margin-top: 15px;
+      padding: 12px;
+      background: #fff;
+      border-radius: 6px;
+      font-family: Arial, sans-serif;
+      font-size: 8px;
+      line-height: 1.4;
+      color: #333;
+    }
+    /* INTENTIONAL ERROR: Using title case instead of ALL CAPS */
+    .warning-header {
+      font-weight: bold;
+      /* NOT uppercase - this should fail verification */
+    }
+  </style>
+</head>
+<body>
+  <!-- This label has "Government Warning" in title case instead of "GOVERNMENT WARNING" - should FAIL -->
+  <div class="label">
+    <div class="brand">HopMaster</div>
+    <div class="class-type">India Pale Ale</div>
+
+    <div class="details">
+      <div class="detail-item">
+        <div class="detail-label">ABV</div>
+        <div class="detail-value">6.5%</div>
+      </div>
+      <div class="detail-item">
+        <div class="detail-label">Volume</div>
+        <div class="detail-value">12 FL. OZ.</div>
+      </div>
+    </div>
+
+    <div class="producer">
+      Brewed by HopMaster Brewing Co.<br>
+      Portland, Oregon
+    </div>
+
+    <div class="warning">
+      <span class="warning-header">Government Warning:</span> (1) According to the Surgeon General, women should not drink alcoholic beverages during pregnancy because of the risk of birth defects. (2) Consumption of alcoholic beverages impairs your ability to drive a car or operate machinery, and may cause health problems.
+    </div>
+  </div>
+</body>
+</html>

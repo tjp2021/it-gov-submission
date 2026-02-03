@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>Test Label - Wrong ABV</title>
+  <style>
+    body {
+      margin: 0;
+      padding: 40px;
+      background: #1a1a1a;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      font-family: 'Times New Roman', serif;
+    }
+    .label {
+      width: 380px;
+      background: linear-gradient(180deg, #722f37 0%, #4a1c24 100%);
+      border: 2px solid #d4af37;
+      border-radius: 4px;
+      padding: 25px;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+      color: #f5f5f5;
+    }
+    .vintage {
+      text-align: center;
+      font-size: 14px;
+      color: #d4af37;
+      margin-bottom: 5px;
+    }
+    .brand {
+      text-align: center;
+      font-size: 28px;
+      font-weight: bold;
+      color: #fff;
+      margin-bottom: 8px;
+      font-family: 'Palatino', serif;
+    }
+    .class-type {
+      text-align: center;
+      font-size: 16px;
+      color: #d4af37;
+      margin-bottom: 15px;
+      font-style: italic;
+    }
+    .region {
+      text-align: center;
+      font-size: 12px;
+      color: #ccc;
+      margin-bottom: 20px;
+    }
+    .details {
+      display: flex;
+      justify-content: space-around;
+      margin: 15px 0;
+      padding: 10px;
+      border-top: 1px solid rgba(255,255,255,0.2);
+      border-bottom: 1px solid rgba(255,255,255,0.2);
+    }
+    .detail-item {
+      text-align: center;
+    }
+    .detail-value {
+      font-size: 13px;
+      color: #f5f5f5;
+    }
+    .producer {
+      text-align: center;
+      font-size: 10px;
+      color: #aaa;
+      margin: 15px 0;
+    }
+    .warning {
+      margin-top: 15px;
+      padding: 10px;
+      background: #fff;
+      border-radius: 2px;
+      font-family: Arial, sans-serif;
+      font-size: 7px;
+      line-height: 1.3;
+      color: #333;
+    }
+    .warning-header {
+      font-weight: bold;
+      text-transform: uppercase;
+    }
+  </style>
+</head>
+<body>
+  <!-- This label shows 14.5% ABV but application has 13.5% - should FAIL -->
+  <div class="label">
+    <div class="vintage">2021</div>
+    <div class="brand">Chateau Margaux</div>
+    <div class="class-type">Cabernet Sauvignon</div>
+    <div class="region">Napa Valley, California</div>
+
+    <div class="details">
+      <div class="detail-item">
+        <div class="detail-value">14.5% Alc./Vol.</div>
+      </div>
+      <div class="detail-item">
+        <div class="detail-value">750 mL</div>
+      </div>
+    </div>
+
+    <div class="producer">
+      Vinted and Bottled by Chateau Margaux Winery<br>
+      Napa, California
+    </div>
+
+    <div class="warning">
+      <span class="warning-header">GOVERNMENT WARNING:</span> (1) According to the Surgeon General, women should not drink alcoholic beverages during pregnancy because of the risk of birth defects. (2) Consumption of alcoholic beverages impairs your ability to drive a car or operate machinery, and may cause health problems.
+    </div>
+  </div>
+</body>
+</html>

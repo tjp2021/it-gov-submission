@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>Test Label - Perfect Match</title>
+  <style>
+    body {
+      margin: 0;
+      padding: 40px;
+      background: #1a1a1a;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      font-family: Georgia, serif;
+    }
+    .label {
+      width: 400px;
+      background: linear-gradient(135deg, #f5e6d3 0%, #e8d4b8 100%);
+      border: 3px solid #8b4513;
+      border-radius: 8px;
+      padding: 30px;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+    }
+    .brand {
+      text-align: center;
+      font-size: 32px;
+      font-weight: bold;
+      color: #2c1810;
+      margin-bottom: 10px;
+      text-transform: uppercase;
+      letter-spacing: 2px;
+    }
+    .class-type {
+      text-align: center;
+      font-size: 16px;
+      color: #5c4033;
+      margin-bottom: 20px;
+      font-style: italic;
+    }
+    .details {
+      display: flex;
+      justify-content: space-between;
+      margin: 20px 0;
+      padding: 15px;
+      background: rgba(255,255,255,0.5);
+      border-radius: 4px;
+    }
+    .detail-item {
+      text-align: center;
+    }
+    .detail-label {
+      font-size: 10px;
+      color: #666;
+      text-transform: uppercase;
+    }
+    .detail-value {
+      font-size: 14px;
+      font-weight: bold;
+      color: #2c1810;
+    }
+    .producer {
+      text-align: center;
+      font-size: 12px;
+      color: #5c4033;
+      margin: 20px 0;
+    }
+    .warning {
+      margin-top: 20px;
+      padding: 15px;
+      background: #fff;
+      border: 1px solid #ccc;
+      font-family: Arial, sans-serif;
+      font-size: 9px;
+      line-height: 1.4;
+      color: #333;
+    }
+    .warning-header {
+      font-weight: bold;
+      text-transform: uppercase;
+    }
+  </style>
+</head>
+<body>
+  <div class="label">
+    <div class="brand">Old Tom Distillery</div>
+    <div class="class-type">Kentucky Straight Bourbon Whiskey</div>
+
+    <div class="details">
+      <div class="detail-item">
+        <div class="detail-label">Alcohol</div>
+        <div class="detail-value">45% Alc./Vol. (90 Proof)</div>
+      </div>
+      <div class="detail-item">
+        <div class="detail-label">Net Contents</div>
+        <div class="detail-value">750 mL</div>
+      </div>
+    </div>
+
+    <div class="producer">
+      Old Tom Distillery, Louisville, Kentucky
+    </div>
+
+    <div class="warning">
+      <span class="warning-header">GOVERNMENT WARNING:</span> (1) According to the Surgeon General, women should not drink alcoholic beverages during pregnancy because of the risk of birth defects. (2) Consumption of alcoholic beverages impairs your ability to drive a car or operate machinery, and may cause health problems.
+    </div>
+  </div>
+</body>
+</html>

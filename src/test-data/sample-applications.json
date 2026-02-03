@@ -1,0 +1,94 @@
+{
+  "labels": [
+    {
+      "id": "perfect",
+      "description": "Perfect match - all fields correct (happy path)",
+      "htmlFile": "labels/label-perfect.html",
+      "expectedResult": "PASS",
+      "applicationData": {
+        "brandName": "Old Tom Distillery",
+        "classType": "Kentucky Straight Bourbon Whiskey",
+        "alcoholContent": "45% Alc./Vol. (90 Proof)",
+        "netContents": "750 mL",
+        "nameAddress": "Old Tom Distillery, Louisville, Kentucky",
+        "countryOfOrigin": "",
+        "governmentWarning": "GOVERNMENT WARNING: (1) According to the Surgeon General, women should not drink alcoholic beverages during pregnancy because of the risk of birth defects. (2) Consumption of alcoholic beverages impairs your ability to drive a car or operate machinery, and may cause health problems."
+      }
+    },
+    {
+      "id": "case-mismatch",
+      "description": "Dave scenario - brand name case mismatch (STONE'S THROW vs Stone's Throw)",
+      "htmlFile": "labels/label-case-mismatch.html",
+      "expectedResult": "PASS (fuzzy match should handle case difference)",
+      "applicationData": {
+        "brandName": "Stone's Throw",
+        "classType": "Small Batch Bourbon Whiskey",
+        "alcoholContent": "46% Alc./Vol.",
+        "netContents": "750 mL",
+        "nameAddress": "Stone's Throw Distillery, Frankfort, Kentucky",
+        "countryOfOrigin": "",
+        "governmentWarning": "GOVERNMENT WARNING: (1) According to the Surgeon General, women should not drink alcoholic beverages during pregnancy because of the risk of birth defects. (2) Consumption of alcoholic beverages impairs your ability to drive a car or operate machinery, and may cause health problems."
+      }
+    },
+    {
+      "id": "wrong-abv",
+      "description": "ABV mismatch - label shows 14.5% but application has 13.5%",
+      "htmlFile": "labels/label-wrong-abv.html",
+      "expectedResult": "FAIL (numeric mismatch on ABV)",
+      "applicationData": {
+        "brandName": "Chateau Margaux",
+        "classType": "Cabernet Sauvignon",
+        "alcoholContent": "13.5% Alc./Vol.",
+        "netContents": "750 mL",
+        "nameAddress": "Chateau Margaux Winery, Napa, California",
+        "countryOfOrigin": "",
+        "governmentWarning": "GOVERNMENT WARNING: (1) According to the Surgeon General, women should not drink alcoholic beverages during pregnancy because of the risk of birth defects. (2) Consumption of alcoholic beverages impairs your ability to drive a car or operate machinery, and may cause health problems."
+      }
+    },
+    {
+      "id": "warning-titlecase",
+      "description": "Jenny scenario - Government Warning in title case instead of ALL CAPS",
+      "htmlFile": "labels/label-warning-titlecase.html",
+      "expectedResult": "FAIL (header format violation)",
+      "applicationData": {
+        "brandName": "HopMaster",
+        "classType": "India Pale Ale",
+        "alcoholContent": "6.5%",
+        "netContents": "12 FL. OZ.",
+        "nameAddress": "HopMaster Brewing Co., Portland, Oregon",
+        "countryOfOrigin": "",
+        "governmentWarning": "GOVERNMENT WARNING: (1) According to the Surgeon General, women should not drink alcoholic beverages during pregnancy because of the risk of birth defects. (2) Consumption of alcoholic beverages impairs your ability to drive a car or operate machinery, and may cause health problems."
+      }
+    },
+    {
+      "id": "no-warning",
+      "description": "Missing government warning entirely",
+      "htmlFile": "labels/label-no-warning.html",
+      "expectedResult": "FAIL (warning not found)",
+      "applicationData": {
+        "brandName": "Blue Fjord",
+        "classType": "Premium Vodka",
+        "alcoholContent": "40% Alc./Vol.",
+        "netContents": "750 mL",
+        "nameAddress": "Nordic Spirits, Inc., Minneapolis, Minnesota",
+        "countryOfOrigin": "USA",
+        "governmentWarning": "GOVERNMENT WARNING: (1) According to the Surgeon General, women should not drink alcoholic beverages during pregnancy because of the risk of birth defects. (2) Consumption of alcoholic beverages impairs your ability to drive a car or operate machinery, and may cause health problems."
+      }
+    },
+    {
+      "id": "imported",
+      "description": "Imported spirit with country of origin - full field coverage",
+      "htmlFile": "labels/label-imported.html",
+      "expectedResult": "PASS",
+      "applicationData": {
+        "brandName": "Glenfiddich",
+        "classType": "Single Malt Scotch Whisky",
+        "alcoholContent": "40% Alc./Vol. (80 Proof)",
+        "netContents": "750 mL",
+        "nameAddress": "William Grant & Sons, Dufftown, Banffshire, Scotland",
+        "countryOfOrigin": "Scotland",
+        "governmentWarning": "GOVERNMENT WARNING: (1) According to the Surgeon General, women should not drink alcoholic beverages during pregnancy because of the risk of birth defects. (2) Consumption of alcoholic beverages impairs your ability to drive a car or operate machinery, and may cause health problems."
+      }
+    }
+  ]
+}
