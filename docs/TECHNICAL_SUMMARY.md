@@ -1,5 +1,7 @@
 # TTB Label Verification Tool — Technical Summary
 
+> Internal development reference document
+
 ## Mission
 
 Build an AI-powered tool for TTB (Alcohol and Tobacco Tax and Trade Bureau) compliance officers to verify alcohol beverage labels against COLA (Certificate of Label Approval) application data.
@@ -158,17 +160,17 @@ src/
 
 ---
 
-## Questions for Review
+## Open Design Questions
 
-1. **Latency:** Is 5-6s acceptable given cloud API constraints? Any other optimization vectors?
+Notes on trade-offs I'm still weighing:
 
-2. **Accuracy vs Speed:** Should we offer a "fast mode" with Haiku (faster but 94% accuracy) vs "accurate mode" with Sonnet?
+1. **Latency:** 5-6s is at the edge of the ≤5s requirement. Cloud API inference is the bottleneck. Potential optimization: OCR + text-only classification (see `docs/OCR_APPROACH.md`).
 
-3. **Bold detection:** Is best-effort + agent review the right approach, or should we drop this check entirely?
+2. **Accuracy vs Speed:** Haiku is faster but 94% accuracy vs Sonnet's ~100%. Currently using Sonnet. Could offer a toggle if speed becomes critical.
 
-4. **Streaming:** Worth the complexity? Current implementation shows field-by-field results as they're computed.
+3. **Bold detection:** Best-effort + agent review feels right since bold detection from photos is fundamentally unreliable.
 
-5. **Anything obviously wrong?** Architecture, code patterns, missing edge cases?
+4. **Streaming:** Adds complexity but improves perceived performance by showing progress during the 5s wait.
 
 ---
 
