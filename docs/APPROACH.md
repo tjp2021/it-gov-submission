@@ -48,7 +48,7 @@ These are honest constraints of this prototype, not bugs.
 
 **Bold detection is best-effort.** Neither Claude Vision nor traditional OCR can reliably determine font weight from a photograph. The tool reports a visual assessment but always flags bold detection as WARNING for agent review. Capitalization detection (ALL CAPS) is reliable and checked separately.
 
-**Batch is capped at 10 labels.** Sarah mentioned 200-300 labels per session. Sequential API calls for 200 labels at ~4 seconds each would take 13+ minutes and exceed HTTP timeouts. The prototype demonstrates batch with 10 parallel labels. Production would need a job queue (Bull/Redis workers) with a poll-for-results pattern.
+**Batch processing is sequential.** Sarah mentioned 200-300 labels per session. Sequential API calls for 200 labels at ~5 seconds each would take 16+ minutes. The prototype provides batch mode at `/batch` that processes labels one at a time with progress tracking. Production would need a job queue (Bull/Redis workers) with a poll-for-results pattern for higher throughput.
 
 **No authentication or audit trail.** A production system for a federal agency needs FedRAMP-compliant auth (likely Azure AD), role-based access, and a complete decision audit trail logging every verification with agent ID, timestamp, and rationale. The prototype is stateless.
 
@@ -69,7 +69,19 @@ These are honest constraints of this prototype, not bugs.
 
 ## Tech Stack
 
-- **Next.js 14** with TypeScript — Fullstack framework, single deployment, evaluators run locally with one command
+- **Next.js 16** with TypeScript — Fullstack framework, single deployment, evaluators run locally with one command
 - **Tailwind CSS** — Fast iteration on UI, clean results display
 - **Claude API** (claude-sonnet-4-20250514) — Vision extraction via tool_use
 - **Azure App Service** — Matches TTB's existing cloud infrastructure
+- **Sharp** — Server-side image processing for test generation
+- **Puppeteer** — HTML-to-PNG conversion for ground truth test labels
+
+## Features Implemented
+
+- **Single Label Verification** — Upload one label, compare against application data
+- **Batch Processing** — Upload multiple labels, verify against same application data
+- **Agent Override** — Accept/confirm warnings and failures with one click
+- **Export Results** — Download JSON or CSV for records
+- **Demo Mode** — Pre-loaded example with one click
+- **Client-side Preprocessing** — Images auto-resized and compressed before upload
+- **Comprehensive Test Suite** — 18 automated tests covering basic, intermediate, and stress cases

@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useCallback } from "react";
+import Link from "next/link";
 import LabelUploader from "@/components/LabelUploader";
 import ApplicationForm, {
   defaultApplicationData,
@@ -141,13 +142,23 @@ export default function Home() {
     <main className="min-h-screen bg-gray-100 py-8 px-4">
       <div className="max-w-4xl mx-auto">
         {/* Header */}
-        <header className="mb-8 text-center">
-          <h1 className="text-3xl font-bold text-gray-900">
-            TTB Label Verification Tool
-          </h1>
-          <p className="text-gray-600 mt-2">
-            AI-powered alcohol beverage label verification
-          </p>
+        <header className="mb-8">
+          <div className="flex items-center justify-between">
+            <div>
+              <h1 className="text-3xl font-bold text-gray-900">
+                TTB Label Verification Tool
+              </h1>
+              <p className="text-gray-600 mt-2">
+                AI-powered alcohol beverage label verification
+              </p>
+            </div>
+            <Link
+              href="/batch"
+              className="px-4 py-2 text-sm bg-gray-200 hover:bg-gray-300 rounded-lg"
+            >
+              Batch Mode
+            </Link>
+          </div>
         </header>
 
         {/* Main Content */}

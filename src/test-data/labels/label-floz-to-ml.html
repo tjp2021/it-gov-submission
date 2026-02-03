@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>Test Label - FL OZ to mL Conversion (Stress Test)</title>
+  <style>
+    body {
+      margin: 0;
+      padding: 40px;
+      background: #1a1a1a;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      font-family: Arial, sans-serif;
+    }
+    .label {
+      width: 300px;
+      background: linear-gradient(180deg, #fff 0%, #f0f0f0 100%);
+      border: 2px solid #333;
+      border-radius: 4px;
+      padding: 20px;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+    }
+    .brand {
+      text-align: center;
+      font-size: 24px;
+      font-weight: bold;
+      color: #222;
+      margin-bottom: 6px;
+      text-transform: uppercase;
+    }
+    .class-type {
+      text-align: center;
+      font-size: 13px;
+      color: #555;
+      margin-bottom: 15px;
+    }
+    .details {
+      display: flex;
+      justify-content: space-around;
+      margin: 15px 0;
+      padding: 12px;
+      background: #f8f8f8;
+      border-radius: 4px;
+    }
+    .detail-item {
+      text-align: center;
+    }
+    .detail-label {
+      font-size: 9px;
+      color: #888;
+      text-transform: uppercase;
+    }
+    .detail-value {
+      font-size: 12px;
+      font-weight: bold;
+      color: #222;
+    }
+    .producer {
+      text-align: center;
+      font-size: 10px;
+      color: #555;
+      margin: 15px 0;
+    }
+    .warning {
+      margin-top: 15px;
+      padding: 12px;
+      background: #fff;
+      border: 1px solid #ddd;
+      font-family: Arial, sans-serif;
+      font-size: 8px;
+      line-height: 1.4;
+      color: #333;
+    }
+    .warning-header {
+      font-weight: bold;
+      text-transform: uppercase;
+    }
+  </style>
+</head>
+<body>
+  <div class="label">
+    <div class="brand">Sierra Cerveza</div>
+    <div class="class-type">Mexican Lager</div>
+
+    <div class="details">
+      <div class="detail-item">
+        <div class="detail-label">Alcohol</div>
+        <div class="detail-value">4.5% Alc./Vol.</div>
+      </div>
+      <div class="detail-item">
+        <div class="detail-label">Net Contents</div>
+        <div class="detail-value">12 FL. OZ.</div>
+      </div>
+    </div>
+
+    <div class="producer">
+      Sierra Brewing Co., Tucson, Arizona
+    </div>
+
+    <div class="warning">
+      <span class="warning-header">GOVERNMENT WARNING:</span> (1) According to the Surgeon General, women should not drink alcoholic beverages during pregnancy because of the risk of birth defects. (2) Consumption of alcoholic beverages impairs your ability to drive a car or operate machinery, and may cause health problems.
+    </div>
+  </div>
+</body>
+</html>

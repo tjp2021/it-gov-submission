@@ -7,16 +7,108 @@ interface LabelUploaderProps {
   currentPreview: string | null;
 }
 
+// Claude Vision API optimal dimensions (per PRD Section 3.7)
+const MAX_DIMENSION = 1568;
+const JPEG_QUALITY = 0.85;
+const MAX_FINAL_SIZE = 5 * 1024 * 1024; // 5MB
+
+async function preprocessImage(file: File): Promise<{ file: File; preview: string; wasResized: boolean }> {
+  return new Promise((resolve, reject) => {
+    const img = new Image();
+    const reader = new FileReader();
+
+    reader.onload = (e) => {
+      const dataUrl = e.target?.result as string;
+      img.src = dataUrl;
+    };
+
+    img.onload = () => {
+      const { width, height } = img;
+      const longestEdge = Math.max(width, height);
+
+      // Check if resizing is needed
+      if (longestEdge <= MAX_DIMENSION && file.size <= MAX_FINAL_SIZE) {
+        // No preprocessing needed - return original
+        resolve({ file, preview: img.src, wasResized: false });
+        return;
+      }
+
+      // Calculate new dimensions maintaining aspect ratio
+      let newWidth = width;
+      let newHeight = height;
+      if (longestEdge > MAX_DIMENSION) {
+        const scale = MAX_DIMENSION / longestEdge;
+        newWidth = Math.round(width * scale);
+        newHeight = Math.round(height * scale);
+      }
+
+      // Create canvas and draw resized image
+      const canvas = document.createElement("canvas");
+      canvas.width = newWidth;
+      canvas.height = newHeight;
+      const ctx = canvas.getContext("2d");
+      if (!ctx) {
+        reject(new Error("Failed to get canvas context"));
+        return;
+      }
+
+      // Use high-quality image smoothing
+      ctx.imageSmoothingEnabled = true;
+      ctx.imageSmoothingQuality = "high";
+      ctx.drawImage(img, 0, 0, newWidth, newHeight);
+
+      // Convert to JPEG blob with compression
+      canvas.toBlob(
+        (blob) => {
+          if (!blob) {
+            reject(new Error("Failed to compress image"));
+            return;
+          }
+
+          // Create new File object from blob
+          const processedFile = new File(
+            [blob],
+            file.name.replace(/\.[^.]+$/, ".jpg"),
+            { type: "image/jpeg" }
+          );
+
+          // Get preview data URL
+          const preview = canvas.toDataURL("image/jpeg", JPEG_QUALITY);
+
+          resolve({
+            file: processedFile,
+            preview,
+            wasResized: width !== newWidth || height !== newHeight,
+          });
+        },
+        "image/jpeg",
+        JPEG_QUALITY
+      );
+    };
+
+    img.onerror = () => {
+      reject(new Error("Failed to load image"));
+    };
+
+    reader.onerror = () => {
+      reject(new Error("Failed to read file"));
+    };
+
+    reader.readAsDataURL(file);
+  });
+}
+
 export default function LabelUploader({
   onImageSelect,
   currentPreview,
 }: LabelUploaderProps) {
   const [isDragging, setIsDragging] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [isProcessing, setIsProcessing] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const validateAndProcessFile = useCallback(
-    (file: File) => {
+    async (file: File) => {
       setError(null);
 
       // Validate file type
@@ -26,19 +118,30 @@ export default function LabelUploader({
         return;
       }
 
-      // Validate file size (10MB max before processing)
-      if (file.size > 10 * 1024 * 1024) {
-        setError("Image must be under 10MB");
+      // Validate file size (20MB max before processing - generous limit)
+      if (file.size > 20 * 1024 * 1024) {
+        setError("Image must be under 20MB");
         return;
       }
 
-      // Create preview and pass to parent
-      const reader = new FileReader();
-      reader.onload = (e) => {
-        const preview = e.target?.result as string;
-        onImageSelect(file, preview);
-      };
-      reader.readAsDataURL(file);
+      try {
+        setIsProcessing(true);
+
+        // Preprocess image: resize and compress for optimal API performance
+        const { file: processedFile, preview } = await preprocessImage(file);
+
+        // Validate final size after processing
+        if (processedFile.size > MAX_FINAL_SIZE) {
+          setError("Image still too large after compression. Please use a smaller image.");
+          return;
+        }
+
+        onImageSelect(processedFile, preview);
+      } catch (err) {
+        setError(err instanceof Error ? err.message : "Failed to process image");
+      } finally {
+        setIsProcessing(false);
+      }
     },
     [onImageSelect]
   );
@@ -111,7 +214,13 @@ export default function LabelUploader({
           className="hidden"
         />
 
-        {currentPreview ? (
+        {isProcessing ? (
+          <div className="space-y-4">
+            <div className="animate-spin text-4xl">⏳</div>
+            <p className="text-lg text-gray-700">Processing image...</p>
+            <p className="text-sm text-gray-500">Optimizing for verification</p>
+          </div>
+        ) : currentPreview ? (
           <div className="space-y-4">
             <img
               src={currentPreview}
@@ -129,7 +238,7 @@ export default function LabelUploader({
               Drop label image here or click to browse
             </p>
             <p className="text-sm text-gray-500">
-              Supports JPG, PNG, WebP, GIF (max 10MB)
+              Supports JPG, PNG, WebP, GIF - auto-optimized for fast verification
             </p>
           </div>
         )}

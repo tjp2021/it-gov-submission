@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>Test Label - Odd Proof (Stress Test)</title>
+  <style>
+    body {
+      margin: 0;
+      padding: 40px;
+      background: #1a1a1a;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      font-family: 'Times New Roman', serif;
+    }
+    .label {
+      width: 380px;
+      background: linear-gradient(135deg, #f7f0e3 0%, #e8dcc8 100%);
+      border: 4px solid #5c3d2e;
+      border-radius: 6px;
+      padding: 28px;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+    }
+    .brand {
+      text-align: center;
+      font-size: 30px;
+      font-weight: bold;
+      color: #3d2817;
+      margin-bottom: 8px;
+      text-transform: uppercase;
+      letter-spacing: 3px;
+    }
+    .class-type {
+      text-align: center;
+      font-size: 15px;
+      color: #5c3d2e;
+      margin-bottom: 18px;
+      font-style: italic;
+    }
+    .details {
+      display: flex;
+      justify-content: space-between;
+      margin: 18px 0;
+      padding: 14px;
+      background: rgba(255,255,255,0.5);
+      border-radius: 4px;
+      border: 1px solid #ccc;
+    }
+    .detail-item {
+      text-align: center;
+    }
+    .detail-label {
+      font-size: 10px;
+      color: #777;
+      text-transform: uppercase;
+    }
+    .detail-value {
+      font-size: 14px;
+      font-weight: bold;
+      color: #3d2817;
+    }
+    .producer {
+      text-align: center;
+      font-size: 11px;
+      color: #5c3d2e;
+      margin: 18px 0;
+    }
+    .warning {
+      margin-top: 18px;
+      padding: 14px;
+      background: #fff;
+      border: 1px solid #ccc;
+      font-family: Arial, sans-serif;
+      font-size: 9px;
+      line-height: 1.4;
+      color: #333;
+    }
+    .warning-header {
+      font-weight: bold;
+      text-transform: uppercase;
+    }
+  </style>
+</head>
+<body>
+  <div class="label">
+    <div class="brand">Wild Turkey</div>
+    <div class="class-type">Kentucky Straight Bourbon Whiskey</div>
+
+    <div class="details">
+      <div class="detail-item">
+        <div class="detail-label">Alcohol</div>
+        <div class="detail-value">101 Proof</div>
+      </div>
+      <div class="detail-item">
+        <div class="detail-label">Net Contents</div>
+        <div class="detail-value">750 mL</div>
+      </div>
+    </div>
+
+    <div class="producer">
+      Wild Turkey Distilling Co., Lawrenceburg, Kentucky
+    </div>
+
+    <div class="warning">
+      <span class="warning-header">GOVERNMENT WARNING:</span> (1) According to the Surgeon General, women should not drink alcoholic beverages during pregnancy because of the risk of birth defects. (2) Consumption of alcoholic beverages impairs your ability to drive a car or operate machinery, and may cause health problems.
+    </div>
+  </div>
+</body>
+</html>

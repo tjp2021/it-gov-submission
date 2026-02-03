@@ -15,6 +15,10 @@
     "composite": {
       "name": "Group 4: Composite (Controlled Real-world)",
       "description": "HTML labels composited onto bottle templates with effects"
+    },
+    "stress": {
+      "name": "Group 5: Stress Tests",
+      "description": "Edge cases for numeric parsing, unicode, complex addresses, and warning validation"
     }
   },
   "labels": [
@@ -337,6 +341,142 @@
         "netContents": "750 mL",
         "nameAddress": "Nordic Spirits, Inc., Minneapolis, Minnesota",
         "countryOfOrigin": "USA",
+        "governmentWarning": "GOVERNMENT WARNING: (1) According to the Surgeon General, women should not drink alcoholic beverages during pregnancy because of the risk of birth defects. (2) Consumption of alcoholic beverages impairs your ability to drive a car or operate machinery, and may cause health problems."
+      }
+    },
+    {
+      "id": "S1-high-abv",
+      "group": "stress",
+      "description": "Extreme high ABV (75.5% / 151 Proof) - overproof rum",
+      "htmlFile": "labels/label-high-abv.html",
+      "expectedResult": "PASS",
+      "expectedReason": "Should parse high ABV values correctly",
+      "applicationData": {
+        "brandName": "Navy Strength",
+        "classType": "Overproof Rum",
+        "alcoholContent": "75.5% Alc./Vol. (151 Proof)",
+        "netContents": "750 mL",
+        "nameAddress": "Navy Strength Distillers, Charleston, South Carolina",
+        "countryOfOrigin": "",
+        "governmentWarning": "GOVERNMENT WARNING: (1) According to the Surgeon General, women should not drink alcoholic beverages during pregnancy because of the risk of birth defects. (2) Consumption of alcoholic beverages impairs your ability to drive a car or operate machinery, and may cause health problems."
+      }
+    },
+    {
+      "id": "S2-low-abv",
+      "group": "stress",
+      "description": "Extreme low ABV (0.5%) - low alcohol wine",
+      "htmlFile": "labels/label-low-abv.html",
+      "expectedResult": "PASS",
+      "expectedReason": "Should parse low ABV values correctly",
+      "applicationData": {
+        "brandName": "Lite Fizz",
+        "classType": "Low Alcohol Sparkling Wine",
+        "alcoholContent": "0.5% Alc./Vol.",
+        "netContents": "750 mL",
+        "nameAddress": "Lite Fizz Winery, Modesto, California",
+        "countryOfOrigin": "",
+        "governmentWarning": "GOVERNMENT WARNING: (1) According to the Surgeon General, women should not drink alcoholic beverages during pregnancy because of the risk of birth defects. (2) Consumption of alcoholic beverages impairs your ability to drive a car or operate machinery, and may cause health problems."
+      }
+    },
+    {
+      "id": "S3-odd-proof",
+      "group": "stress",
+      "description": "Odd proof number (101 Proof = 50.5% ABV) - proof only on label",
+      "htmlFile": "labels/label-odd-proof.html",
+      "expectedResult": "PASS",
+      "expectedReason": "Should convert 101 Proof to 50.5% ABV correctly",
+      "applicationData": {
+        "brandName": "Wild Turkey",
+        "classType": "Kentucky Straight Bourbon Whiskey",
+        "alcoholContent": "50.5%",
+        "netContents": "750 mL",
+        "nameAddress": "Wild Turkey Distilling Co., Lawrenceburg, Kentucky",
+        "countryOfOrigin": "",
+        "governmentWarning": "GOVERNMENT WARNING: (1) According to the Surgeon General, women should not drink alcoholic beverages during pregnancy because of the risk of birth defects. (2) Consumption of alcoholic beverages impairs your ability to drive a car or operate machinery, and may cause health problems."
+      }
+    },
+    {
+      "id": "S4-liters",
+      "group": "stress",
+      "description": "Volume in liters (1.75 L) - should convert to mL",
+      "htmlFile": "labels/label-liters.html",
+      "expectedResult": "PASS",
+      "expectedReason": "1.75 L = 1750 mL should match",
+      "applicationData": {
+        "brandName": "Costco Select",
+        "classType": "Blended Scotch Whisky",
+        "alcoholContent": "40% Alc./Vol.",
+        "netContents": "1750 mL",
+        "nameAddress": "Bottled by Costco Wholesale, Issaquah, Washington",
+        "countryOfOrigin": "",
+        "governmentWarning": "GOVERNMENT WARNING: (1) According to the Surgeon General, women should not drink alcoholic beverages during pregnancy because of the risk of birth defects. (2) Consumption of alcoholic beverages impairs your ability to drive a car or operate machinery, and may cause health problems."
+      }
+    },
+    {
+      "id": "S5-multiline-address",
+      "group": "stress",
+      "description": "Multi-line address with production phrase prefix",
+      "htmlFile": "labels/label-multiline-address.html",
+      "expectedResult": "PASS",
+      "expectedReason": "Should strip 'Vinted and Bottled by' and match normalized address",
+      "applicationData": {
+        "brandName": "Emerald Hills",
+        "classType": "Oregon Pinot Noir",
+        "alcoholContent": "14.2% Alc./Vol.",
+        "netContents": "750 mL",
+        "nameAddress": "Emerald Hills Winery, 1234 Vineyard Lane, Suite 200, Willamette Valley, Oregon 97128",
+        "countryOfOrigin": "",
+        "governmentWarning": "GOVERNMENT WARNING: (1) According to the Surgeon General, women should not drink alcoholic beverages during pregnancy because of the risk of birth defects. (2) Consumption of alcoholic beverages impairs your ability to drive a car or operate machinery, and may cause health problems."
+      }
+    },
+    {
+      "id": "S6-truncated-warning",
+      "group": "stress",
+      "description": "Government warning missing 'and may cause health problems' clause",
+      "htmlFile": "labels/label-truncated-warning.html",
+      "expectedResult": "FAIL",
+      "expectedReason": "Truncated warning text should fail verification",
+      "applicationData": {
+        "brandName": "Shortcut Spirits",
+        "classType": "American Whiskey",
+        "alcoholContent": "40% Alc./Vol.",
+        "netContents": "750 mL",
+        "nameAddress": "Shortcut Spirits Co., Nashville, Tennessee",
+        "countryOfOrigin": "",
+        "governmentWarning": "GOVERNMENT WARNING: (1) According to the Surgeon General, women should not drink alcoholic beverages during pregnancy because of the risk of birth defects. (2) Consumption of alcoholic beverages impairs your ability to drive a car or operate machinery, and may cause health problems."
+      }
+    },
+    {
+      "id": "S7-unicode-brand",
+      "group": "stress",
+      "description": "Brand name with accented characters (Château Élégance)",
+      "htmlFile": "labels/label-unicode-brand.html",
+      "expectedResult": "PASS",
+      "expectedReason": "Should handle unicode accented characters in brand name",
+      "applicationData": {
+        "brandName": "Château Élégance",
+        "classType": "Bordeaux Rouge",
+        "alcoholContent": "13.5% Alc./Vol.",
+        "netContents": "750 mL",
+        "nameAddress": "Château Élégance, Margaux, France",
+        "countryOfOrigin": "France",
+        "governmentWarning": "GOVERNMENT WARNING: (1) According to the Surgeon General, women should not drink alcoholic beverages during pregnancy because of the risk of birth defects. (2) Consumption of alcoholic beverages impairs your ability to drive a car or operate machinery, and may cause health problems."
+      }
+    },
+    {
+      "id": "S8-floz-to-ml",
+      "group": "stress",
+      "description": "Reverse volume conversion - label has FL OZ, application has mL",
+      "htmlFile": "labels/label-floz-to-ml.html",
+      "expectedResult": "PASS",
+      "expectedReason": "12 FL OZ ≈ 355 mL should match within tolerance",
+      "applicationData": {
+        "brandName": "Sierra Cerveza",
+        "classType": "Mexican Lager",
+        "alcoholContent": "4.5% Alc./Vol.",
+        "netContents": "355 mL",
+        "nameAddress": "Sierra Brewing Co., Tucson, Arizona",
+        "countryOfOrigin": "",
         "governmentWarning": "GOVERNMENT WARNING: (1) According to the Surgeon General, women should not drink alcoholic beverages during pregnancy because of the risk of birth defects. (2) Consumption of alcoholic beverages impairs your ability to drive a car or operate machinery, and may cause health problems."
       }
     }

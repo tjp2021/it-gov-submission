@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>Test Label - Low ABV (Stress Test)</title>
+  <style>
+    body {
+      margin: 0;
+      padding: 40px;
+      background: #1a1a1a;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      font-family: Arial, sans-serif;
+    }
+    .label {
+      width: 350px;
+      background: linear-gradient(180deg, #fff9e6 0%, #ffe6b3 100%);
+      border: 2px solid #cc9900;
+      border-radius: 12px;
+      padding: 25px;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+    }
+    .brand {
+      text-align: center;
+      font-size: 28px;
+      font-weight: bold;
+      color: #996600;
+      margin-bottom: 8px;
+    }
+    .class-type {
+      text-align: center;
+      font-size: 14px;
+      color: #666;
+      margin-bottom: 15px;
+    }
+    .details {
+      display: flex;
+      justify-content: space-around;
+      margin: 15px 0;
+      padding: 12px;
+      background: rgba(255,255,255,0.6);
+      border-radius: 6px;
+    }
+    .detail-item {
+      text-align: center;
+    }
+    .detail-label {
+      font-size: 9px;
+      color: #888;
+      text-transform: uppercase;
+    }
+    .detail-value {
+      font-size: 13px;
+      font-weight: bold;
+      color: #333;
+    }
+    .producer {
+      text-align: center;
+      font-size: 11px;
+      color: #666;
+      margin: 15px 0;
+    }
+    .warning {
+      margin-top: 15px;
+      padding: 12px;
+      background: #fff;
+      border: 1px solid #ddd;
+      font-family: Arial, sans-serif;
+      font-size: 8px;
+      line-height: 1.4;
+      color: #333;
+    }
+    .warning-header {
+      font-weight: bold;
+      text-transform: uppercase;
+    }
+  </style>
+</head>
+<body>
+  <div class="label">
+    <div class="brand">Lite Fizz</div>
+    <div class="class-type">Low Alcohol Sparkling Wine</div>
+
+    <div class="details">
+      <div class="detail-item">
+        <div class="detail-label">Alcohol</div>
+        <div class="detail-value">0.5% Alc./Vol.</div>
+      </div>
+      <div class="detail-item">
+        <div class="detail-label">Net Contents</div>
+        <div class="detail-value">750 mL</div>
+      </div>
+    </div>
+
+    <div class="producer">
+      Lite Fizz Winery, Modesto, California
+    </div>
+
+    <div class="warning">
+      <span class="warning-header">GOVERNMENT WARNING:</span> (1) According to the Surgeon General, women should not drink alcoholic beverages during pregnancy because of the risk of birth defects. (2) Consumption of alcoholic beverages impairs your ability to drive a car or operate machinery, and may cause health problems.
+    </div>
+  </div>
+</body>
+</html>
