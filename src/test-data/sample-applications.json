@@ -11,6 +11,10 @@
     "advanced": {
       "name": "Group 3: Advanced (Real-world Conditions)",
       "description": "AI-generated images with challenging real-world conditions"
+    },
+    "composite": {
+      "name": "Group 4: Composite (Controlled Real-world)",
+      "description": "HTML labels composited onto bottle templates with effects"
     }
   },
   "labels": [
@@ -265,6 +269,74 @@
         "netContents": "750 mL",
         "nameAddress": "Botanist Bay Distillers, Portland, Oregon",
         "countryOfOrigin": "",
+        "governmentWarning": "GOVERNMENT WARNING: (1) According to the Surgeon General, women should not drink alcoholic beverages during pregnancy because of the risk of birth defects. (2) Consumption of alcoholic beverages impairs your ability to drive a car or operate machinery, and may cause health problems."
+      }
+    },
+    {
+      "id": "C1-wine-blur",
+      "group": "composite",
+      "description": "Wine label with slight blur (focus issues)",
+      "htmlFile": "labels/label-c1-wine-blur.png",
+      "expectedResult": "FAIL",
+      "expectedReason": "ABV mismatch should be detected despite blur",
+      "applicationData": {
+        "brandName": "Chateau Margaux",
+        "classType": "Cabernet Sauvignon",
+        "alcoholContent": "13.5% Alc./Vol.",
+        "netContents": "750 mL",
+        "nameAddress": "Chateau Margaux Winery, Napa, California",
+        "countryOfOrigin": "",
+        "governmentWarning": "GOVERNMENT WARNING: (1) According to the Surgeon General, women should not drink alcoholic beverages during pregnancy because of the risk of birth defects. (2) Consumption of alcoholic beverages impairs your ability to drive a car or operate machinery, and may cause health problems."
+      }
+    },
+    {
+      "id": "C2-whiskey-lowlight",
+      "group": "composite",
+      "description": "Bourbon label in dim lighting conditions",
+      "htmlFile": "labels/label-c2-whiskey-lowlight.png",
+      "expectedResult": "PASS",
+      "expectedReason": "All fields should match despite low contrast",
+      "applicationData": {
+        "brandName": "Old Tom Distillery",
+        "classType": "Kentucky Straight Bourbon Whiskey",
+        "alcoholContent": "45% Alc./Vol. (90 Proof)",
+        "netContents": "750 mL",
+        "nameAddress": "Old Tom Distillery, Louisville, Kentucky",
+        "countryOfOrigin": "",
+        "governmentWarning": "GOVERNMENT WARNING: (1) According to the Surgeon General, women should not drink alcoholic beverages during pregnancy because of the risk of birth defects. (2) Consumption of alcoholic beverages impairs your ability to drive a car or operate machinery, and may cause health problems."
+      }
+    },
+    {
+      "id": "C3-beer-warm",
+      "group": "composite",
+      "description": "Beer label under warm lighting",
+      "htmlFile": "labels/label-c3-beer-warm.png",
+      "expectedResult": "FAIL",
+      "expectedReason": "Warning header format violation should be detected",
+      "applicationData": {
+        "brandName": "HopMaster",
+        "classType": "India Pale Ale",
+        "alcoholContent": "6.5%",
+        "netContents": "12 FL. OZ.",
+        "nameAddress": "HopMaster Brewing Co., Portland, Oregon",
+        "countryOfOrigin": "",
+        "governmentWarning": "GOVERNMENT WARNING: (1) According to the Surgeon General, women should not drink alcoholic beverages during pregnancy because of the risk of birth defects. (2) Consumption of alcoholic beverages impairs your ability to drive a car or operate machinery, and may cause health problems."
+      }
+    },
+    {
+      "id": "C4-vodka-noise",
+      "group": "composite",
+      "description": "Vodka label with compression artifacts",
+      "htmlFile": "labels/label-c4-vodka-noise.png",
+      "expectedResult": "FAIL",
+      "expectedReason": "Missing government warning should be detected",
+      "applicationData": {
+        "brandName": "Blue Fjord",
+        "classType": "Premium Vodka",
+        "alcoholContent": "40% Alc./Vol.",
+        "netContents": "750 mL",
+        "nameAddress": "Nordic Spirits, Inc., Minneapolis, Minnesota",
+        "countryOfOrigin": "USA",
         "governmentWarning": "GOVERNMENT WARNING: (1) According to the Surgeon General, women should not drink alcoholic beverages during pregnancy because of the risk of birth defects. (2) Consumption of alcoholic beverages impairs your ability to drive a car or operate machinery, and may cause health problems."
       }
     }
