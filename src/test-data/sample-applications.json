@@ -1,7 +1,18 @@
 {
+  "groups": {
+    "basic": {
+      "name": "Group 1: Basic",
+      "purpose": "Verify core matching logic works correctly for standard cases"
+    },
+    "intermediate": {
+      "name": "Group 2: Intermediate",
+      "purpose": "Verify unit conversions, format variations, and normalization logic"
+    }
+  },
   "labels": [
     {
-      "id": "perfect",
+      "id": "B1-perfect",
+      "group": "basic",
       "description": "Perfect match - all fields correct (happy path)",
       "htmlFile": "labels/label-perfect.html",
       "expectedResult": "PASS",
@@ -16,10 +27,12 @@
       }
     },
     {
-      "id": "case-mismatch",
+      "id": "B2-case-mismatch",
+      "group": "basic",
       "description": "Dave scenario - brand name case mismatch (STONE'S THROW vs Stone's Throw)",
       "htmlFile": "labels/label-case-mismatch.html",
-      "expectedResult": "PASS (fuzzy match should handle case difference)",
+      "expectedResult": "PASS",
+      "expectedReason": "Fuzzy match handles case difference after normalization",
       "applicationData": {
         "brandName": "Stone's Throw",
         "classType": "Small Batch Bourbon Whiskey",
@@ -31,10 +44,12 @@
       }
     },
     {
-      "id": "wrong-abv",
+      "id": "B3-wrong-abv",
+      "group": "basic",
       "description": "ABV mismatch - label shows 14.5% but application has 13.5%",
       "htmlFile": "labels/label-wrong-abv.html",
-      "expectedResult": "FAIL (numeric mismatch on ABV)",
+      "expectedResult": "FAIL",
+      "expectedReason": "Numeric mismatch on ABV (1% difference)",
       "applicationData": {
         "brandName": "Chateau Margaux",
         "classType": "Cabernet Sauvignon",
@@ -46,10 +61,12 @@
       }
     },
     {
-      "id": "warning-titlecase",
+      "id": "B4-warning-titlecase",
+      "group": "basic",
       "description": "Jenny scenario - Government Warning in title case instead of ALL CAPS",
       "htmlFile": "labels/label-warning-titlecase.html",
-      "expectedResult": "FAIL (header format violation)",
+      "expectedResult": "FAIL",
+      "expectedReason": "Header format violation - must be ALL CAPS per 27 CFR Part 16",
       "applicationData": {
         "brandName": "HopMaster",
         "classType": "India Pale Ale",
@@ -61,10 +78,12 @@
       }
     },
     {
-      "id": "no-warning",
+      "id": "B5-no-warning",
+      "group": "basic",
       "description": "Missing government warning entirely",
       "htmlFile": "labels/label-no-warning.html",
-      "expectedResult": "FAIL (warning not found)",
+      "expectedResult": "FAIL",
+      "expectedReason": "Government warning not found on label",
       "applicationData": {
         "brandName": "Blue Fjord",
         "classType": "Premium Vodka",
@@ -76,10 +95,12 @@
       }
     },
     {
-      "id": "imported",
+      "id": "B6-imported",
+      "group": "basic",
       "description": "Imported spirit with country of origin - full field coverage",
       "htmlFile": "labels/label-imported.html",
       "expectedResult": "PASS",
+      "expectedReason": "All fields match including country of origin",
       "applicationData": {
         "brandName": "Glenfiddich",
         "classType": "Single Malt Scotch Whisky",
@@ -87,6 +108,74 @@
         "netContents": "750 mL",
         "nameAddress": "William Grant & Sons, Dufftown, Banffshire, Scotland",
         "countryOfOrigin": "Scotland",
+        "governmentWarning": "GOVERNMENT WARNING: (1) According to the Surgeon General, women should not drink alcoholic beverages during pregnancy because of the risk of birth defects. (2) Consumption of alcoholic beverages impairs your ability to drive a car or operate machinery, and may cause health problems."
+      }
+    },
+    {
+      "id": "I1-proof-to-abv",
+      "group": "intermediate",
+      "description": "Proof to ABV conversion - label shows 90 Proof, app has 45%",
+      "htmlFile": "labels/label-proof-to-abv.html",
+      "expectedResult": "PASS",
+      "expectedReason": "90 Proof = 45% ABV via conversion",
+      "applicationData": {
+        "brandName": "Copper Still",
+        "classType": "Tennessee Whiskey",
+        "alcoholContent": "45%",
+        "netContents": "750 mL",
+        "nameAddress": "Copper Still Distillery, Lynchburg, Tennessee",
+        "countryOfOrigin": "",
+        "governmentWarning": "GOVERNMENT WARNING: (1) According to the Surgeon General, women should not drink alcoholic beverages during pregnancy because of the risk of birth defects. (2) Consumption of alcoholic beverages impairs your ability to drive a car or operate machinery, and may cause health problems."
+      }
+    },
+    {
+      "id": "I2-ml-to-floz",
+      "group": "intermediate",
+      "description": "mL to fl oz conversion - label shows 750 mL, app has 25.4 fl oz",
+      "htmlFile": "labels/label-ml-to-floz.html",
+      "expectedResult": "PASS",
+      "expectedReason": "750 mL ≈ 25.4 fl oz via conversion (within 0.5% tolerance)",
+      "applicationData": {
+        "brandName": "Verde",
+        "classType": "London Dry Gin",
+        "alcoholContent": "47% Alc./Vol.",
+        "netContents": "25.4 fl oz",
+        "nameAddress": "Verde Spirits Co., Portland, Oregon",
+        "countryOfOrigin": "",
+        "governmentWarning": "GOVERNMENT WARNING: (1) According to the Surgeon General, women should not drink alcoholic beverages during pregnancy because of the risk of birth defects. (2) Consumption of alcoholic beverages impairs your ability to drive a car or operate machinery, and may cause health problems."
+      }
+    },
+    {
+      "id": "I3-address-abbrev",
+      "group": "intermediate",
+      "description": "Address abbreviations - label has St./Ste./KY, app has full words",
+      "htmlFile": "labels/label-address-abbrev.html",
+      "expectedResult": "PASS",
+      "expectedReason": "Address normalization expands abbreviations before comparison",
+      "applicationData": {
+        "brandName": "Midnight Reserve",
+        "classType": "Small Batch Bourbon",
+        "alcoholContent": "46% Alc./Vol.",
+        "netContents": "750 mL",
+        "nameAddress": "Midnight Reserve Distillery, 456 Oak Street, Suite 100, Lexington, Kentucky 40507",
+        "countryOfOrigin": "",
+        "governmentWarning": "GOVERNMENT WARNING: (1) According to the Surgeon General, women should not drink alcoholic beverages during pregnancy because of the risk of birth defects. (2) Consumption of alcoholic beverages impairs your ability to drive a car or operate machinery, and may cause health problems."
+      }
+    },
+    {
+      "id": "I4-punctuation",
+      "group": "intermediate",
+      "description": "Punctuation variance - label has apostrophe, app doesn't",
+      "htmlFile": "labels/label-punctuation.html",
+      "expectedResult": "PASS",
+      "expectedReason": "Normalization handles apostrophe differences",
+      "applicationData": {
+        "brandName": "Makers Mark",
+        "classType": "Kentucky Bourbon Whisky",
+        "alcoholContent": "45% Alc./Vol. (90 Proof)",
+        "netContents": "750 mL",
+        "nameAddress": "Makers Mark Distillery, Inc., Loretto, Kentucky",
+        "countryOfOrigin": "",
         "governmentWarning": "GOVERNMENT WARNING: (1) According to the Surgeon General, women should not drink alcoholic beverages during pregnancy because of the risk of birth defects. (2) Consumption of alcoholic beverages impairs your ability to drive a car or operate machinery, and may cause health problems."
       }
     }

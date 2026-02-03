@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>Test Label - mL to fl oz Conversion</title>
+  <style>
+    body {
+      margin: 0;
+      padding: 40px;
+      background: #1a1a1a;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      font-family: 'Helvetica Neue', sans-serif;
+    }
+    .label {
+      width: 380px;
+      background: linear-gradient(180deg, #e8f5e9 0%, #c8e6c9 100%);
+      border: 3px solid #2e7d32;
+      border-radius: 10px;
+      padding: 25px;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+    }
+    .brand {
+      text-align: center;
+      font-size: 34px;
+      font-weight: 300;
+      color: #1b5e20;
+      margin-bottom: 8px;
+      letter-spacing: 3px;
+    }
+    .class-type {
+      text-align: center;
+      font-size: 16px;
+      color: #388e3c;
+      margin-bottom: 15px;
+      font-weight: 500;
+    }
+    .details {
+      display: flex;
+      justify-content: space-around;
+      margin: 20px 0;
+      padding: 12px;
+      background: rgba(255,255,255,0.7);
+      border-radius: 6px;
+    }
+    .detail-value {
+      font-size: 14px;
+      font-weight: 600;
+      color: #1b5e20;
+    }
+    .producer {
+      text-align: center;
+      font-size: 10px;
+      color: #555;
+      margin: 15px 0;
+    }
+    .warning {
+      margin-top: 15px;
+      padding: 10px;
+      background: #fff;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+      font-family: Arial, sans-serif;
+      font-size: 7px;
+      line-height: 1.3;
+      color: #333;
+    }
+    .warning-header {
+      font-weight: bold;
+      text-transform: uppercase;
+    }
+  </style>
+</head>
+<body>
+  <!-- Label shows "750 mL" but application will have "25.4 fl oz" - should PASS via conversion -->
+  <div class="label">
+    <div class="brand">VERDE</div>
+    <div class="class-type">London Dry Gin</div>
+
+    <div class="details">
+      <div class="detail-value">47% Alc./Vol.</div>
+      <div class="detail-value">750 mL</div>
+    </div>
+
+    <div class="producer">
+      Distilled and Bottled by Verde Spirits Co.<br>
+      Portland, Oregon
+    </div>
+
+    <div class="warning">
+      <span class="warning-header">GOVERNMENT WARNING:</span> (1) According to the Surgeon General, women should not drink alcoholic beverages during pregnancy because of the risk of birth defects. (2) Consumption of alcoholic beverages impairs your ability to drive a car or operate machinery, and may cause health problems.
+    </div>
+  </div>
+</body>
+</html>
