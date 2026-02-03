@@ -9,7 +9,7 @@ import ApplicationForm, {
 import VerificationResults from "@/components/VerificationResults";
 import LoadingState from "@/components/LoadingState";
 import DemoButton from "@/components/DemoButton";
-import type { ApplicationData, VerificationResult } from "@/lib/types";
+import type { ApplicationData, VerificationResult, FieldResult } from "@/lib/types";
 
 type AppState = "input" | "loading" | "results";
 
@@ -23,6 +23,9 @@ export default function Home() {
   const [result, setResult] = useState<VerificationResult | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [loadingStartTime, setLoadingStartTime] = useState<number>(0);
+  const [streamMessage, setStreamMessage] = useState<string>("");
+  const [streamElapsed, setStreamElapsed] = useState<number>(0);
+  const [streamFields, setStreamFields] = useState<FieldResult[]>([]);
 
   const handleImageSelect = useCallback((file: File, preview: string) => {
     setImageFile(file);
@@ -60,25 +63,70 @@ export default function Home() {
     setError(null);
     setState("loading");
     setLoadingStartTime(Date.now());
+    setStreamMessage("Starting...");
+    setStreamElapsed(0);
+    setStreamFields([]);
 
     try {
       const formData = new FormData();
       formData.append("labelImage", imageFile);
       formData.append("applicationData", JSON.stringify(applicationData));
 
-      const response = await fetch("/api/verify", {
+      const response = await fetch("/api/verify-stream", {
         method: "POST",
         body: formData,
       });
 
-      const data = await response.json();
-
       if (!response.ok) {
-        throw new Error(data.error || "Verification failed");
+        const errorData = await response.json();
+        throw new Error(errorData.error || "Verification failed");
       }
 
-      setResult(data);
-      setState("results");
+      // Handle SSE stream
+      const reader = response.body?.getReader();
+      const decoder = new TextDecoder();
+
+      if (!reader) {
+        throw new Error("No response stream");
+      }
+
+      let buffer = "";
+
+      while (true) {
+        const { done, value } = await reader.read();
+        if (done) break;
+
+        buffer += decoder.decode(value, { stream: true });
+        const lines = buffer.split("\n");
+        buffer = lines.pop() || "";
+
+        for (const line of lines) {
+          if (line.startsWith("event: ")) {
+            const eventType = line.slice(7);
+            const dataLine = lines[lines.indexOf(line) + 1];
+            if (dataLine?.startsWith("data: ")) {
+              const data = JSON.parse(dataLine.slice(6));
+
+              switch (eventType) {
+                case "progress":
+                  setStreamMessage(data.message);
+                  setStreamElapsed(data.elapsed);
+                  break;
+                case "field":
+                  setStreamFields(prev => [...prev, data as FieldResult]);
+                  break;
+                case "complete":
+                  setResult(data as VerificationResult);
+                  setState("results");
+                  return;
+                case "error":
+                  throw new Error(data.error);
+              }
+            }
+          }
+        }
+      }
+
     } catch (err) {
       setError(err instanceof Error ? err.message : "Verification failed");
       setState("input");
@@ -163,7 +211,14 @@ export default function Home() {
 
         {/* Main Content */}
         <div className="bg-white rounded-xl shadow-lg p-6 md:p-8">
-          {state === "loading" && <LoadingState startTime={loadingStartTime} />}
+          {state === "loading" && (
+            <LoadingState
+              startTime={loadingStartTime}
+              streamMessage={streamMessage}
+              streamElapsed={streamElapsed}
+              streamFields={streamFields}
+            />
+          )}
 
           {state === "results" && result && (
             <VerificationResults

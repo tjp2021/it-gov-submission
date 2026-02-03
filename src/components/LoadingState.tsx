@@ -1,47 +1,53 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import type { FieldResult } from "@/lib/types";
 
 interface LoadingStateProps {
   startTime: number;
+  streamMessage?: string;
+  streamElapsed?: number;
+  streamFields?: FieldResult[];
 }
 
-export default function LoadingState({ startTime }: LoadingStateProps) {
+export default function LoadingState({
+  startTime,
+  streamMessage,
+  streamElapsed,
+  streamFields = []
+}: LoadingStateProps) {
   const [elapsed, setElapsed] = useState(0);
-  const [stage, setStage] = useState(0);
-
-  const stages = [
-    { label: "Uploading image...", duration: 500 },
-    { label: "Analyzing label with AI...", duration: 3000 },
-    { label: "Comparing fields...", duration: 500 },
-    { label: "Generating results...", duration: 500 },
-  ];
 
   useEffect(() => {
     const interval = setInterval(() => {
-      const now = Date.now();
-      const diff = now - startTime;
-      setElapsed(diff);
-
-      // Determine current stage based on elapsed time
-      let cumulative = 0;
-      for (let i = 0; i < stages.length; i++) {
-        cumulative += stages[i].duration;
-        if (diff < cumulative) {
-          setStage(i);
-          break;
-        }
-        if (i === stages.length - 1) {
-          setStage(stages.length - 1);
-        }
-      }
+      setElapsed(Date.now() - startTime);
     }, 100);
-
     return () => clearInterval(interval);
   }, [startTime]);
 
+  const displayElapsed = streamElapsed ?? elapsed;
+  const displayMessage = streamMessage ?? "Processing...";
+
+  const getStatusIcon = (status: string) => {
+    switch (status) {
+      case "PASS": return "✓";
+      case "FAIL": return "✗";
+      case "WARNING": return "⚠";
+      default: return "?";
+    }
+  };
+
+  const getStatusColor = (status: string) => {
+    switch (status) {
+      case "PASS": return "text-green-600";
+      case "FAIL": return "text-red-600";
+      case "WARNING": return "text-yellow-600";
+      default: return "text-gray-600";
+    }
+  };
+
   return (
-    <div className="flex flex-col items-center justify-center py-16 space-y-6">
+    <div className="flex flex-col items-center justify-center py-8 space-y-6">
       {/* Spinner */}
       <div className="relative">
         <div className="w-16 h-16 border-4 border-blue-200 rounded-full"></div>
@@ -51,24 +57,27 @@ export default function LoadingState({ startTime }: LoadingStateProps) {
       {/* Stage label */}
       <div className="text-center">
         <p className="text-lg font-medium text-gray-700">
-          {stages[stage]?.label || "Processing..."}
+          {displayMessage}
         </p>
         <p className="text-sm text-gray-500 mt-1">
-          {(elapsed / 1000).toFixed(1)}s elapsed
+          {(displayElapsed / 1000).toFixed(1)}s elapsed
         </p>
       </div>
 
-      {/* Progress dots */}
-      <div className="flex gap-2">
-        {stages.map((_, i) => (
-          <div
-            key={i}
-            className={`w-2 h-2 rounded-full transition-colors duration-300 ${
-              i <= stage ? "bg-blue-600" : "bg-gray-300"
-            }`}
-          />
-        ))}
-      </div>
+      {/* Streaming field results */}
+      {streamFields.length > 0 && (
+        <div className="w-full max-w-md bg-gray-50 rounded-lg p-4 space-y-2">
+          <p className="text-xs text-gray-500 uppercase tracking-wide mb-2">Results streaming...</p>
+          {streamFields.map((field, i) => (
+            <div key={i} className="flex items-center justify-between text-sm">
+              <span className="text-gray-700">{field.fieldName}</span>
+              <span className={`font-medium ${getStatusColor(field.status)}`}>
+                {getStatusIcon(field.status)} {field.status}
+              </span>
+            </div>
+          ))}
+        </div>
+      )}
     </div>
   );
 }
