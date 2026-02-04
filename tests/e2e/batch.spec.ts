@@ -246,19 +246,20 @@ test.describe('Batch Label Verification', () => {
     // Fill form first
     await fillDemoFormData(page);
 
-    // Upload 5 files - enough to see streaming behavior
+    // Upload 10 files - enough to see streaming behavior even with concurrency 10
     const fileInput = page.locator('input[type="file"]');
-    await fileInput.setInputFiles(Array(5).fill(demoLabelPath));
+    await fileInput.setInputFiles(Array(10).fill(demoLabelPath));
 
     // Start verification
-    await page.click('button:has-text("Verify 5 Labels")');
+    await page.click('button:has-text("Verify 10 Labels")');
 
     // Should show processing state immediately
     await expect(page.locator('text=Processing Labels...')).toBeVisible({ timeout: 5000 });
 
     // Progress should update as results stream in
-    // With concurrency of 3, first batch completes together, then remaining 2
-    await expect(page.locator('text=/[1-5] of 5 labels/')).toBeVisible({ timeout: 15000 });
+    // With concurrency of 10, all start together but complete progressively
+    // Look for any progress indicator during processing
+    await expect(page.locator('text=/\\d+ of 10 labels/')).toBeVisible({ timeout: 15000 });
 
     // Wait for completion
     await expect(page.locator('text=Batch Results')).toBeVisible({ timeout: 45000 });
