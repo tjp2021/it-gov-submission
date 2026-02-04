@@ -110,10 +110,11 @@ The ABLA mandates the same warning statement on every beverage label sold in the
 | Scenario | Time | Notes |
 |----------|------|-------|
 | Single label | ~2.5s | Gemini Flash extraction + comparison |
-| Batch of 3 | ~2.9s | Parallel processing, all 3 concurrent |
-| Batch of 10 | ~10s | Parallel with concurrency limit of 3 |
+| Batch of 10 | ~3s | Parallel processing with concurrency 10 |
+| Batch of 50 | ~13s | Tested in e2e stress test |
+| Batch of 300 | ~78s | Projected (supports full take-home requirement) |
 
-The 5-second single-label requirement from Sarah is met. Batch processing at 10 labels (prototype cap) completes in ~10 seconds with real-time progress streaming.
+The 5-second single-label requirement from Sarah is met. Batch processing supports up to 300 labels (per take-home requirement "200-300 label applications at once") with real-time SSE streaming showing progress as each completes.
 
 ---
 
@@ -122,8 +123,6 @@ The 5-second single-label requirement from Sarah is met. Batch processing at 10 
 These are honest constraints of this prototype, not bugs.
 
 **Bold detection is best-effort.** Neither Gemini nor traditional OCR can reliably determine font weight from a photograph. The tool reports a visual assessment but always flags bold detection as WARNING for agent review. Capitalization detection (ALL CAPS) is reliable and checked separately.
-
-**Batch limited to 10 labels.** Sarah mentioned 200-300 labels per session. Processing 200 labels even at 2.5s each with concurrency would take several minutes. The prototype caps at 10 to demonstrate the pattern. Production would need a job queue (Bull/Redis workers) with a poll-for-results pattern for higher throughput.
 
 **Batch uses single application data.** The current batch mode verifies multiple label images against the same application data (useful for front/back/side labels of one product). Full batch processing with per-label application data would require CSV upload or a more complex UI.
 
