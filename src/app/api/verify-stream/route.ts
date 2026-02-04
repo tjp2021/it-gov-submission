@@ -1,5 +1,5 @@
 import { NextRequest } from "next/server";
-import { extractLabelFields } from "@/lib/extraction";
+import { extractWithGemini } from "@/lib/gemini-extraction";
 import { compareField } from "@/lib/comparison";
 import { verifyGovernmentWarning } from "@/lib/warning-check";
 import { FIELD_CONFIG, STANDARD_WARNING_TEXT } from "@/lib/constants";
@@ -93,10 +93,10 @@ export async function POST(request: NextRequest) {
         const imageBase64 = Buffer.from(imageBuffer).toString("base64");
         const mimeType = imageFile.type as "image/jpeg" | "image/png" | "image/webp" | "image/gif";
 
-        // Stage 3: Extract with Claude (the slow part)
+        // Stage 3: Extract with Gemini Flash
         send("progress", { stage: "extracting", message: "Analyzing label with AI...", elapsed: Date.now() - startTime });
 
-        const extractionResult = await extractLabelFields(imageBase64, mimeType);
+        const extractionResult = await extractWithGemini(imageBase64, mimeType);
 
         if (!extractionResult.success) {
           send("error", { error: `Extraction failed: ${extractionResult.error}` });
