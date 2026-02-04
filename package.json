@@ -12,6 +12,8 @@
     "test:advanced": "node scripts/run-tests.js advanced",
     "test:screenshots": "node scripts/screenshot-labels.js",
     "test:generate": "node scripts/generate-test-labels.js",
+    "test:degrade": "node scripts/degrade-labels.js",
+    "test:download": "node scripts/download-label.js",
     "benchmark": "node scripts/benchmark.js",
     "test:e2e": "playwright test"
   },
