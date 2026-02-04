@@ -15,6 +15,80 @@ interface BatchUploaderProps {
 }
 
 const MAX_BATCH_SIZE = 10;
+const MAX_DIMENSION = 1568;
+const JPEG_QUALITY = 0.85;
+const MAX_FINAL_SIZE = 5 * 1024 * 1024; // 5MB
+
+async function preprocessImage(file: File): Promise<{ file: File; preview: string }> {
+  return new Promise((resolve, reject) => {
+    const img = new Image();
+    const reader = new FileReader();
+
+    reader.onload = (e) => {
+      const dataUrl = e.target?.result as string;
+      img.src = dataUrl;
+    };
+
+    img.onload = () => {
+      const { width, height } = img;
+      const longestEdge = Math.max(width, height);
+
+      // Check if resizing is needed
+      if (longestEdge <= MAX_DIMENSION && file.size <= MAX_FINAL_SIZE) {
+        resolve({ file, preview: img.src });
+        return;
+      }
+
+      // Calculate new dimensions maintaining aspect ratio
+      let newWidth = width;
+      let newHeight = height;
+      if (longestEdge > MAX_DIMENSION) {
+        const scale = MAX_DIMENSION / longestEdge;
+        newWidth = Math.round(width * scale);
+        newHeight = Math.round(height * scale);
+      }
+
+      // Create canvas and draw resized image
+      const canvas = document.createElement("canvas");
+      canvas.width = newWidth;
+      canvas.height = newHeight;
+      const ctx = canvas.getContext("2d");
+      if (!ctx) {
+        reject(new Error("Failed to get canvas context"));
+        return;
+      }
+
+      ctx.imageSmoothingEnabled = true;
+      ctx.imageSmoothingQuality = "high";
+      ctx.drawImage(img, 0, 0, newWidth, newHeight);
+
+      // Convert to JPEG blob with compression
+      canvas.toBlob(
+        (blob) => {
+          if (!blob) {
+            reject(new Error("Failed to compress image"));
+            return;
+          }
+
+          const processedFile = new File(
+            [blob],
+            file.name.replace(/\.[^.]+$/, ".jpg"),
+            { type: "image/jpeg" }
+          );
+
+          const preview = canvas.toDataURL("image/jpeg", JPEG_QUALITY);
+          resolve({ file: processedFile, preview });
+        },
+        "image/jpeg",
+        JPEG_QUALITY
+      );
+    };
+
+    img.onerror = () => reject(new Error("Failed to load image"));
+    reader.onerror = () => reject(new Error("Failed to read file"));
+    reader.readAsDataURL(file);
+  });
+}
 
 export default function BatchUploader({ onFilesSelect, files }: BatchUploaderProps) {
   const [isDragging, setIsDragging] = useState(false);
@@ -51,19 +125,25 @@ export default function BatchUploader({ onFilesSelect, files }: BatchUploaderPro
           continue; // Skip files > 20MB
         }
 
-        // Create preview
-        const preview = await new Promise<string>((resolve) => {
-          const reader = new FileReader();
-          reader.onload = (e) => resolve(e.target?.result as string);
-          reader.readAsDataURL(file);
-        });
+        // Preprocess image: resize and compress for optimal API performance
+        try {
+          const { file: processedFile, preview } = await preprocessImage(file);
 
-        newFiles.push({
-          id: `${Date.now()}-${i}-${Math.random().toString(36).substr(2, 9)}`,
-          file,
-          preview,
-          status: "pending",
-        });
+          // Skip if still too large after compression
+          if (processedFile.size > MAX_FINAL_SIZE) {
+            continue;
+          }
+
+          newFiles.push({
+            id: `${Date.now()}-${i}-${Math.random().toString(36).substr(2, 9)}`,
+            file: processedFile,
+            preview,
+            status: "pending",
+          });
+        } catch {
+          // Skip files that fail to process
+          continue;
+        }
       }
 
       if (newFiles.length === 0 && fileList.length > 0) {
