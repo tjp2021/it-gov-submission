@@ -203,12 +203,20 @@ export default function BatchPage() {
               <p className="text-gray-600 mt-2">
                 Verify multiple labels against the same application data
               </p>
+              <p className="text-xs text-gray-500 mt-1">
+                Prototype limit: 10 labels per batch. Ideal for front/back/side labels of a single product.
+              </p>
             </div>
             <Link
               href="/"
-              className="px-4 py-2 text-sm bg-gray-200 hover:bg-gray-300 rounded-lg"
+              className="flex flex-col items-end"
             >
-              Single Mode
+              <span className="px-4 py-2 text-sm bg-gray-200 hover:bg-gray-300 rounded-lg">
+                ← Single Mode
+              </span>
+              <span className="text-xs text-gray-500 mt-1">
+                One label at a time
+              </span>
             </Link>
           </div>
         </header>

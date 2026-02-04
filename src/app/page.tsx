@@ -202,9 +202,14 @@ export default function Home() {
             </div>
             <Link
               href="/batch"
-              className="px-4 py-2 text-sm bg-gray-200 hover:bg-gray-300 rounded-lg"
+              className="flex flex-col items-end"
             >
-              Batch Mode
+              <span className="px-4 py-2 text-sm bg-gray-200 hover:bg-gray-300 rounded-lg">
+                Batch Mode →
+              </span>
+              <span className="text-xs text-gray-500 mt-1">
+                Verify up to 10 labels at once
+              </span>
             </Link>
           </div>
         </header>
