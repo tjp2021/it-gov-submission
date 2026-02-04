@@ -14,6 +14,8 @@ interface BatchUploaderProps {
   files: BatchFile[];
 }
 
+const MAX_BATCH_SIZE = 10;
+
 export default function BatchUploader({ onFilesSelect, files }: BatchUploaderProps) {
   const [isDragging, setIsDragging] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -25,8 +27,21 @@ export default function BatchUploader({ onFilesSelect, files }: BatchUploaderPro
       const validTypes = ["image/jpeg", "image/png", "image/webp", "image/gif"];
       const newFiles: BatchFile[] = [];
 
+      // Check if we've already hit the limit
+      const remainingSlots = MAX_BATCH_SIZE - files.length;
+      if (remainingSlots <= 0) {
+        setError(`Maximum ${MAX_BATCH_SIZE} labels per batch.`);
+        return;
+      }
+
       for (let i = 0; i < fileList.length; i++) {
         const file = fileList[i];
+
+        // Stop if we've hit the limit
+        if (newFiles.length >= remainingSlots) {
+          setError(`Maximum ${MAX_BATCH_SIZE} labels per batch. Only added ${newFiles.length} of ${fileList.length} files.`);
+          break;
+        }
 
         if (!validTypes.includes(file.type)) {
           continue; // Skip invalid files
@@ -108,7 +123,7 @@ export default function BatchUploader({ onFilesSelect, files }: BatchUploaderPro
     <div className="space-y-4">
       <div className="flex items-center justify-between">
         <label className="block text-lg font-semibold text-gray-800">
-          Label Images ({files.length} selected)
+          Label Images ({files.length}/{MAX_BATCH_SIZE} selected)
         </label>
         {files.length > 0 && (
           <button

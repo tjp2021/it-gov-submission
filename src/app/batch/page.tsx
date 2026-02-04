@@ -23,6 +23,30 @@ interface BatchResult {
 
 type AppState = "input" | "processing" | "results";
 
+// SSE event types from batch-verify endpoint
+interface SSEResultEvent {
+  type: "result";
+  id: string;
+  fileName: string;
+  result: VerificationResult | null;
+  error: string | null;
+  index: number;
+  total: number;
+}
+
+interface SSECompleteEvent {
+  type: "complete";
+  totalProcessed: number;
+  totalTimeMs: number;
+}
+
+interface SSEErrorEvent {
+  type: "error";
+  error: string;
+}
+
+type SSEEvent = SSEResultEvent | SSECompleteEvent | SSEErrorEvent;
+
 export default function BatchPage() {
   const [state, setState] = useState<AppState>("input");
   const [files, setFiles] = useState<BatchFile[]>([]);
@@ -53,61 +77,104 @@ export default function BatchPage() {
     setState("processing");
     setProgress({ current: 0, total: files.length });
 
+    // Mark all files as processing initially
+    setFiles((prev) =>
+      prev.map((f) => ({ ...f, status: "processing" as const }))
+    );
+
+    // Build FormData with all images
+    const formData = new FormData();
+    formData.append("applicationData", JSON.stringify(applicationData));
+
+    for (const file of files) {
+      formData.append(`image_${file.id}`, file.file);
+    }
+
     const batchResults: BatchResult[] = [];
 
-    for (let i = 0; i < files.length; i++) {
-      const file = files[i];
-      setProgress({ current: i + 1, total: files.length });
+    try {
+      const response = await fetch("/api/batch-verify", {
+        method: "POST",
+        body: formData,
+      });
 
-      // Update file status
-      setFiles((prev) =>
-        prev.map((f) => (f.id === file.id ? { ...f, status: "processing" } : f))
-      );
-
-      try {
-        const formData = new FormData();
-        formData.append("labelImage", file.file);
-        formData.append("applicationData", JSON.stringify(applicationData));
-
-        const response = await fetch("/api/verify", {
-          method: "POST",
-          body: formData,
-        });
-
-        const data = await response.json();
-
-        if (!response.ok) {
-          batchResults.push({
-            id: file.id,
-            fileName: file.file.name,
-            result: null,
-            error: data.error || "Verification failed",
-          });
-          setFiles((prev) =>
-            prev.map((f) => (f.id === file.id ? { ...f, status: "error" } : f))
-          );
-        } else {
-          batchResults.push({
-            id: file.id,
-            fileName: file.file.name,
-            result: data,
-            error: null,
-          });
-          setFiles((prev) =>
-            prev.map((f) => (f.id === file.id ? { ...f, status: "done" } : f))
-          );
-        }
-      } catch (err) {
-        batchResults.push({
-          id: file.id,
-          fileName: file.file.name,
-          result: null,
-          error: err instanceof Error ? err.message : "Unknown error",
-        });
-        setFiles((prev) =>
-          prev.map((f) => (f.id === file.id ? { ...f, status: "error" } : f))
-        );
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.error || "Batch verification failed");
       }
+
+      if (!response.body) {
+        throw new Error("No response body");
+      }
+
+      // Parse SSE stream
+      const reader = response.body.getReader();
+      const decoder = new TextDecoder();
+      let buffer = "";
+
+      while (true) {
+        const { done, value } = await reader.read();
+        if (done) break;
+
+        buffer += decoder.decode(value, { stream: true });
+        const lines = buffer.split("\n");
+        buffer = lines.pop() || "";
+
+        let eventType = "";
+        let eventData = "";
+
+        for (const line of lines) {
+          if (line.startsWith("event: ")) {
+            eventType = line.slice(7);
+          } else if (line.startsWith("data: ")) {
+            eventData = line.slice(6);
+          } else if (line === "" && eventType && eventData) {
+            // Process complete event
+            const event = JSON.parse(eventData) as SSEEvent;
+
+            if (event.type === "result") {
+              const resultEvent = event as SSEResultEvent;
+
+              // Update file status
+              const status = resultEvent.error ? "error" : "done";
+              setFiles((prev) =>
+                prev.map((f) =>
+                  f.id === resultEvent.id ? { ...f, status } : f
+                )
+              );
+
+              // Add to results
+              batchResults.push({
+                id: resultEvent.id,
+                fileName: resultEvent.fileName,
+                result: resultEvent.result,
+                error: resultEvent.error,
+              });
+
+              // Update progress
+              setProgress({ current: batchResults.length, total: files.length });
+            } else if (event.type === "complete") {
+              // Batch complete
+              console.log(`Batch completed in ${(event as SSECompleteEvent).totalTimeMs}ms`);
+            } else if (event.type === "error") {
+              throw new Error((event as SSEErrorEvent).error);
+            }
+
+            eventType = "";
+            eventData = "";
+          }
+        }
+      }
+    } catch (err) {
+      const errorMessage = err instanceof Error ? err.message : "Unknown error";
+      setError(errorMessage);
+
+      // Mark any remaining files as error
+      setFiles((prev) =>
+        prev.map((f) =>
+          f.status === "processing" ? { ...f, status: "error" as const } : f
+        )
+      );
     }
 
     setResults(batchResults);
