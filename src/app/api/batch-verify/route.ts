@@ -9,10 +9,10 @@ import { verifySingleLabel, SingleVerificationResult } from "@/lib/verify-single
 import type { ApplicationData } from "@/lib/types";
 
 export const runtime = "nodejs";
-export const maxDuration = 60; // Allow up to 60s for batch processing
+export const maxDuration = 300; // Allow up to 5 minutes for large batches (300 labels)
 
-const MAX_BATCH_SIZE = 10;
-const CONCURRENCY_LIMIT = 3;
+const MAX_BATCH_SIZE = 300;
+const CONCURRENCY_LIMIT = 10; // Higher concurrency for large batches
 
 interface BatchItem {
   id: string;

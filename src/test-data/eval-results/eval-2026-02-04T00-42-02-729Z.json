@@ -1,0 +1,291 @@
+{
+  "evalId": "eval-2026-02-04T00-42-02-729Z",
+  "timestamp": "2026-02-04T00:42:02.730Z",
+  "testCases": 18,
+  "compare": null,
+  "extraction": null,
+  "latency": {
+    "tests": [
+      {
+        "id": "B1-perfect",
+        "visionMs": 4928,
+        "ocrMs": 5423,
+        "speedup": 0.9
+      },
+      {
+        "id": "B2-case-mismatch",
+        "visionMs": 4939,
+        "ocrMs": 4862,
+        "speedup": 1
+      },
+      {
+        "id": "B3-wrong-abv",
+        "visionMs": 4777,
+        "ocrMs": 4592,
+        "speedup": 1
+      },
+      {
+        "id": "B4-warning-titlecase",
+        "visionMs": 5579,
+        "ocrMs": 5039,
+        "speedup": 1.1
+      },
+      {
+        "id": "B5-no-warning",
+        "visionMs": 4993,
+        "ocrMs": 4351,
+        "speedup": 1.1
+      },
+      {
+        "id": "B6-imported",
+        "visionMs": 5640,
+        "ocrMs": 5062,
+        "speedup": 1.1
+      },
+      {
+        "id": "I1-proof-to-abv",
+        "visionMs": 4649,
+        "ocrMs": 4868,
+        "speedup": 1
+      },
+      {
+        "id": "I2-ml-to-floz",
+        "visionMs": 5528,
+        "ocrMs": 4515,
+        "speedup": 1.2
+      },
+      {
+        "id": "I3-address-abbrev",
+        "visionMs": 5312,
+        "ocrMs": 4521,
+        "speedup": 1.2
+      },
+      {
+        "id": "I4-punctuation",
+        "visionMs": 5089,
+        "ocrMs": 4520,
+        "speedup": 1.1
+      },
+      {
+        "id": "S1-high-abv",
+        "visionMs": 11265,
+        "ocrMs": 5177,
+        "speedup": 2.2
+      },
+      {
+        "id": "S2-low-abv",
+        "visionMs": 4930,
+        "ocrMs": 5096,
+        "speedup": 1
+      },
+      {
+        "id": "S3-odd-proof",
+        "visionMs": 4777,
+        "ocrMs": 5754,
+        "speedup": 0.8
+      },
+      {
+        "id": "S4-liters",
+        "visionMs": 4939,
+        "ocrMs": 5528,
+        "speedup": 0.9
+      },
+      {
+        "id": "S5-multiline-address",
+        "visionMs": 6486,
+        "ocrMs": 6865,
+        "speedup": 0.9
+      },
+      {
+        "id": "S6-truncated-warning",
+        "visionMs": 5188,
+        "ocrMs": 5575,
+        "speedup": 0.9
+      },
+      {
+        "id": "S7-unicode-brand",
+        "visionMs": 4793,
+        "ocrMs": 4714,
+        "speedup": 1
+      },
+      {
+        "id": "S8-floz-to-ml",
+        "visionMs": 5104,
+        "ocrMs": 7083,
+        "speedup": 0.7
+      }
+    ],
+    "vision": {
+      "times": [
+        4928,
+        4939,
+        4777,
+        5579,
+        4993,
+        5640,
+        4649,
+        5528,
+        5312,
+        5089,
+        11265,
+        4930,
+        4777,
+        4939,
+        6486,
+        5188,
+        4793,
+        5104
+      ],
+      "avg": 5495,
+      "min": 4649,
+      "max": 11265,
+      "p95": 11265
+    },
+    "ocr": {
+      "times": [
+        5423,
+        4862,
+        4592,
+        5039,
+        4351,
+        5062,
+        4868,
+        4515,
+        4521,
+        4520,
+        5177,
+        5096,
+        5754,
+        5528,
+        6865,
+        5575,
+        4714,
+        7083
+      ],
+      "avg": 5197,
+      "min": 4351,
+      "max": 7083,
+      "p95": 7083,
+      "underTarget": 0
+    },
+    "speedup": "1.1"
+  },
+  "ocrOnly": null,
+  "fallback": {
+    "tests": [
+      {
+        "id": "B1-perfect",
+        "confidence": 65,
+        "usedFallback": false,
+        "status": "FAIL"
+      },
+      {
+        "id": "B2-case-mismatch",
+        "confidence": 79,
+        "usedFallback": false,
+        "status": "FAIL"
+      },
+      {
+        "id": "B3-wrong-abv",
+        "confidence": 62,
+        "usedFallback": false,
+        "status": "FAIL"
+      },
+      {
+        "id": "B4-warning-titlecase",
+        "confidence": 69,
+        "usedFallback": false,
+        "status": "FAIL"
+      },
+      {
+        "id": "B5-no-warning",
+        "confidence": 72,
+        "usedFallback": false,
+        "status": "FAIL"
+      },
+      {
+        "id": "B6-imported",
+        "confidence": 62,
+        "usedFallback": false,
+        "status": "FAIL"
+      },
+      {
+        "id": "I1-proof-to-abv",
+        "confidence": 91,
+        "usedFallback": true,
+        "fallbackReason": "OCR text validation failed (missing expected patterns)",
+        "status": "REVIEW"
+      },
+      {
+        "id": "I2-ml-to-floz",
+        "confidence": 52,
+        "usedFallback": false,
+        "status": "FAIL"
+      },
+      {
+        "id": "I3-address-abbrev",
+        "confidence": 61,
+        "usedFallback": false,
+        "status": "FAIL"
+      },
+      {
+        "id": "I4-punctuation",
+        "confidence": 74,
+        "usedFallback": false,
+        "status": "FAIL"
+      },
+      {
+        "id": "S1-high-abv",
+        "confidence": 52,
+        "usedFallback": false,
+        "status": "FAIL"
+      },
+      {
+        "id": "S2-low-abv",
+        "confidence": 53,
+        "usedFallback": false,
+        "status": "FAIL"
+      },
+      {
+        "id": "S3-odd-proof",
+        "confidence": 56,
+        "usedFallback": false,
+        "status": "FAIL"
+      },
+      {
+        "id": "S4-liters",
+        "confidence": 53,
+        "usedFallback": false,
+        "status": "FAIL"
+      },
+      {
+        "id": "S5-multiline-address",
+        "confidence": 56,
+        "usedFallback": false,
+        "status": "FAIL"
+      },
+      {
+        "id": "S6-truncated-warning",
+        "confidence": 49,
+        "usedFallback": true,
+        "fallbackReason": "OCR confidence too low: 49.0%",
+        "status": "FAIL"
+      },
+      {
+        "id": "S7-unicode-brand",
+        "confidence": 59,
+        "usedFallback": false,
+        "status": "FAIL"
+      },
+      {
+        "id": "S8-floz-to-ml",
+        "confidence": 42,
+        "usedFallback": true,
+        "fallbackReason": "OCR confidence too low: 42.0%",
+        "status": "REVIEW"
+      }
+    ],
+    "fallbackCount": 3,
+    "total": 18
+  }
+}

@@ -204,7 +204,7 @@ export default function BatchPage() {
                 Verify multiple labels against the same application data
               </p>
               <p className="text-xs text-gray-500 mt-1">
-                Prototype limit: 10 labels per batch. Ideal for front/back/side labels of a single product.
+                Upload up to 300 labels. All verified against the same application data.
               </p>
             </div>
             <Link

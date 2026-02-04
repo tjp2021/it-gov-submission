@@ -1,0 +1,1350 @@
+{
+  "evalId": "eval-2026-02-04T01-11-06-686Z",
+  "timestamp": "2026-02-04T01:11:06.687Z",
+  "testCases": 18,
+  "compare": {
+    "tests": [
+      {
+        "id": "B1-perfect",
+        "expected": "PASS",
+        "vision": "REVIEW",
+        "ocr": "FAIL",
+        "matches": false
+      },
+      {
+        "id": "B2-case-mismatch",
+        "expected": "PASS",
+        "vision": "REVIEW",
+        "ocr": "FAIL",
+        "matches": false
+      },
+      {
+        "id": "B3-wrong-abv",
+        "expected": "FAIL",
+        "vision": "FAIL",
+        "ocr": "FAIL",
+        "matches": true
+      },
+      {
+        "id": "B4-warning-titlecase",
+        "expected": "FAIL",
+        "vision": "FAIL",
+        "ocr": "FAIL",
+        "matches": true
+      },
+      {
+        "id": "B5-no-warning",
+        "expected": "FAIL",
+        "vision": "FAIL",
+        "ocr": "FAIL",
+        "matches": true
+      },
+      {
+        "id": "B6-imported",
+        "expected": "PASS",
+        "vision": "REVIEW",
+        "ocr": "REVIEW",
+        "matches": true
+      },
+      {
+        "id": "I1-proof-to-abv",
+        "expected": "PASS",
+        "vision": "FAIL",
+        "ocr": "REVIEW",
+        "matches": false
+      },
+      {
+        "id": "I2-ml-to-floz",
+        "expected": "PASS",
+        "vision": "REVIEW",
+        "ocr": "FAIL",
+        "matches": false
+      },
+      {
+        "id": "I3-address-abbrev",
+        "expected": "PASS",
+        "vision": "REVIEW",
+        "ocr": "FAIL",
+        "matches": false
+      },
+      {
+        "id": "I4-punctuation",
+        "expected": "PASS",
+        "vision": "REVIEW",
+        "ocr": "FAIL",
+        "matches": false
+      },
+      {
+        "id": "S1-high-abv",
+        "expected": "PASS",
+        "vision": "REVIEW",
+        "ocr": "FAIL",
+        "matches": false
+      },
+      {
+        "id": "S2-low-abv",
+        "expected": "PASS",
+        "vision": "REVIEW",
+        "ocr": "FAIL",
+        "matches": false
+      },
+      {
+        "id": "S3-odd-proof",
+        "expected": "PASS",
+        "vision": "REVIEW",
+        "ocr": "FAIL",
+        "matches": false
+      },
+      {
+        "id": "S4-liters",
+        "expected": "PASS",
+        "vision": "REVIEW",
+        "ocr": "FAIL",
+        "matches": false
+      },
+      {
+        "id": "S5-multiline-address",
+        "expected": "PASS",
+        "vision": "REVIEW",
+        "ocr": "FAIL",
+        "matches": false
+      },
+      {
+        "id": "S6-truncated-warning",
+        "expected": "FAIL",
+        "vision": "FAIL",
+        "ocr": "FAIL",
+        "matches": true
+      },
+      {
+        "id": "S7-unicode-brand",
+        "expected": "PASS",
+        "vision": "REVIEW",
+        "ocr": "FAIL",
+        "matches": false
+      },
+      {
+        "id": "S8-floz-to-ml",
+        "expected": "PASS",
+        "vision": "REVIEW",
+        "ocr": "REVIEW",
+        "matches": true
+      }
+    ],
+    "matching": 6,
+    "total": 18
+  },
+  "extraction": {
+    "tests": [
+      {
+        "id": "B1-perfect",
+        "fields": [
+          {
+            "field": "brandName",
+            "vision": "OLD TOM DISTILLERY",
+            "ocr": "OLD TOM",
+            "matches": false
+          },
+          {
+            "field": "classType",
+            "vision": "Kentucky Straight Bourbon Whiskey",
+            "ocr": "Kentucky Straight Bourbon Whiskey",
+            "matches": true
+          },
+          {
+            "field": "alcoholContent",
+            "vision": "45% Alc./Vol. (90 Proof)",
+            "ocr": "45% Alc./Vol. (90 Proof)",
+            "matches": true
+          },
+          {
+            "field": "netContents",
+            "vision": "750 mL",
+            "ocr": "750 mL",
+            "matches": true
+          },
+          {
+            "field": "nameAddress",
+            "vision": "Old Tom Distillery, Louisville, Kentucky",
+            "ocr": "Old Tom Distillery, Louisville, Kentucky",
+            "matches": true
+          },
+          {
+            "field": "governmentWarning",
+            "vision": "GOVERNMENT WARNING: (1) According to the Surgeon General, women should not drink alcoholic beverages during pregnancy because of the risk of birth defects. (2) Consumption of alcoholic beverages impairs your ability to drive a car or operate machinery, and may cause health problems.",
+            "ocr": "GOVERNMENT WARNING: (1) According to the Surgeon General, women should not drink alcoholic beverages during pregnancy because of the risk of birth defects. (2) Consumption of alcoholic beverages impairs your ability to drive a car or operate machinery, and may cause health problems.",
+            "matches": true
+          }
+        ]
+      },
+      {
+        "id": "B2-case-mismatch",
+        "fields": [
+          {
+            "field": "brandName",
+            "vision": "STONE'S THROW",
+            "ocr": "STONE'S THROW",
+            "matches": true
+          },
+          {
+            "field": "classType",
+            "vision": "SMALL BATCH BOURBON WHISKEY",
+            "ocr": "SMALL BATCH BOURBON WHISKEY",
+            "matches": true
+          },
+          {
+            "field": "alcoholContent",
+            "vision": "46% Alc./Vol.",
+            "ocr": "46% Ale./Vol.",
+            "matches": false
+          },
+          {
+            "field": "netContents",
+            "vision": "750 mL",
+            "ocr": "750 mL",
+            "matches": true
+          },
+          {
+            "field": "nameAddress",
+            "vision": "Stone's Throw Distillery, Frankfort, Kentucky",
+            "ocr": "Stone's Throw Distillery, Frankfort, Kentucky",
+            "matches": true
+          },
+          {
+            "field": "governmentWarning",
+            "vision": "GOVERNMENT WARNING: (1) According to the Surgeon General, women should not drink alcoholic beverages during pregnancy because of the risk of birth defects. (2) Consumption of alcoholic beverages impairs your ability to drive a car or operate machinery, and may cause health problems.",
+            "ocr": "NONE",
+            "matches": false
+          }
+        ]
+      },
+      {
+        "id": "B3-wrong-abv",
+        "fields": [
+          {
+            "field": "brandName",
+            "vision": "Chateau Margaux",
+            "ocr": "Chateau Margaux",
+            "matches": true
+          },
+          {
+            "field": "classType",
+            "vision": "Cabernet Sauvignon",
+            "ocr": "Cabernet Sauvignon",
+            "matches": true
+          },
+          {
+            "field": "alcoholContent",
+            "vision": "14.5% Alc./Vol.",
+            "ocr": "145% Alool",
+            "matches": false
+          },
+          {
+            "field": "netContents",
+            "vision": "750 mL",
+            "ocr": "750m",
+            "matches": false
+          },
+          {
+            "field": "nameAddress",
+            "vision": "Vinted and Bottled by Chateau Margaux Winery\nNapa, California",
+            "ocr": "<UNKNOWN>",
+            "matches": false
+          },
+          {
+            "field": "governmentWarning",
+            "vision": "GOVERNMENT WARNING: (1) According to the Surgeon General, women should not drink alcoholic beverages during pregnancy because of the risk of birth defects. (2) Consumption of alcoholic beverages impairs your ability to drive a car or operate machinery, and may cause health problems.",
+            "ocr": "<UNKNOWN>",
+            "matches": false
+          }
+        ]
+      },
+      {
+        "id": "B4-warning-titlecase",
+        "fields": [
+          {
+            "field": "brandName",
+            "vision": "HOPMASTER",
+            "ocr": "HOPMASTER",
+            "matches": true
+          },
+          {
+            "field": "classType",
+            "vision": "India Pale Ale",
+            "ocr": "India Pale Ale",
+            "matches": true
+          },
+          {
+            "field": "alcoholContent",
+            "vision": "ALCOHOL 6.5% BY VOLUME 12 FL. OZ.",
+            "ocr": "6.5%",
+            "matches": false
+          },
+          {
+            "field": "netContents",
+            "vision": "12 FL. OZ.",
+            "ocr": "12 FL. OZ.",
+            "matches": true
+          },
+          {
+            "field": "nameAddress",
+            "vision": "Brewed by HopMaster Brewing Co. Portland, Oregon",
+            "ocr": "Brovied by HopMastar Brawing Co, Porland, Oregon",
+            "matches": false
+          },
+          {
+            "field": "governmentWarning",
+            "vision": "Government Warning: (1) According to the Surgeon General, women should not drink alcoholic beverages during pregnancy because of the risk of birth defects. (2) Consumption of alcoholic beverages impairs your ability to drive a car or operate machinery, and may cause health problems.",
+            "ocr": "GOVERNMENT WARNING: (1) According to the Surgeon General, women should not drink alcoholic beverages during pregnancy because of the risk of birth defects. (2) Consumption of alcoholic beverages impairs your ability to drive a car or operate machinery, and may cause health problems.",
+            "matches": true
+          }
+        ]
+      },
+      {
+        "id": "B5-no-warning",
+        "fields": [
+          {
+            "field": "brandName",
+            "vision": "Blue Fjord",
+            "ocr": "Blue Fjord",
+            "matches": true
+          },
+          {
+            "field": "classType",
+            "vision": "PREMIUM VODKA",
+            "ocr": "PREMIUM VODKA",
+            "matches": true
+          },
+          {
+            "field": "alcoholContent",
+            "vision": "40% Alc./Vol.",
+            "ocr": "40% Alc./Vol.",
+            "matches": true
+          },
+          {
+            "field": "netContents",
+            "vision": "750 mL",
+            "ocr": "750 mL",
+            "matches": true
+          },
+          {
+            "field": "nameAddress",
+            "vision": "Distilled and Bottled by Nordic Spirits, Inc. Minneapolis, Minnesota",
+            "ocr": "Distilled and Bottled by Nordic Spirits, Inc.",
+            "matches": false
+          },
+          {
+            "field": "governmentWarning",
+            "vision": "null",
+            "ocr": "Product of USA",
+            "matches": false
+          }
+        ]
+      },
+      {
+        "id": "B6-imported",
+        "fields": [
+          {
+            "field": "brandName",
+            "vision": "Glenfiddich",
+            "ocr": "Glenfiddich",
+            "matches": true
+          },
+          {
+            "field": "classType",
+            "vision": "Single Malt Scotch Whisky",
+            "ocr": "Single Malt Scotch Whisky",
+            "matches": true
+          },
+          {
+            "field": "alcoholContent",
+            "vision": "40% Alc./Vol. (80 Proof)",
+            "ocr": "40% Alc./Vol. (80 Proof)",
+            "matches": true
+          },
+          {
+            "field": "netContents",
+            "vision": "750 mL",
+            "ocr": "750 mL",
+            "matches": true
+          },
+          {
+            "field": "nameAddress",
+            "vision": "William Grant & Sons, Dufftown, Banffshire",
+            "ocr": "Dil, Age, nd Boot in Sond by Wiliam Gos & So, Dunn, Bnfibe",
+            "matches": false
+          },
+          {
+            "field": "governmentWarning",
+            "vision": "GOVERNMENT WARNING: (1) According to the Surgeon General, women should not drink alcoholic beverages during pregnancy because of the risk of birth defects. (2) Consumption of alcoholic beverages impairs your ability to drive a car or operate machinery, and may cause health problems.",
+            "ocr": "UNKNOWN",
+            "matches": false
+          }
+        ]
+      },
+      {
+        "id": "I1-proof-to-abv",
+        "fields": [
+          {
+            "field": "brandName",
+            "vision": "COPPER STILL",
+            "ocr": "COPPER STILL",
+            "matches": true
+          },
+          {
+            "field": "classType",
+            "vision": "Tennessee Whiskey",
+            "ocr": "Tennessee Whiskey",
+            "matches": true
+          },
+          {
+            "field": "alcoholContent",
+            "vision": "90 Proof",
+            "ocr": "90 Proof",
+            "matches": true
+          },
+          {
+            "field": "netContents",
+            "vision": "750 mL",
+            "ocr": "750 mL",
+            "matches": true
+          },
+          {
+            "field": "nameAddress",
+            "vision": "Copper Still Distillery, Lynchburg, Tennessee",
+            "ocr": "Copper Still Distillery, Lynchburg, Tennessee",
+            "matches": true
+          },
+          {
+            "field": "governmentWarning",
+            "vision": "(1) According to the Surgeon General, women should not drink alcoholic beverages during pregnancy because of the risk of birth defects. (2) Consumption of alcoholic beverages impairs your ability to drive a car or operate machinery, and may cause health problems.",
+            "ocr": "GOVERNMENT WARNING: (1) According to the Surgeon General, women should not drink alcoholic beverages during pregnancy because of the risk of birth defects. (2) Consumption of alcoholic beverages impairs your ability to drive a car or operate machinery, and may cause health problems.",
+            "matches": false
+          }
+        ]
+      },
+      {
+        "id": "I2-ml-to-floz",
+        "fields": [
+          {
+            "field": "brandName",
+            "vision": "VERDE",
+            "ocr": "London Dry Gin",
+            "matches": false
+          },
+          {
+            "field": "classType",
+            "vision": "London Dry Gin",
+            "ocr": "<UNKNOWN>",
+            "matches": false
+          },
+          {
+            "field": "alcoholContent",
+            "vision": "47% Alc./Vol.",
+            "ocr": "47% Alc./Vol.",
+            "matches": true
+          },
+          {
+            "field": "netContents",
+            "vision": "750 mL",
+            "ocr": "750 mL.",
+            "matches": false
+          },
+          {
+            "field": "nameAddress",
+            "vision": "Distilled and Bottled by Verde Spirits Co.\nPortland, Oregon",
+            "ocr": "Ot ac Bot by Verda Spits Go. Portas, Crago",
+            "matches": false
+          },
+          {
+            "field": "governmentWarning",
+            "vision": "GOVERNMENT WARNING: (1) According to the Surgeon General, women should not drink alcoholic beverages during pregnancy because of the risk of birth defects. (2) Consumption of alcoholic beverages impairs your ability to drive a car or operate machinery, and may cause health problems.",
+            "ocr": "prey ok on Coan ot SSR Sg moa dy",
+            "matches": false
+          }
+        ]
+      },
+      {
+        "id": "I3-address-abbrev",
+        "fields": [
+          {
+            "field": "brandName",
+            "vision": "Midnight Reserve",
+            "ocr": "Midnight Reserve",
+            "matches": true
+          },
+          {
+            "field": "classType",
+            "vision": "Small Batch Bourbon",
+            "ocr": "Small Batch Bourbon",
+            "matches": true
+          },
+          {
+            "field": "alcoholContent",
+            "vision": "46% Alc./Vol.",
+            "ocr": "46% Alc. /Vol.",
+            "matches": false
+          },
+          {
+            "field": "netContents",
+            "vision": "750 mL",
+            "ocr": "750 mL",
+            "matches": true
+          },
+          {
+            "field": "nameAddress",
+            "vision": "Bottled by Midnight Reserve Distillery\n456 Oak St., Ste. 100\nLexington, KY 40507",
+            "ocr": "Not found",
+            "matches": false
+          },
+          {
+            "field": "governmentWarning",
+            "vision": "GOVERNMENT WARNING: (1) According to the Surgeon General, women should not drink alcoholic beverages during pregnancy because of the risk of birth defects. (2) Consumption of alcoholic beverages impairs your ability to drive a car or operate machinery, and may cause health problems.",
+            "ocr": "Not found",
+            "matches": false
+          }
+        ]
+      },
+      {
+        "id": "I4-punctuation",
+        "fields": [
+          {
+            "field": "brandName",
+            "vision": "Maker's Mark",
+            "ocr": "Maker's Mark",
+            "matches": true
+          },
+          {
+            "field": "classType",
+            "vision": "KENTUCKY BOURBON WHISKY",
+            "ocr": "KENTUCKY BOURBON WHISKY",
+            "matches": true
+          },
+          {
+            "field": "alcoholContent",
+            "vision": "45% Alc./Vol. (90 Proof)",
+            "ocr": "45% Ale./Vol. (90 Proof)",
+            "matches": false
+          },
+          {
+            "field": "netContents",
+            "vision": "750 mL",
+            "ocr": "750 mL",
+            "matches": true
+          },
+          {
+            "field": "nameAddress",
+            "vision": "Distilled and Bottled by\nMaker's Mark Distillery, Inc.\nLoretto, Kentucky",
+            "ocr": "<UNKNOWN>",
+            "matches": false
+          },
+          {
+            "field": "governmentWarning",
+            "vision": "GOVERNMENT WARNING: (1) According to the Surgeon General, women should not drink alcoholic beverages during pregnancy because of the risk of birth defects. (2) Consumption of alcoholic beverages impairs your ability to drive a car or operate machinery, and may cause health problems.",
+            "ocr": "NOT_FOUND",
+            "matches": false
+          }
+        ]
+      },
+      {
+        "id": "S1-high-abv",
+        "fields": [
+          {
+            "field": "brandName",
+            "vision": "NAVY STRENGTH",
+            "ocr": "Overproof Rum",
+            "matches": false
+          },
+          {
+            "field": "classType",
+            "vision": "Overproof Rum",
+            "ocr": "Navy Strength",
+            "matches": false
+          },
+          {
+            "field": "alcoholContent",
+            "vision": "75.5% Alc./Vol. (151 Proof)",
+            "ocr": "75.5% Alc. /Vol. (151 Proof)",
+            "matches": false
+          },
+          {
+            "field": "netContents",
+            "vision": "750 mL",
+            "ocr": "750 mL",
+            "matches": true
+          },
+          {
+            "field": "nameAddress",
+            "vision": "Navy Strength Distillers, Charleston, South Carolina",
+            "ocr": "Navy Strength Distillers, Charleston, South Carolina",
+            "matches": true
+          },
+          {
+            "field": "governmentWarning",
+            "vision": "GOVERNMENT WARNING: (1) According to the Surgeon General, women should not drink alcoholic beverages during pregnancy because of the risk of birth defects. (2) Consumption of alcoholic beverages impairs your ability to drive a car or operate machinery, and may cause health problems.",
+            "ocr": "GOVERNMENT WARNING: 1) Cringe Surgan Geral, win sho rc dik Schl evra ag Ga 43a fh kf at. (3) Corsumon Ct kh barage par you oly dv 3 or peas machen: an ay Causa as praia.",
+            "matches": false
+          }
+        ]
+      },
+      {
+        "id": "S2-low-abv",
+        "fields": [
+          {
+            "field": "brandName",
+            "vision": "Lite Fizz",
+            "ocr": "Lite Fizz",
+            "matches": true
+          },
+          {
+            "field": "classType",
+            "vision": "Low Alcohol Sparkling Wine",
+            "ocr": "Low Alcohol Sparkling Wine",
+            "matches": true
+          },
+          {
+            "field": "alcoholContent",
+            "vision": "0.5% Alc./Vol.",
+            "ocr": "0.5% Alc./Vol.",
+            "matches": true
+          },
+          {
+            "field": "netContents",
+            "vision": "750 mL",
+            "ocr": "750 mL",
+            "matches": true
+          },
+          {
+            "field": "nameAddress",
+            "vision": "Lite Fizz Winery, Modesto, California",
+            "ocr": "Le Fiz Wier, Modesto, alfa",
+            "matches": false
+          },
+          {
+            "field": "governmentWarning",
+            "vision": "GOVERNMENT WARNING: (1) According to the Surgeon General, women should not drink alcoholic beverages during pregnancy because of the risk of birth defects. (2) Consumption of alcoholic beverages impairs your ability to drive a car or operate machinery, and may cause health problems.",
+            "ocr": "COVERAMENT WAG: civ Sop sem",
+            "matches": false
+          }
+        ]
+      },
+      {
+        "id": "S3-odd-proof",
+        "fields": [
+          {
+            "field": "brandName",
+            "vision": "WILD TURKEY",
+            "ocr": "Wild Turkey",
+            "matches": true
+          },
+          {
+            "field": "classType",
+            "vision": "Kentucky Straight Bourbon Whiskey",
+            "ocr": "Kentucky Straight Bourbon Whiskey",
+            "matches": true
+          },
+          {
+            "field": "alcoholContent",
+            "vision": "101 Proof",
+            "ocr": "101 Proof",
+            "matches": true
+          },
+          {
+            "field": "netContents",
+            "vision": "750 mL",
+            "ocr": "750 mL",
+            "matches": true
+          },
+          {
+            "field": "nameAddress",
+            "vision": "Wild Turkey Distilling Co., Lawrenceburg, Kentucky",
+            "ocr": "Wild Turkey Distling Co. Lawrenceburg, Kentucky",
+            "matches": false
+          },
+          {
+            "field": "governmentWarning",
+            "vision": "GOVERNMENT WARNING: (1) According to the Surgeon General, women should not drink alcoholic beverages during pregnancy because of the risk of birth defects. (2) Consumption of alcoholic beverages impairs your ability to drive a car or operate machinery, and may cause health problems.",
+            "ocr": "GOVERNMENT WARNING: (1) Acercing tte Surgeon General vom sho not atic alcool bvarages rg regan because erik of Bh defect. (2) Consmponof coho bearages impas your ait ode car cprate machinery and may cause hls proms.",
+            "matches": false
+          }
+        ]
+      },
+      {
+        "id": "S4-liters",
+        "fields": [
+          {
+            "field": "brandName",
+            "vision": "COSTCO SELECT",
+            "ocr": "Blended Scotch Whisky",
+            "matches": false
+          },
+          {
+            "field": "classType",
+            "vision": "Blended Scotch Whisky",
+            "ocr": "Blended Scotch Whisky",
+            "matches": true
+          },
+          {
+            "field": "alcoholContent",
+            "vision": "40% Alc./Vol.",
+            "ocr": "40% Alc./Vol.",
+            "matches": true
+          },
+          {
+            "field": "netContents",
+            "vision": "1.75 L",
+            "ocr": "175L",
+            "matches": false
+          },
+          {
+            "field": "nameAddress",
+            "vision": "Bottled by Costco Wholesale, Issaquah, Washington",
+            "ocr": "Bottled by Costco Wholesale, Issaquah, Washington",
+            "matches": true
+          },
+          {
+            "field": "governmentWarning",
+            "vision": "GOVERNMENT WARNING: (1) According to the Surgeon General, women should not drink alcoholic beverages during pregnancy because of the risk of birth defects. (2) Consumption of alcoholic beverages impairs your ability to drive a car or operate machinery, and may cause health problems.",
+            "ocr": "GOVERNMENT WARNING: 1) According to the Surgeon General, women should not drink alcoholic beverages during pregnancy because of the risk of birth defects. 2) Consumption of alcoholic beverages impairs your ability to drive a car or operate machinery, and may cause health problems.",
+            "matches": false
+          }
+        ]
+      },
+      {
+        "id": "S5-multiline-address",
+        "fields": [
+          {
+            "field": "brandName",
+            "vision": "EMERALD HILLS",
+            "ocr": "Oregon Pinot Noir",
+            "matches": false
+          },
+          {
+            "field": "classType",
+            "vision": "Oregon Pinot Noir",
+            "ocr": "Pinot Noir",
+            "matches": false
+          },
+          {
+            "field": "alcoholContent",
+            "vision": "14.2% Alc./Vol.",
+            "ocr": "14.2% Alc./Vol.",
+            "matches": true
+          },
+          {
+            "field": "netContents",
+            "vision": "750 mL",
+            "ocr": "750mL",
+            "matches": false
+          },
+          {
+            "field": "nameAddress",
+            "vision": "Vinted and Bottled by\nEmerald Hills Winery\n1234 Vineyard Lane, Suite 200\nWillamette Valley, Oregon 97128",
+            "ocr": "Emerald ils Winery\n1234 Vineyard Lane, Site 200\nWillamette ally, Oregon 97128",
+            "matches": false
+          },
+          {
+            "field": "governmentWarning",
+            "vision": "GOVERNMENT WARNING: (1) According to the Surgeon General, women should not drink alcoholic beverages during pregnancy because of the risk of birth defects. (2) Consumption of alcoholic beverages impairs your ability to drive a car or operate machinery, and may cause health problems.",
+            "ocr": "GOVERNMENT WARNING: 1) According to the Surgeon General, women should not drink alcoholic beverages during pregnancy because of the risk of birth defects. (2) Consumption of alcoholic beverages impairs your ability to drive a car or operate machinery, and may cause health problems.",
+            "matches": false
+          }
+        ]
+      },
+      {
+        "id": "S6-truncated-warning",
+        "fields": [
+          {
+            "field": "brandName",
+            "vision": "SHORTCUT SPIRITS",
+            "ocr": "SHORTCUT SPIRITS",
+            "matches": true
+          },
+          {
+            "field": "classType",
+            "vision": "American Whiskey",
+            "ocr": "American Whiskey",
+            "matches": true
+          },
+          {
+            "field": "alcoholContent",
+            "vision": "40% Alc./Vol.",
+            "ocr": "40% Alc./Vol.",
+            "matches": true
+          },
+          {
+            "field": "netContents",
+            "vision": "750 mL",
+            "ocr": "750 mL",
+            "matches": true
+          },
+          {
+            "field": "nameAddress",
+            "vision": "Shortcut Spirits Co., Nashville, Tennessee",
+            "ocr": "Shortcut Spirits Co., Nashville, Tennessee",
+            "matches": true
+          },
+          {
+            "field": "governmentWarning",
+            "vision": "GOVERNMENT WARNING: (1) According to the Surgeon General, women should not drink alcoholic beverages during pregnancy because of the risk of birth defects. (2) Consumption of alcoholic beverages impairs your ability to drive a car or operate machinery.",
+            "ocr": "GOVERNMENT WARNING: (1) According to the Surgeon General, women should not drink alcoholic beverages during pregnancy because of the risk of birth defects. (2) Consumption of alcoholic beverages impairs your ability to drive a car or operate machinery.",
+            "matches": true
+          }
+        ]
+      },
+      {
+        "id": "S7-unicode-brand",
+        "fields": [
+          {
+            "field": "brandName",
+            "vision": "Château Élégance",
+            "ocr": "Chateau Elégance",
+            "matches": false
+          },
+          {
+            "field": "classType",
+            "vision": "Bordeaux Rouge",
+            "ocr": "Bordeaux Rouge",
+            "matches": true
+          },
+          {
+            "field": "alcoholContent",
+            "vision": "13.5% Alc./Vol.",
+            "ocr": "13.5% Alc./Vol.",
+            "matches": true
+          },
+          {
+            "field": "netContents",
+            "vision": "750 mL",
+            "ocr": "750 mL",
+            "matches": true
+          },
+          {
+            "field": "nameAddress",
+            "vision": "Château Élégance, Margaux, France",
+            "ocr": "Chateau Elégance, Margaux, France.",
+            "matches": false
+          },
+          {
+            "field": "governmentWarning",
+            "vision": "GOVERNMENT WARNING: (1) According to the Surgeon General, women should not drink alcoholic beverages during pregnancy because of the risk of birth defects. (2) Consumption of alcoholic beverages impairs your ability to drive a car or operate machinery, and may cause health problems.",
+            "ocr": "Frodet ot rane",
+            "matches": false
+          }
+        ]
+      },
+      {
+        "id": "S8-floz-to-ml",
+        "fields": [
+          {
+            "field": "brandName",
+            "vision": "SIERRA CERVEZA",
+            "ocr": "SIERRA CERVEZA",
+            "matches": true
+          },
+          {
+            "field": "classType",
+            "vision": "Mexican Lager",
+            "ocr": "Mexican Lager",
+            "matches": true
+          },
+          {
+            "field": "alcoholContent",
+            "vision": "4.5% Alc./Vol.",
+            "ocr": "4.5% Alc./Vol.",
+            "matches": true
+          },
+          {
+            "field": "netContents",
+            "vision": "12 FL. OZ.",
+            "ocr": "12 FL. OZ.",
+            "matches": true
+          },
+          {
+            "field": "nameAddress",
+            "vision": "Sierra Brewing Co., Tucson, Arizona",
+            "ocr": "Sierra Brewing Co., Tucson, Arizona",
+            "matches": true
+          },
+          {
+            "field": "governmentWarning",
+            "vision": "GOVERNMENT WARNING: (1) According to the Surgeon General, women should not drink alcoholic beverages during pregnancy because of the risk of birth defects. (2) Consumption of alcoholic beverages impairs your ability to drive a car or operate machinery, and may cause health problems.",
+            "ocr": "GOVERNMENT WARNING: (1) According to the Surgeon General, women should not drink alcoholic beverages during pregnancy because of the risk of birth defects. (2) Consumption of alcoholic beverages impairs your ability to drive a car or operate machinery, and may cause health problems.",
+            "matches": true
+          }
+        ]
+      }
+    ],
+    "fieldMatches": {
+      "brandName": {
+        "matches": 12,
+        "total": 18,
+        "accuracy": "66.7%"
+      },
+      "classType": {
+        "matches": 15,
+        "total": 18,
+        "accuracy": "83.3%"
+      },
+      "alcoholContent": {
+        "matches": 12,
+        "total": 18,
+        "accuracy": "66.7%"
+      },
+      "netContents": {
+        "matches": 14,
+        "total": 18,
+        "accuracy": "77.8%"
+      },
+      "nameAddress": {
+        "matches": 7,
+        "total": 18,
+        "accuracy": "38.9%"
+      },
+      "governmentWarning": {
+        "matches": 4,
+        "total": 18,
+        "accuracy": "22.2%"
+      }
+    },
+    "overallAccuracy": "59.3%"
+  },
+  "latency": {
+    "tests": [
+      {
+        "id": "B1-perfect",
+        "visionMs": 6056,
+        "ocrMs": 2731,
+        "speedup": 2.2
+      },
+      {
+        "id": "B2-case-mismatch",
+        "visionMs": 4245,
+        "ocrMs": 1812,
+        "speedup": 2.3
+      },
+      {
+        "id": "B3-wrong-abv",
+        "visionMs": 5741,
+        "ocrMs": 2232,
+        "speedup": 2.6
+      },
+      {
+        "id": "B4-warning-titlecase",
+        "visionMs": 4882,
+        "ocrMs": 2440,
+        "speedup": 2
+      },
+      {
+        "id": "B5-no-warning",
+        "visionMs": 4924,
+        "ocrMs": 2116,
+        "speedup": 2.3
+      },
+      {
+        "id": "B6-imported",
+        "visionMs": 4784,
+        "ocrMs": 2324,
+        "speedup": 2.1
+      },
+      {
+        "id": "I1-proof-to-abv",
+        "visionMs": 4902,
+        "ocrMs": 4616,
+        "speedup": 1.1
+      },
+      {
+        "id": "I2-ml-to-floz",
+        "visionMs": 6686,
+        "ocrMs": 2385,
+        "speedup": 2.8
+      },
+      {
+        "id": "I3-address-abbrev",
+        "visionMs": 6882,
+        "ocrMs": 2244,
+        "speedup": 3.1
+      },
+      {
+        "id": "I4-punctuation",
+        "visionMs": 6388,
+        "ocrMs": 2185,
+        "speedup": 2.9
+      },
+      {
+        "id": "S1-high-abv",
+        "visionMs": 5411,
+        "ocrMs": 3057,
+        "speedup": 1.8
+      },
+      {
+        "id": "S2-low-abv",
+        "visionMs": 5330,
+        "ocrMs": 2617,
+        "speedup": 2
+      },
+      {
+        "id": "S3-odd-proof",
+        "visionMs": 5529,
+        "ocrMs": 2745,
+        "speedup": 2
+      },
+      {
+        "id": "S4-liters",
+        "visionMs": 4580,
+        "ocrMs": 2908,
+        "speedup": 1.6
+      },
+      {
+        "id": "S5-multiline-address",
+        "visionMs": 5522,
+        "ocrMs": 2706,
+        "speedup": 2
+      },
+      {
+        "id": "S6-truncated-warning",
+        "visionMs": 4612,
+        "ocrMs": 5449,
+        "speedup": 0.8
+      },
+      {
+        "id": "S7-unicode-brand",
+        "visionMs": 4828,
+        "ocrMs": 2334,
+        "speedup": 2.1
+      },
+      {
+        "id": "S8-floz-to-ml",
+        "visionMs": 6589,
+        "ocrMs": 6583,
+        "speedup": 1
+      }
+    ],
+    "vision": {
+      "times": [
+        6056,
+        4245,
+        5741,
+        4882,
+        4924,
+        4784,
+        4902,
+        6686,
+        6882,
+        6388,
+        5411,
+        5330,
+        5529,
+        4580,
+        5522,
+        4612,
+        4828,
+        6589
+      ],
+      "avg": 5438,
+      "min": 4245,
+      "max": 6882,
+      "p95": 6882
+    },
+    "ocr": {
+      "times": [
+        2731,
+        1812,
+        2232,
+        2440,
+        2116,
+        2324,
+        4616,
+        2385,
+        2244,
+        2185,
+        3057,
+        2617,
+        2745,
+        2908,
+        2706,
+        5449,
+        2334,
+        6583
+      ],
+      "avg": 2971,
+      "min": 1812,
+      "max": 6583,
+      "p95": 6583,
+      "underTarget": 1
+    },
+    "speedup": "1.8"
+  },
+  "ocrOnly": {
+    "tests": [
+      {
+        "id": "B1-perfect",
+        "confidence": 65,
+        "textLength": 283,
+        "hasWarning": true,
+        "hasABV": true,
+        "usedFallback": false
+      },
+      {
+        "id": "B2-case-mismatch",
+        "confidence": 79,
+        "textLength": 10,
+        "hasWarning": true,
+        "hasABV": true,
+        "usedFallback": false
+      },
+      {
+        "id": "B3-wrong-abv",
+        "confidence": 62,
+        "textLength": 9,
+        "hasWarning": true,
+        "hasABV": true,
+        "usedFallback": false
+      },
+      {
+        "id": "B4-warning-titlecase",
+        "confidence": 69,
+        "textLength": 9,
+        "hasWarning": true,
+        "hasABV": true,
+        "usedFallback": false
+      },
+      {
+        "id": "B5-no-warning",
+        "confidence": 72,
+        "textLength": 7,
+        "hasWarning": true,
+        "hasABV": true,
+        "usedFallback": false
+      },
+      {
+        "id": "B6-imported",
+        "confidence": 62,
+        "textLength": 10,
+        "hasWarning": true,
+        "hasABV": true,
+        "usedFallback": false
+      },
+      {
+        "id": "I1-proof-to-abv",
+        "confidence": 91,
+        "textLength": 283,
+        "hasWarning": true,
+        "hasABV": true,
+        "usedFallback": true,
+        "fallbackReason": "OCR text validation failed (missing expected patterns)"
+      },
+      {
+        "id": "I2-ml-to-floz",
+        "confidence": 52,
+        "textLength": 32,
+        "hasWarning": true,
+        "hasABV": true,
+        "usedFallback": false
+      },
+      {
+        "id": "I3-address-abbrev",
+        "confidence": 61,
+        "textLength": 17,
+        "hasWarning": true,
+        "hasABV": true,
+        "usedFallback": false
+      },
+      {
+        "id": "I4-punctuation",
+        "confidence": 74,
+        "textLength": 283,
+        "hasWarning": true,
+        "hasABV": true,
+        "usedFallback": false
+      },
+      {
+        "id": "S1-high-abv",
+        "confidence": 52,
+        "textLength": 169,
+        "hasWarning": true,
+        "hasABV": true,
+        "usedFallback": false
+      },
+      {
+        "id": "S2-low-abv",
+        "confidence": 53,
+        "textLength": 27,
+        "hasWarning": true,
+        "hasABV": true,
+        "usedFallback": false
+      },
+      {
+        "id": "S3-odd-proof",
+        "confidence": 56,
+        "textLength": 215,
+        "hasWarning": true,
+        "hasABV": true,
+        "usedFallback": false
+      },
+      {
+        "id": "S4-liters",
+        "confidence": 53,
+        "textLength": 166,
+        "hasWarning": true,
+        "hasABV": true,
+        "usedFallback": false
+      },
+      {
+        "id": "S5-multiline-address",
+        "confidence": 56,
+        "textLength": 194,
+        "hasWarning": true,
+        "hasABV": true,
+        "usedFallback": false
+      },
+      {
+        "id": "S6-truncated-warning",
+        "confidence": 49,
+        "textLength": 252,
+        "hasWarning": true,
+        "hasABV": true,
+        "usedFallback": true,
+        "fallbackReason": "OCR confidence too low: 49.0%"
+      },
+      {
+        "id": "S7-unicode-brand",
+        "confidence": 59,
+        "textLength": 14,
+        "hasWarning": true,
+        "hasABV": true,
+        "usedFallback": false
+      },
+      {
+        "id": "S8-floz-to-ml",
+        "confidence": 42,
+        "textLength": 283,
+        "hasWarning": true,
+        "hasABV": true,
+        "usedFallback": true,
+        "fallbackReason": "OCR confidence too low: 42.0%"
+      }
+    ],
+    "avgConfidence": 61.666666666666664,
+    "hasWarning": 18,
+    "hasABV": 18,
+    "total": 18
+  },
+  "fallback": {
+    "tests": [
+      {
+        "id": "B1-perfect",
+        "confidence": 65,
+        "usedFallback": false,
+        "status": "FAIL"
+      },
+      {
+        "id": "B2-case-mismatch",
+        "confidence": 79,
+        "usedFallback": false,
+        "status": "FAIL"
+      },
+      {
+        "id": "B3-wrong-abv",
+        "confidence": 62,
+        "usedFallback": false,
+        "status": "FAIL"
+      },
+      {
+        "id": "B4-warning-titlecase",
+        "confidence": 69,
+        "usedFallback": false,
+        "status": "REVIEW"
+      },
+      {
+        "id": "B5-no-warning",
+        "confidence": 72,
+        "usedFallback": false,
+        "status": "FAIL"
+      },
+      {
+        "id": "B6-imported",
+        "confidence": 62,
+        "usedFallback": false,
+        "status": "REVIEW"
+      },
+      {
+        "id": "I1-proof-to-abv",
+        "confidence": 91,
+        "usedFallback": true,
+        "fallbackReason": "OCR text validation failed (missing expected patterns)",
+        "status": "REVIEW"
+      },
+      {
+        "id": "I2-ml-to-floz",
+        "confidence": 52,
+        "usedFallback": false,
+        "status": "FAIL"
+      },
+      {
+        "id": "I3-address-abbrev",
+        "confidence": 61,
+        "usedFallback": false,
+        "status": "FAIL"
+      },
+      {
+        "id": "I4-punctuation",
+        "confidence": 74,
+        "usedFallback": false,
+        "status": "FAIL"
+      },
+      {
+        "id": "S1-high-abv",
+        "confidence": 52,
+        "usedFallback": false,
+        "status": "FAIL"
+      },
+      {
+        "id": "S2-low-abv",
+        "confidence": 53,
+        "usedFallback": false,
+        "status": "FAIL"
+      },
+      {
+        "id": "S3-odd-proof",
+        "confidence": 56,
+        "usedFallback": false,
+        "status": "FAIL"
+      },
+      {
+        "id": "S4-liters",
+        "confidence": 53,
+        "usedFallback": false,
+        "status": "FAIL"
+      },
+      {
+        "id": "S5-multiline-address",
+        "confidence": 56,
+        "usedFallback": false,
+        "status": "FAIL"
+      },
+      {
+        "id": "S6-truncated-warning",
+        "confidence": 49,
+        "usedFallback": true,
+        "fallbackReason": "OCR confidence too low: 49.0%",
+        "status": "FAIL"
+      },
+      {
+        "id": "S7-unicode-brand",
+        "confidence": 59,
+        "usedFallback": false,
+        "status": "FAIL"
+      },
+      {
+        "id": "S8-floz-to-ml",
+        "confidence": 42,
+        "usedFallback": true,
+        "fallbackReason": "OCR confidence too low: 42.0%",
+        "status": "REVIEW"
+      }
+    ],
+    "fallbackCount": 3,
+    "total": 18
+  }
+}

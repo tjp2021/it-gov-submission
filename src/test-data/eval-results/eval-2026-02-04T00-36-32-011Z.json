@@ -1,0 +1,306 @@
+{
+  "evalId": "eval-2026-02-04T00-36-32-011Z",
+  "timestamp": "2026-02-04T00:36:32.012Z",
+  "testCases": 18,
+  "compare": null,
+  "extraction": null,
+  "latency": {
+    "tests": [
+      {
+        "id": "B1-perfect",
+        "visionMs": 4746,
+        "ocrMs": 5381,
+        "speedup": 0.9
+      },
+      {
+        "id": "B2-case-mismatch",
+        "visionMs": 5965,
+        "ocrMs": 5243,
+        "speedup": 1.1
+      },
+      {
+        "id": "B3-wrong-abv",
+        "visionMs": 5143,
+        "ocrMs": 5494,
+        "speedup": 0.9
+      },
+      {
+        "id": "B4-warning-titlecase",
+        "visionMs": 5550,
+        "ocrMs": 5656,
+        "speedup": 1
+      },
+      {
+        "id": "B5-no-warning",
+        "visionMs": 5250,
+        "ocrMs": 5077,
+        "speedup": 1
+      },
+      {
+        "id": "B6-imported",
+        "visionMs": 5358,
+        "ocrMs": 5890,
+        "speedup": 0.9
+      },
+      {
+        "id": "I1-proof-to-abv",
+        "visionMs": 5220,
+        "ocrMs": 4632,
+        "speedup": 1.1
+      },
+      {
+        "id": "I2-ml-to-floz",
+        "visionMs": 4990,
+        "ocrMs": 5398,
+        "speedup": 0.9
+      },
+      {
+        "id": "I3-address-abbrev",
+        "visionMs": 5146,
+        "ocrMs": 6100,
+        "speedup": 0.8
+      },
+      {
+        "id": "I4-punctuation",
+        "visionMs": 5436,
+        "ocrMs": 6969,
+        "speedup": 0.8
+      },
+      {
+        "id": "S1-high-abv",
+        "visionMs": 5867,
+        "ocrMs": 6166,
+        "speedup": 1
+      },
+      {
+        "id": "S2-low-abv",
+        "visionMs": 5287,
+        "ocrMs": 5566,
+        "speedup": 0.9
+      },
+      {
+        "id": "S3-odd-proof",
+        "visionMs": 4830,
+        "ocrMs": 5211,
+        "speedup": 0.9
+      },
+      {
+        "id": "S4-liters",
+        "visionMs": 5045,
+        "ocrMs": 5359,
+        "speedup": 0.9
+      },
+      {
+        "id": "S5-multiline-address",
+        "visionMs": 5667,
+        "ocrMs": 5882,
+        "speedup": 1
+      },
+      {
+        "id": "S6-truncated-warning",
+        "visionMs": 4516,
+        "ocrMs": 5113,
+        "speedup": 0.9
+      },
+      {
+        "id": "S7-unicode-brand",
+        "visionMs": 5062,
+        "ocrMs": 5506,
+        "speedup": 0.9
+      },
+      {
+        "id": "S8-floz-to-ml",
+        "visionMs": 9716,
+        "ocrMs": 5539,
+        "speedup": 1.8
+      }
+    ],
+    "vision": {
+      "times": [
+        4746,
+        5965,
+        5143,
+        5550,
+        5250,
+        5358,
+        5220,
+        4990,
+        5146,
+        5436,
+        5867,
+        5287,
+        4830,
+        5045,
+        5667,
+        4516,
+        5062,
+        9716
+      ],
+      "avg": 5489,
+      "min": 4516,
+      "max": 9716,
+      "p95": 9716
+    },
+    "ocr": {
+      "times": [
+        5381,
+        5243,
+        5494,
+        5656,
+        5077,
+        5890,
+        4632,
+        5398,
+        6100,
+        6969,
+        6166,
+        5566,
+        5211,
+        5359,
+        5882,
+        5113,
+        5506,
+        5539
+      ],
+      "avg": 5566,
+      "min": 4632,
+      "max": 6969,
+      "p95": 6969,
+      "underTarget": 0
+    },
+    "speedup": "1.0"
+  },
+  "ocrOnly": null,
+  "fallback": {
+    "tests": [
+      {
+        "id": "B1-perfect",
+        "confidence": 65,
+        "usedFallback": true,
+        "fallbackReason": "Classification failed: 404 {\"type\":\"error\",\"error\":{\"type\":\"not_found_error\",\"message\":\"model: claude-3-5-haiku-20241022\"},\"request_id\":\"req_011CXn6bZk4AtQd8SVikyDWZ\"}",
+        "status": "REVIEW"
+      },
+      {
+        "id": "B2-case-mismatch",
+        "confidence": 79,
+        "usedFallback": true,
+        "fallbackReason": "Classification failed: 404 {\"type\":\"error\",\"error\":{\"type\":\"not_found_error\",\"message\":\"model: claude-3-5-haiku-20241022\"},\"request_id\":\"req_011CXn6bwKaWf46PPcZnY5AZ\"}",
+        "status": "REVIEW"
+      },
+      {
+        "id": "B3-wrong-abv",
+        "confidence": 62,
+        "usedFallback": true,
+        "fallbackReason": "Classification failed: 404 {\"type\":\"error\",\"error\":{\"type\":\"not_found_error\",\"message\":\"model: claude-3-5-haiku-20241022\"},\"request_id\":\"req_011CXn6cKDhtQzA5rMyfLnfm\"}",
+        "status": "FAIL"
+      },
+      {
+        "id": "B4-warning-titlecase",
+        "confidence": 69,
+        "usedFallback": true,
+        "fallbackReason": "Classification failed: 404 {\"type\":\"error\",\"error\":{\"type\":\"not_found_error\",\"message\":\"model: claude-3-5-haiku-20241022\"},\"request_id\":\"req_011CXn6ciBq3Y9dYvb1ysMKo\"}",
+        "status": "FAIL"
+      },
+      {
+        "id": "B5-no-warning",
+        "confidence": 72,
+        "usedFallback": true,
+        "fallbackReason": "Classification failed: 404 {\"type\":\"error\",\"error\":{\"type\":\"not_found_error\",\"message\":\"model: claude-3-5-haiku-20241022\"},\"request_id\":\"req_011CXn6d972hvaM6BP2Btyt6\"}",
+        "status": "FAIL"
+      },
+      {
+        "id": "B6-imported",
+        "confidence": 62,
+        "usedFallback": true,
+        "fallbackReason": "Classification failed: 404 {\"type\":\"error\",\"error\":{\"type\":\"not_found_error\",\"message\":\"model: claude-3-5-haiku-20241022\"},\"request_id\":\"req_011CXn6dTjww2b7hVnmFCS3M\"}",
+        "status": "REVIEW"
+      },
+      {
+        "id": "I1-proof-to-abv",
+        "confidence": 91,
+        "usedFallback": true,
+        "fallbackReason": "OCR text validation failed (missing expected patterns)",
+        "status": "FAIL"
+      },
+      {
+        "id": "I2-ml-to-floz",
+        "confidence": 52,
+        "usedFallback": true,
+        "fallbackReason": "Classification failed: 404 {\"type\":\"error\",\"error\":{\"type\":\"not_found_error\",\"message\":\"model: claude-3-5-haiku-20241022\"},\"request_id\":\"req_011CXn6eJi1CLVfywnKj5GUG\"}",
+        "status": "REVIEW"
+      },
+      {
+        "id": "I3-address-abbrev",
+        "confidence": 61,
+        "usedFallback": true,
+        "fallbackReason": "Classification failed: 404 {\"type\":\"error\",\"error\":{\"type\":\"not_found_error\",\"message\":\"model: claude-3-5-haiku-20241022\"},\"request_id\":\"req_011CXn6em8EzLNfuP8j7QCCe\"}",
+        "status": "REVIEW"
+      },
+      {
+        "id": "I4-punctuation",
+        "confidence": 74,
+        "usedFallback": true,
+        "fallbackReason": "Classification failed: 404 {\"type\":\"error\",\"error\":{\"type\":\"not_found_error\",\"message\":\"model: claude-3-5-haiku-20241022\"},\"request_id\":\"req_011CXn6fB4uQaMg45fhPDDGA\"}",
+        "status": "REVIEW"
+      },
+      {
+        "id": "S1-high-abv",
+        "confidence": 52,
+        "usedFallback": true,
+        "fallbackReason": "Classification failed: 404 {\"type\":\"error\",\"error\":{\"type\":\"not_found_error\",\"message\":\"model: claude-3-5-haiku-20241022\"},\"request_id\":\"req_011CXn6fbc2wU6j5BGmpqxmV\"}",
+        "status": "REVIEW"
+      },
+      {
+        "id": "S2-low-abv",
+        "confidence": 53,
+        "usedFallback": true,
+        "fallbackReason": "Classification failed: 404 {\"type\":\"error\",\"error\":{\"type\":\"not_found_error\",\"message\":\"model: claude-3-5-haiku-20241022\"},\"request_id\":\"req_011CXn6fzDKoicPHKSXDCfX6\"}",
+        "status": "REVIEW"
+      },
+      {
+        "id": "S3-odd-proof",
+        "confidence": 56,
+        "usedFallback": true,
+        "fallbackReason": "Classification failed: 404 {\"type\":\"error\",\"error\":{\"type\":\"not_found_error\",\"message\":\"model: claude-3-5-haiku-20241022\"},\"request_id\":\"req_011CXn6gNV2MV89LYYNrzQSh\"}",
+        "status": "REVIEW"
+      },
+      {
+        "id": "S4-liters",
+        "confidence": 53,
+        "usedFallback": true,
+        "fallbackReason": "Classification failed: 404 {\"type\":\"error\",\"error\":{\"type\":\"not_found_error\",\"message\":\"model: claude-3-5-haiku-20241022\"},\"request_id\":\"req_011CXn6gpaugA6tmjNHA89LX\"}",
+        "status": "REVIEW"
+      },
+      {
+        "id": "S5-multiline-address",
+        "confidence": 56,
+        "usedFallback": true,
+        "fallbackReason": "Classification failed: 404 {\"type\":\"error\",\"error\":{\"type\":\"not_found_error\",\"message\":\"model: claude-3-5-haiku-20241022\"},\"request_id\":\"req_011CXn6hCvpqqNWRBfmnne3W\"}",
+        "status": "REVIEW"
+      },
+      {
+        "id": "S6-truncated-warning",
+        "confidence": 49,
+        "usedFallback": true,
+        "fallbackReason": "OCR confidence too low: 49.0%",
+        "status": "FAIL"
+      },
+      {
+        "id": "S7-unicode-brand",
+        "confidence": 59,
+        "usedFallback": true,
+        "fallbackReason": "Classification failed: 404 {\"type\":\"error\",\"error\":{\"type\":\"not_found_error\",\"message\":\"model: claude-3-5-haiku-20241022\"},\"request_id\":\"req_011CXn6hyN2bAcajRtebRGtK\"}",
+        "status": "REVIEW"
+      },
+      {
+        "id": "S8-floz-to-ml",
+        "confidence": 42,
+        "usedFallback": true,
+        "fallbackReason": "OCR confidence too low: 42.0%",
+        "status": "REVIEW"
+      }
+    ],
+    "fallbackCount": 18,
+    "total": 18
+  }
+}

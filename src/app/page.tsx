@@ -208,7 +208,7 @@ export default function Home() {
                 Batch Mode →
               </span>
               <span className="text-xs text-gray-500 mt-1">
-                Verify up to 10 labels at once
+                Verify up to 300 labels at once
               </span>
             </Link>
           </div>

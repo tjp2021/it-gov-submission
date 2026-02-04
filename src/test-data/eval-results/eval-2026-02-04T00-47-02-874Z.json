@@ -1,0 +1,141 @@
+{
+  "evalId": "eval-2026-02-04T00-47-02-874Z",
+  "timestamp": "2026-02-04T00:47:02.875Z",
+  "testCases": 18,
+  "compare": {
+    "tests": [
+      {
+        "id": "B1-perfect",
+        "expected": "PASS",
+        "vision": "REVIEW",
+        "ocr": "FAIL",
+        "matches": false
+      },
+      {
+        "id": "B2-case-mismatch",
+        "expected": "PASS",
+        "vision": "REVIEW",
+        "ocr": "FAIL",
+        "matches": false
+      },
+      {
+        "id": "B3-wrong-abv",
+        "expected": "FAIL",
+        "vision": "FAIL",
+        "ocr": "FAIL",
+        "matches": true
+      },
+      {
+        "id": "B4-warning-titlecase",
+        "expected": "FAIL",
+        "vision": "FAIL",
+        "ocr": "FAIL",
+        "matches": true
+      },
+      {
+        "id": "B5-no-warning",
+        "expected": "FAIL",
+        "vision": "FAIL",
+        "ocr": "FAIL",
+        "matches": true
+      },
+      {
+        "id": "B6-imported",
+        "expected": "PASS",
+        "vision": "REVIEW",
+        "ocr": "FAIL",
+        "matches": false
+      },
+      {
+        "id": "I1-proof-to-abv",
+        "expected": "PASS",
+        "vision": "REVIEW",
+        "ocr": "REVIEW",
+        "matches": true
+      },
+      {
+        "id": "I2-ml-to-floz",
+        "expected": "PASS",
+        "vision": "REVIEW",
+        "ocr": "FAIL",
+        "matches": false
+      },
+      {
+        "id": "I3-address-abbrev",
+        "expected": "PASS",
+        "vision": "REVIEW",
+        "ocr": "FAIL",
+        "matches": false
+      },
+      {
+        "id": "I4-punctuation",
+        "expected": "PASS",
+        "vision": "REVIEW",
+        "ocr": "FAIL",
+        "matches": false
+      },
+      {
+        "id": "S1-high-abv",
+        "expected": "PASS",
+        "vision": "REVIEW",
+        "ocr": "FAIL",
+        "matches": false
+      },
+      {
+        "id": "S2-low-abv",
+        "expected": "PASS",
+        "vision": "REVIEW",
+        "ocr": "FAIL",
+        "matches": false
+      },
+      {
+        "id": "S3-odd-proof",
+        "expected": "PASS",
+        "vision": "REVIEW",
+        "ocr": "FAIL",
+        "matches": false
+      },
+      {
+        "id": "S4-liters",
+        "expected": "PASS",
+        "vision": "REVIEW",
+        "ocr": "FAIL",
+        "matches": false
+      },
+      {
+        "id": "S5-multiline-address",
+        "expected": "PASS",
+        "vision": "REVIEW",
+        "ocr": "FAIL",
+        "matches": false
+      },
+      {
+        "id": "S6-truncated-warning",
+        "expected": "FAIL",
+        "vision": "FAIL",
+        "ocr": "FAIL",
+        "matches": true
+      },
+      {
+        "id": "S7-unicode-brand",
+        "expected": "PASS",
+        "vision": "REVIEW",
+        "ocr": "FAIL",
+        "matches": false
+      },
+      {
+        "id": "S8-floz-to-ml",
+        "expected": "PASS",
+        "vision": "REVIEW",
+        "ocr": "REVIEW",
+        "matches": true
+      }
+    ],
+    "matching": 6,
+    "total": 18
+  },
+  "extraction": null,
+  "latency": null,
+  "ocrOnly": null,
+  "fallback": null
+}

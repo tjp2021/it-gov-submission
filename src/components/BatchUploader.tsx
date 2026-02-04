@@ -14,7 +14,7 @@ interface BatchUploaderProps {
   files: BatchFile[];
 }
 
-const MAX_BATCH_SIZE = 10;
+const MAX_BATCH_SIZE = 300;
 const MAX_DIMENSION = 1568;
 const JPEG_QUALITY = 0.85;
 const MAX_FINAL_SIZE = 5 * 1024 * 1024; // 5MB

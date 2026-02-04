@@ -20,7 +20,7 @@ test.describe('Batch Label Verification', () => {
   test('batch page loads correctly', async ({ page }) => {
     await expect(page.locator('text=Batch Label Verification')).toBeVisible();
     await expect(page.locator('text=Drop multiple label images')).toBeVisible();
-    await expect(page.locator('text=/0\\/10 selected/')).toBeVisible();
+    await expect(page.locator('text=/0\\/300 selected/')).toBeVisible();
   });
 
   test('can upload multiple images at once', async ({ page }) => {
@@ -28,27 +28,27 @@ test.describe('Batch Label Verification', () => {
 
     // Upload multiple files at once (setInputFiles with array)
     await fileInput.setInputFiles([demoLabelPath, demoLabelPath]);
-    await expect(page.locator('text=/2\\/10 selected/')).toBeVisible();
+    await expect(page.locator('text=/2\\/300 selected/')).toBeVisible();
 
     // Should show thumbnails
     const thumbnails = page.locator('img[alt="demo-label.png"]');
     await expect(thumbnails).toHaveCount(2);
   });
 
-  test('enforces 10-label limit', async ({ page }) => {
+  test('enforces 300-label limit', async ({ page }) => {
     const fileInput = page.locator('input[type="file"]');
 
-    // Create array of 12 files (same demo label)
-    const files = Array(12).fill(demoLabelPath);
+    // Create array of 305 files (same demo label) - exceeds 300 limit
+    const files = Array(305).fill(demoLabelPath);
 
-    // Upload all at once - should only accept first 10
+    // Upload all at once - should only accept first 300
     await fileInput.setInputFiles(files);
 
-    // Should show 10/10 selected
-    await expect(page.locator('text=/10\\/10 selected/')).toBeVisible();
+    // Should show 300/300 selected
+    await expect(page.locator('text=/300\\/300 selected/')).toBeVisible();
 
     // Should show error message about limit
-    await expect(page.locator('text=/Maximum 10 labels per batch/')).toBeVisible();
+    await expect(page.locator('text=/Maximum 300 labels per batch/')).toBeVisible();
   });
 
   test('can remove uploaded images', async ({ page }) => {
@@ -56,18 +56,18 @@ test.describe('Batch Label Verification', () => {
 
     // Upload 3 files at once
     await fileInput.setInputFiles([demoLabelPath, demoLabelPath, demoLabelPath]);
-    await expect(page.locator('text=/3\\/10 selected/')).toBeVisible();
+    await expect(page.locator('text=/3\\/300 selected/')).toBeVisible();
 
     // Remove one using the X button (hover to reveal)
     const firstThumbnail = page.locator('img[alt="demo-label.png"]').first().locator('..');
     await firstThumbnail.hover();
     await page.locator('button:has-text("×")').first().click();
 
-    await expect(page.locator('text=/2\\/10 selected/')).toBeVisible();
+    await expect(page.locator('text=/2\\/300 selected/')).toBeVisible();
 
     // Clear all
     await page.click('text=Clear All');
-    await expect(page.locator('text=/0\\/10 selected/')).toBeVisible();
+    await expect(page.locator('text=/0\\/300 selected/')).toBeVisible();
   });
 
   test('validates required fields before verification', async ({ page }) => {
@@ -88,7 +88,7 @@ test.describe('Batch Label Verification', () => {
     // Upload 2 files
     const fileInput = page.locator('input[type="file"]');
     await fileInput.setInputFiles([demoLabelPath, demoLabelPath]);
-    await expect(page.locator('text=/2\\/10 selected/')).toBeVisible();
+    await expect(page.locator('text=/2\\/300 selected/')).toBeVisible();
 
     // Start verification
     await page.click('button:has-text("Verify 2 Labels")');
@@ -178,7 +178,7 @@ test.describe('Batch Label Verification', () => {
 
     // Should be back to input state
     await expect(page.locator('text=Drop multiple label images')).toBeVisible();
-    await expect(page.locator('text=/0\\/10 selected/')).toBeVisible();
+    await expect(page.locator('text=/0\\/300 selected/')).toBeVisible();
   });
 
   test('shows summary statistics after verification', async ({ page }) => {
@@ -201,46 +201,45 @@ test.describe('Batch Label Verification', () => {
     await expect(page.locator('text=Failed')).toBeVisible();
   });
 
-  test('stress test: processes 10 labels (PRD max) in parallel', async ({ page }) => {
+  test('stress test: processes 50 labels in parallel', async ({ page }) => {
     // Fill form first
     await fillDemoFormData(page);
 
-    // Upload 10 files (PRD maximum per section 3.8)
+    // Upload 50 files - tests scaling (system supports 300, testing 50 for reasonable CI time)
     const fileInput = page.locator('input[type="file"]');
-    const tenFiles = Array(10).fill(demoLabelPath);
-    await fileInput.setInputFiles(tenFiles);
+    const fiftyFiles = Array(50).fill(demoLabelPath);
+    await fileInput.setInputFiles(fiftyFiles);
 
-    // Verify 10 files uploaded
-    await expect(page.locator('text=/10\\/10 selected/')).toBeVisible();
+    // Verify 50 files uploaded
+    await expect(page.locator('text=/50\\/300 selected/')).toBeVisible();
 
     const startTime = Date.now();
 
     // Start verification
-    await page.click('button:has-text("Verify 10 Labels")');
+    await page.click('button:has-text("Verify 50 Labels")');
 
     // Should show processing state
     await expect(page.locator('text=Processing Labels...')).toBeVisible({ timeout: 5000 });
 
-    // Wait for results - 10 labels with concurrency 3 should take ~10-12s
-    // Using 60s timeout to be safe for CI/network variance
-    await expect(page.locator('text=Batch Results')).toBeVisible({ timeout: 60000 });
+    // Wait for results - 50 labels with concurrency 10 should take ~12-15s
+    // Using 120s timeout to be safe for CI/network variance
+    await expect(page.locator('text=Batch Results')).toBeVisible({ timeout: 120000 });
 
     const elapsed = Date.now() - startTime;
 
-    // PRD Section 3.8: With concurrency of 3 and ~2.5s per image,
-    // 10 images should complete in ~10s (ceil(10/3) * 2.5 = 10s)
-    // Allow up to 30s for network variance, but should be much faster than
-    // sequential processing (10 * 2.5s = 25s)
-    expect(elapsed).toBeLessThan(30000);
+    // With concurrency of 10 and ~2.5s per image,
+    // 50 images should complete in ~12.5s (ceil(50/10) * 2.5 = 12.5s)
+    // Allow up to 60s for network variance
+    expect(elapsed).toBeLessThan(60000);
 
-    // Verify all 10 results are shown
+    // Verify all 50 results are shown
     await expect(page.locator('text=Total').first()).toBeVisible();
 
-    // Check the summary shows 10 total
+    // Check the summary shows 50 total
     const summaryText = await page.locator('div:has-text("Total")').first().textContent();
-    expect(summaryText).toContain('10');
+    expect(summaryText).toContain('50');
 
-    console.log(`Batch of 10 completed in ${(elapsed/1000).toFixed(2)}s`);
+    console.log(`Batch of 50 completed in ${(elapsed/1000).toFixed(2)}s`);
   });
 
   test('stress test: verifies streaming shows progressive results', async ({ page }) => {
