@@ -8,8 +8,8 @@ AI-powered alcohol beverage label verification for TTB compliance officers.
 # Install dependencies
 npm install
 
-# Set your Anthropic API key
-export ANTHROPIC_API_KEY=sk-ant-...
+# Set your Gemini API key
+export GEMINI_API_KEY=your-api-key
 
 # Start the development server
 npm run dev
@@ -30,7 +30,7 @@ npm run dev
 
 1. **Upload** a label image (JPG, PNG, WebP, GIF)
 2. **Enter** the COLA application data (or use Demo mode)
-3. **Verify** — Claude Vision extracts text and compares against application
+3. **Verify** — Gemini Flash extracts text and compares against application
 4. **Review** — Each field shows PASS/FAIL/WARNING with confidence scores
 5. **Override** if needed — Agent makes final compliance decision
 
@@ -77,7 +77,7 @@ src/
 │   ├── BatchUploader.tsx  # Multi-file upload
 │   └── BatchResults.tsx   # Batch results display
 ├── lib/
-│   ├── extraction.ts      # Claude Vision API integration
+│   ├── extraction.ts      # Vision API integration (Claude/Gemini)
 │   ├── comparison.ts      # Field matching functions
 │   ├── utils.ts           # Normalization helpers
 │   └── types.ts           # TypeScript interfaces
@@ -113,7 +113,7 @@ npm run test:generate    # Generate DALL-E test images (requires API key)
 
 | Variable | Required | Description |
 |----------|----------|-------------|
-| `ANTHROPIC_API_KEY` | Yes | Claude API key for vision extraction |
+| `GEMINI_API_KEY` | Yes | Google Gemini API key for vision extraction |
 | `OPENAI_API_KEY` | No | For generating DALL-E test images |
 
 ## Azure Deployment
