@@ -36,22 +36,24 @@ Build an AI-powered tool for TTB (Alcohol and Tobacco Tax and Trade Bureau) comp
 │                      Next.js App                        │
 ├─────────────────────────────────────────────────────────┤
 │  Frontend (React)          │  API Routes               │
-│  - LabelUploader           │  - /api/verify            │
-│  - ApplicationForm         │  - /api/verify-stream     │
-│  - VerificationResults     │                           │
-│  - BatchUploader           │                           │
+│  - LabelUploader           │  - /api/verify (Claude)   │
+│  - ApplicationForm         │  - /api/verify-gemini ⚡  │
+│  - VerificationResults     │  - /api/verify-stream     │
+│  - BatchUploader           │  - /api/verify-ocr        │
 └─────────────────────────────────────────────────────────┘
                               │
-                              ▼
-┌─────────────────────────────────────────────────────────┐
-│                    Claude Vision API                    │
-│            (claude-sonnet-4-20250514)                   │
-│                                                         │
-│  - Extracts label fields via tool_use                   │
-│  - Returns structured JSON (not free text)              │
-│  - ~4-5s inference time                                 │
-└─────────────────────────────────────────────────────────┘
-                              │
+                   ┌──────────┴──────────┐
+                   ▼                     ▼
+┌──────────────────────────┐  ┌──────────────────────────┐
+│    Claude Vision API     │  │   Gemini 2.0 Flash ⚡    │
+│  (claude-sonnet-4)       │  │   (gemini-2.0-flash)     │
+│                          │  │                          │
+│  - High accuracy         │  │  - 2x faster (~2.5s)     │
+│  - ~5s inference         │  │  - Same accuracy         │
+│  - Higher cost           │  │  - 30x cheaper           │
+└──────────────────────────┘  └──────────────────────────┘
+                   │                     │
+                   └──────────┬──────────┘
                               ▼
 ┌─────────────────────────────────────────────────────────┐
 │                  Comparison Engine                      │
@@ -79,29 +81,24 @@ Build an AI-powered tool for TTB (Alcohol and Tobacco Tax and Trade Bureau) comp
 
 ## Constraints & Open Issues
 
-### Latency (The Big One)
+### Latency (Solved)
 
 **Target:** ≤5 seconds
-**Actual:** 5-6 seconds average
+**Actual with Gemini Flash:** ~2.5 seconds average ✅
 
-| Component | Time |
-|-----------|------|
-| Image upload | ~0.3s |
-| Claude API inference | ~4-5s |
-| Comparison logic | <10ms |
-| **Total** | **~5-6s** |
+| Component | Claude Vision | Gemini Flash |
+|-----------|---------------|--------------|
+| Image upload | ~0.3s | ~0.3s |
+| API inference | ~4-5s | **~2s** |
+| Comparison logic | <10ms | <10ms |
+| **Total** | **~5-6s** | **~2.5s** |
 
-**What we tried:**
-- Haiku model — same latency, worse accuracy (94.4% vs 100%)
-- Smaller images (640px) — only 0.3s faster, accuracy drops
-- Image compression — negligible impact
+**What we tried (see `docs/PERFORMANCE.md` for details):**
+- Haiku model — same latency, worse accuracy (94.4% vs 100%) ❌
+- Tesseract OCR + classification — 33% accuracy, unusable ❌
+- **Gemini 2.0 Flash** — 100% accuracy, 2.1x faster ✅
 
-**Why it's hard to fix:**
-- Claude's inference time is the bottleneck
-- All cloud vision APIs (GPT-4V, Gemini) have similar latency
-- Self-hosted models lack accuracy on small text (government warning fine print)
-
-**Recommendation:** Accept 5-6s as floor for cloud AI. Document as "meets target under typical conditions."
+**Recommendation:** Use `/api/verify-gemini` endpoint for production.
 
 ### Bold Detection
 

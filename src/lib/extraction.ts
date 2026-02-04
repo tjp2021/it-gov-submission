@@ -7,7 +7,7 @@ const client = new Anthropic();
 // Options: "sonnet" (default, most accurate) or "haiku" (faster, lower cost)
 const MODEL_MAP = {
   sonnet: "claude-sonnet-4-20250514",
-  haiku: "claude-haiku-3-5-20241022",
+  haiku: "claude-3-5-haiku-20241022",
 } as const;
 
 function getModel(): string {

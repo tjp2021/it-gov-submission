@@ -2,159 +2,218 @@
 
 **PRD Requirement:** Response time ≤5 seconds (Sarah's workflow requirement)
 
-**Current State:** Average 5.8s, with 11/18 tests exceeding the 5s target
+**Current State:** With Gemini Flash, average ~2.5s — **requirement met with margin**
 
-## Time Breakdown
+---
 
-| Component | Time | % of Total |
-|-----------|------|------------|
-| Claude API (Sonnet) | 4-6s | ~85% |
-| Network round-trip | 0.3-0.5s | ~7% |
-| Image preprocessing | 0.1-0.2s | ~3% |
-| Comparison logic | <10ms | <1% |
-| Response rendering | <50ms | <1% |
+## Iteration History
 
-**The API call dominates.** All other optimizations combined can't get us under 5s if the API takes 5s+.
+### Phase 1: Baseline (Claude Vision)
 
-## Optimization Options
+| Metric | Value |
+|--------|-------|
+| Average latency | 5.5s |
+| P95 latency | 7.8s |
+| Pass rate | 100% |
 
-### Option 1: Use Claude Haiku (Recommended for Testing)
+**Problem:** 61% of tests exceed 5s target. The Claude API call dominates.
 
-**Change:** Switch from `claude-sonnet-4-20250514` to `claude-haiku-3-5-20241022`
+### Phase 2: Haiku Model Test
+
+**Hypothesis:** Haiku is faster than Sonnet
 
 | Metric | Sonnet | Haiku | Change |
 |--------|--------|-------|--------|
-| Latency | 4-6s | 1.5-2.5s | **-60%** |
-| Cost | $3/$15 per 1M tokens | $0.25/$1.25 | **-90%** |
-| Accuracy | Highest | Good | TBD |
+| Avg latency | 5.8s | 5.5s | -5% |
+| Pass rate | 100% | 94.4% | -5.6% |
 
-**Trade-off:** Haiku may miss subtle details or make more extraction errors. Need to run test suite to validate.
+**Result:** Minimal improvement, accuracy loss. Not viable.
 
-**Implementation:** Change model in `src/lib/extraction.ts`
+### Phase 3: OCR + Classification (Failed Experiment)
 
-### Option 2: Reduce Image Resolution
+**Hypothesis:** Tesseract OCR (~300ms) + Claude Haiku (~500ms) = ~800ms total
 
-**Change:** Lower MAX_DIMENSION from 1568px to 1024px
+#### Attempt 3a: Tesseract + Haiku 3
 
-| Metric | 1568px | 1024px | Change |
-|--------|--------|--------|--------|
-| Payload size | ~500KB | ~250KB | -50% |
-| Upload time | ~300ms | ~150ms | -150ms |
-| API processing | Baseline | -5-10% | -200-400ms |
+| Metric | Vision | OCR+Haiku | Change |
+|--------|--------|-----------|--------|
+| Avg latency | 5.4s | 2.9s | -46% |
+| Pass rate | 100% | 33% | **-67%** |
 
-**Trade-off:** May reduce OCR accuracy on small text (government warning fine print). Need to test.
+**Why it failed:**
+- Tesseract is the **worst** OCR option (92% accuracy in benchmarks)
+- OCR errors propagate to classification
+- Government warning extraction only 22% accurate
 
-**Implementation:** Change `MAX_DIMENSION` in `src/components/LabelUploader.tsx`
+#### OCR Benchmark Research (2025-2026)
 
-### Option 3: Streaming Response
+We researched OCR accuracy benchmarks:
 
-**Change:** Use Claude streaming API and display results progressively
+| OCR Engine | Accuracy | Notes |
+|------------|----------|-------|
+| Google Vision API | 98.8% | Best, costs money |
+| AWS Textract | 98.8% | Best, costs money |
+| Surya | 97.4% | Best open-source, Python only |
+| PaddleOCR | 93.0% | Good JS support |
+| **Tesseract** | **92.4%** | **Worst performer** |
 
-| Metric | Current | Streaming | Change |
-|--------|---------|-----------|--------|
-| Time to first byte | 4-6s | 0.5-1s | **-80%** |
-| Total time | 4-6s | 4-6s | Same |
-| Perceived speed | Slow | Fast | Better UX |
+Sources:
+- [OCR Benchmark 2026](https://research.aimultiple.com/ocr-accuracy/)
+- [8 Top Open-Source OCR Models](https://modal.com/blog/8-top-open-source-ocr-models-compared)
 
-**Trade-off:** Same total time, but user sees activity immediately. Doesn't actually meet the 5s requirement but improves UX while we work on real solutions.
+**Key insight:** We picked the worst OCR option. But more importantly...
 
-**Implementation:** Modify API route to use `stream: true` and update frontend
+### Phase 4: Gemini Flash (Success)
 
-### Option 4: Field-Specific Extraction (Not Recommended)
+**Hypothesis:** Skip OCR entirely. Use a fast multimodal model (Gemini 2.0 Flash) for single-call extraction.
 
-**Change:** Make separate API calls for each field type
+| Metric | Claude Vision | Gemini Flash | Change |
+|--------|---------------|--------------|--------|
+| Avg latency | 5.5s | **2.5s** | **-55%** |
+| P95 latency | 7.8s | **2.9s** | **-63%** |
+| Pass rate | 100% | **100%** | Same |
 
-**Trade-off:** Would actually be SLOWER due to multiple round-trips. Claude already extracts all fields in one pass efficiently.
+**Why it works:**
+- Gemini Flash is optimized for speed
+- Single API call (no OCR → Classification pipeline)
+- 100% accuracy parity with Claude Vision
+- 30x cheaper than Claude
 
-### Option 5: Caching (Limited Benefit)
+---
 
-**Change:** Cache extraction results by image hash
+## Final Architecture Comparison
 
-**Trade-off:** Only helps re-verification of same image. Labels are typically verified once. Limited real-world benefit.
+```
+BEFORE (Claude Vision):
+┌─────────┐     ┌─────────────────────┐     ┌──────────┐
+│  Image  │ ──► │  Claude Vision API  │ ──► │  Fields  │
+└─────────┘     │     (~5 seconds)    │     └──────────┘
+                └─────────────────────┘
 
-### Option 6: On-Premise Model (Future)
+FAILED (OCR + Classification):
+┌─────────┐     ┌───────────┐     ┌─────────────┐     ┌──────────┐
+│  Image  │ ──► │ Tesseract │ ──► │ Claude Text │ ──► │  Fields  │
+└─────────┘     │  (~300ms) │     │   (~3s)     │     └──────────┘
+                └───────────┘     └─────────────┘
+                       ↓
+              OCR errors cascade → 33% accuracy
 
-**Change:** Deploy smaller model locally or use Azure OpenAI
-
-**Trade-off:** Requires infrastructure, maintenance, may not match Claude accuracy. Better for production but not prototype scope.
-
-## Recommended Strategy
-
-### Phase 1: Validate Haiku Accuracy (Now)
-1. Add model configuration option
-2. Run full test suite with Haiku
-3. If accuracy holds (>95% same results), make it default
-4. Expected result: 1.5-2.5s response time
-
-### Phase 2: Reduce Resolution (If Needed)
-1. Test 1024px resolution with both models
-2. Verify government warning text still readable
-3. Expected additional savings: 200-400ms
-
-### Phase 3: Streaming UX (Polish)
-1. Implement streaming for perceived performance
-2. Show extraction progress in UI
-3. User sees activity within 500ms
-
-## Metrics to Track
-
-| Metric | Target | Current | After Haiku |
-|--------|--------|---------|-------------|
-| P50 latency | <4s | ~5.5s | TBD |
-| P95 latency | <5s | ~8s | TBD |
-| Pass rate | 100% | 100% | TBD |
-| Accuracy parity | >95% | Baseline | TBD |
-
-## Testing Protocol
-
-Before changing models in production:
-
-```bash
-# Run tests with Sonnet (current)
-npm test -- basic intermediate stress
-# Record: pass rate, latency stats
-
-# Run tests with Haiku (new)
-CLAUDE_MODEL=haiku npm test -- basic intermediate stress
-# Record: pass rate, latency stats
-
-# Compare results
-# - Same pass/fail outcomes?
-# - Any extraction differences?
-# - Latency improvement?
+AFTER (Gemini Flash):
+┌─────────┐     ┌─────────────────────┐     ┌──────────┐
+│  Image  │ ──► │  Gemini Flash API   │ ──► │  Fields  │
+└─────────┘     │    (~2.5 seconds)   │     └──────────┘
+                └─────────────────────┘
 ```
 
-## Test Results
+---
 
-### Haiku vs Sonnet (2026-02-03)
+## Test Results (2026-02-04)
 
-| Metric | Sonnet | Haiku |
-|--------|--------|-------|
-| Pass Rate | 18/18 (100%) | 17/18 (94.4%) |
-| Avg Latency | 5.8s | 5.5s |
-| P95 Latency | 8.5s | 6.9s |
-| Min Latency | 4.6s | 4.6s |
+### Gemini Flash vs Claude Vision (18 test cases)
 
-**Haiku Failure Analysis:**
-- Test S5 (multiline-address) failed on government warning text
-- Haiku extracted "problems" instead of "problems." (missing period)
-- Strict text matching catches this minor punctuation error
+```
+Test Case                | Vision     | Gemini     | Match
+-------------------------|------------|------------|-------
+B1-perfect               | REVIEW     | REVIEW     | ✅
+B2-case-mismatch         | REVIEW     | REVIEW     | ✅
+B3-wrong-abv             | FAIL       | FAIL       | ✅
+B4-warning-titlecase     | FAIL       | FAIL       | ✅
+B5-no-warning            | FAIL       | FAIL       | ✅
+B6-imported              | REVIEW     | REVIEW     | ✅
+I1-proof-to-abv          | REVIEW     | REVIEW     | ✅
+I2-ml-to-floz            | REVIEW     | REVIEW     | ✅
+I3-address-abbrev        | REVIEW     | REVIEW     | ✅
+I4-punctuation           | REVIEW     | REVIEW     | ✅
+S1-high-abv              | REVIEW     | REVIEW     | ✅
+S2-low-abv               | REVIEW     | REVIEW     | ✅
+S3-odd-proof             | REVIEW     | REVIEW     | ✅
+S4-liters                | REVIEW     | REVIEW     | ✅
+S5-multiline-address     | REVIEW     | REVIEW     | ✅
+S6-truncated-warning     | FAIL       | FAIL       | ✅
+S7-unicode-brand         | REVIEW     | REVIEW     | ✅
+S8-floz-to-ml            | REVIEW     | REVIEW     | ✅
 
-**Key Finding:** Latency improvement with Haiku is minimal (~5%). The bottleneck appears to be:
-1. Network round-trip to Anthropic API
-2. Test harness overhead (sequential execution)
-3. Server processing (Next.js API route)
+Accuracy Match: 18/18 (100%)
+```
 
-**Conclusion:** Model swap alone won't hit <5s target. Need to investigate:
-1. Direct API latency (bypass test harness)
-2. Image size impact
-3. Streaming for perceived performance
+### Latency Comparison
+
+| Metric | Claude Vision | Gemini Flash |
+|--------|---------------|--------------|
+| Min | 4.2s | 2.0s |
+| Avg | 5.5s | 2.5s |
+| P95 | 7.8s | 2.9s |
+| Max | 8.5s | 6.5s |
+
+---
 
 ## Decision Log
 
 | Date | Decision | Rationale |
 |------|----------|-----------|
-| 2026-02-03 | Document options | PRD requires <5s, current avg 5.8s |
-| 2026-02-03 | Tested Haiku | 94.4% accuracy, only 5% latency improvement — not sufficient |
-| TBD | Try reduced resolution | Test if smaller images improve API response time |
-| TBD | Measure direct API | Isolate API latency from test harness overhead |
+| 2026-02-03 | Baseline documented | PRD requires <5s, avg was 5.8s |
+| 2026-02-03 | Tested Haiku | 94.4% accuracy, only 5% latency improvement — rejected |
+| 2026-02-04 | Tested Tesseract OCR | 33% accuracy — rejected |
+| 2026-02-04 | Researched OCR benchmarks | Tesseract is worst option (92% vs 98% for cloud) |
+| 2026-02-04 | **Tested Gemini Flash** | **100% accuracy, 2.1x speedup — accepted** |
+
+---
+
+## Current Recommendation
+
+**Use Gemini Flash as primary extraction engine.**
+
+| Requirement | Target | Actual | Status |
+|-------------|--------|--------|--------|
+| Latency | ≤5s | 2.5s avg | ✅ |
+| Accuracy | 100% | 100% | ✅ |
+| Cost | N/A | 30x cheaper | ✅ |
+
+**Configuration:**
+```bash
+# .env.local
+GEMINI_API_KEY=your-key-here
+```
+
+**Endpoint:** `/api/verify-gemini`
+
+---
+
+## Future Optimization Options
+
+### Can we go faster than 2.5s?
+
+| Option | Potential | Feasibility | Notes |
+|--------|-----------|-------------|-------|
+| Gemini Flash-Lite | ~1.5s | High | Faster variant, need to test accuracy |
+| Smaller images | -200ms | Medium | Risk: small text unreadable |
+| Edge caching | -100ms | Low | CDN can't cache API calls |
+| Self-hosted model | ~500ms | Low | Accuracy/maintenance concerns |
+
+**Theoretical floor:** ~1.5-2s (API round-trip + inference minimum)
+
+### Why <1s is unlikely with cloud APIs
+
+1. **Network latency**: 100-200ms minimum round-trip
+2. **Image tokenization**: ~200-500ms to process image
+3. **Model inference**: ~500-1000ms minimum for quality extraction
+4. **Response serialization**: ~100ms
+
+Total minimum: ~1-2s for any cloud multimodal API.
+
+To achieve <1s would require:
+- On-device inference (mobile app with local model)
+- Pre-cached results (not applicable to new images)
+- Reduced accuracy (simpler models)
+
+---
+
+## Files Changed
+
+| File | Purpose |
+|------|---------|
+| `src/lib/gemini-extraction.ts` | Gemini Flash extraction |
+| `src/app/api/verify-gemini/route.ts` | New fast endpoint |
+| `scripts/eval-gemini.js` | Comparison evaluation |
+| `package.json` | Added `@google/generative-ai` |
+| `.env.local` | Added `GEMINI_API_KEY` |
