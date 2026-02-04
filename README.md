@@ -20,7 +20,7 @@ npm run dev
 ## Features
 
 - **Single Label Verification** — Upload a label image and compare against COLA application data
-- **Batch Processing** — Verify up to 300 labels in parallel at `/batch` (~78s for full batch)
+- **Batch Processing** — Verify up to 300 labels in parallel at `/batch` (50 labels tested in ~14s)
 - **Smart Matching** — Fuzzy matching for brand names, unit conversion for ABV/volume, strict matching for government warning
 - **Agent Override** — Accept warnings or confirm issues with one click
 - **Export Results** — Download verification results as JSON or CSV

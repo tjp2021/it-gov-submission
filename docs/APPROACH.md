@@ -111,8 +111,8 @@ The ABLA mandates the same warning statement on every beverage label sold in the
 |----------|------|-------|
 | Single label | ~2.5s | Gemini Flash extraction + comparison |
 | Batch of 10 | ~3s | Parallel processing with concurrency 10 |
-| Batch of 50 | ~13s | Tested in e2e stress test |
-| Batch of 300 | ~78s | Projected (supports full take-home requirement) |
+| Batch of 50 | ~14s | **Tested** in e2e stress test |
+| Batch of 300 | ~78s | *Projected* based on 50-label test (not tested due to API costs) |
 
 The 5-second single-label requirement from Sarah is met. Batch processing supports up to 300 labels (per take-home requirement "200-300 label applications at once") with real-time SSE streaming showing progress as each completes.
 
