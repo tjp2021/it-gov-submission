@@ -200,4 +200,68 @@ test.describe('Batch Label Verification', () => {
     await expect(page.locator('text=Passed')).toBeVisible();
     await expect(page.locator('text=Failed')).toBeVisible();
   });
+
+  test('stress test: processes 10 labels (PRD max) in parallel', async ({ page }) => {
+    // Fill form first
+    await fillDemoFormData(page);
+
+    // Upload 10 files (PRD maximum per section 3.8)
+    const fileInput = page.locator('input[type="file"]');
+    const tenFiles = Array(10).fill(demoLabelPath);
+    await fileInput.setInputFiles(tenFiles);
+
+    // Verify 10 files uploaded
+    await expect(page.locator('text=/10\\/10 selected/')).toBeVisible();
+
+    const startTime = Date.now();
+
+    // Start verification
+    await page.click('button:has-text("Verify 10 Labels")');
+
+    // Should show processing state
+    await expect(page.locator('text=Processing Labels...')).toBeVisible({ timeout: 5000 });
+
+    // Wait for results - 10 labels with concurrency 3 should take ~10-12s
+    // Using 60s timeout to be safe for CI/network variance
+    await expect(page.locator('text=Batch Results')).toBeVisible({ timeout: 60000 });
+
+    const elapsed = Date.now() - startTime;
+
+    // PRD Section 3.8: With concurrency of 3 and ~2.5s per image,
+    // 10 images should complete in ~10s (ceil(10/3) * 2.5 = 10s)
+    // Allow up to 30s for network variance, but should be much faster than
+    // sequential processing (10 * 2.5s = 25s)
+    expect(elapsed).toBeLessThan(30000);
+
+    // Verify all 10 results are shown
+    await expect(page.locator('text=Total').first()).toBeVisible();
+
+    // Check the summary shows 10 total
+    const summaryText = await page.locator('div:has-text("Total")').first().textContent();
+    expect(summaryText).toContain('10');
+
+    console.log(`Batch of 10 completed in ${(elapsed/1000).toFixed(2)}s`);
+  });
+
+  test('stress test: verifies streaming shows progressive results', async ({ page }) => {
+    // Fill form first
+    await fillDemoFormData(page);
+
+    // Upload 5 files - enough to see streaming behavior
+    const fileInput = page.locator('input[type="file"]');
+    await fileInput.setInputFiles(Array(5).fill(demoLabelPath));
+
+    // Start verification
+    await page.click('button:has-text("Verify 5 Labels")');
+
+    // Should show processing state immediately
+    await expect(page.locator('text=Processing Labels...')).toBeVisible({ timeout: 5000 });
+
+    // Progress should update as results stream in
+    // With concurrency of 3, first batch completes together, then remaining 2
+    await expect(page.locator('text=/[1-5] of 5 labels/')).toBeVisible({ timeout: 15000 });
+
+    // Wait for completion
+    await expect(page.locator('text=Batch Results')).toBeVisible({ timeout: 45000 });
+  });
 });
