@@ -29,6 +29,13 @@ const LATENCY_THRESHOLDS = {
   excellent: 2000  // 2 seconds - excellent performance
 };
 
+// Retry configuration for rate limiting
+const RETRY_CONFIG = {
+  maxRetries: 3,
+  baseDelayMs: 2000,  // Start with 2 second delay
+  maxDelayMs: 10000   // Cap at 10 seconds
+};
+
 async function runTests() {
   const timestamp = new Date().toISOString().replace(/[:.]/g, '-');
   const runId = `test-run-${timestamp}`;
@@ -190,6 +197,37 @@ function getLatencyIcon(ms) {
   return '🔴';
 }
 
+// Retry helper with exponential backoff for rate limits
+async function fetchWithRetry(url, options, retryCount = 0) {
+  const { fetch: undiciFetch } = await import('undici');
+
+  try {
+    const response = await undiciFetch(url, options);
+
+    // Check for rate limit (429)
+    if (response.status === 429 && retryCount < RETRY_CONFIG.maxRetries) {
+      const delay = Math.min(
+        RETRY_CONFIG.baseDelayMs * Math.pow(2, retryCount),
+        RETRY_CONFIG.maxDelayMs
+      );
+      process.stdout.write(`\n     ⏳ Rate limited, retrying in ${delay/1000}s (attempt ${retryCount + 1}/${RETRY_CONFIG.maxRetries})...`);
+      await new Promise(r => setTimeout(r, delay));
+      return fetchWithRetry(url, options, retryCount + 1);
+    }
+
+    return response;
+  } catch (err) {
+    // Retry on network errors too
+    if (retryCount < RETRY_CONFIG.maxRetries && err.code === 'ECONNRESET') {
+      const delay = RETRY_CONFIG.baseDelayMs * Math.pow(2, retryCount);
+      process.stdout.write(`\n     ⏳ Connection reset, retrying in ${delay/1000}s...`);
+      await new Promise(r => setTimeout(r, delay));
+      return fetchWithRetry(url, options, retryCount + 1);
+    }
+    throw err;
+  }
+}
+
 async function runSingleTest(scenario) {
   // htmlFile now contains the full path like "automated/basic/label-perfect.png"
   const imagePath = scenario.htmlFile;
@@ -222,7 +260,7 @@ async function runSingleTest(scenario) {
     const imageBuffer = fs.readFileSync(pngPath);
 
     // Create form data using undici
-    const { FormData, fetch: undiciFetch } = await import('undici');
+    const { FormData } = await import('undici');
 
     const formData = new FormData();
     // Use Blob with filename in the set call
@@ -230,17 +268,21 @@ async function runSingleTest(scenario) {
     formData.set('labelImage', blob, pngFileName);
     formData.set('applicationData', JSON.stringify(scenario.applicationData));
 
-    // Make request with timing using undici fetch
+    // Make request with timing and retry logic for rate limits
     const startTime = Date.now();
-    const response = await undiciFetch(API_URL, {
+    const response = await fetchWithRetry(API_URL, {
       method: 'POST',
       body: formData
     });
     result.latencyMs = Date.now() - startTime;
 
     if (!response.ok) {
-      const error = await response.json();
-      result.error = error.error || `HTTP ${response.status}`;
+      if (response.status === 429) {
+        result.error = `Rate limited after ${RETRY_CONFIG.maxRetries} retries`;
+      } else {
+        const error = await response.json().catch(() => ({}));
+        result.error = error.error || `HTTP ${response.status}`;
+      }
       return result;
     }
 

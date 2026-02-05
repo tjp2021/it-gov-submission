@@ -62,6 +62,9 @@ interface ParsedImage {
   label: ImageLabel;
 }
 
+const MAX_IMAGES = 6;
+const MIN_IMAGE_SIZE = 100; // Minimum 100 bytes for a valid image
+
 async function parseMultiImageFormData(formData: FormData): Promise<{
   images: ParsedImage[];
   applicationData: ApplicationData;
@@ -85,7 +88,7 @@ async function parseMultiImageFormData(formData: FormData): Promise<{
 
   // Check for single image (backward compatibility)
   const singleImage = formData.get("labelImage") as File | null;
-  if (singleImage) {
+  if (singleImage && singleImage.size > 0) {
     images.push({
       index: 0,
       file: singleImage,
@@ -94,9 +97,10 @@ async function parseMultiImageFormData(formData: FormData): Promise<{
   }
 
   // Check for multi-image format: labelImage_0, labelImage_1, etc.
-  for (let i = 0; i < 6; i++) {
+  // Only check up to MAX_IMAGES
+  for (let i = 0; i < MAX_IMAGES; i++) {
     const image = formData.get(`labelImage_${i}`) as File | null;
-    if (image) {
+    if (image && image.size > 0) {
       images.push({
         index: i,
         file: image,
@@ -105,8 +109,21 @@ async function parseMultiImageFormData(formData: FormData): Promise<{
     }
   }
 
+  // Check if too many images were provided (beyond our limit)
+  const extraImage = formData.get(`labelImage_${MAX_IMAGES}`) as File | null;
+  if (extraImage) {
+    throw new Error(`Maximum ${MAX_IMAGES} images allowed`);
+  }
+
   if (images.length === 0) {
-    throw new Error("No images provided");
+    throw new Error("At least one image is required");
+  }
+
+  // Validate each image has minimum size
+  for (const img of images) {
+    if (img.file.size < MIN_IMAGE_SIZE) {
+      throw new Error(`Image ${img.file.name || img.index} is too small or empty`);
+    }
   }
 
   return { images, applicationData };
@@ -144,6 +161,24 @@ async function extractFromImage(
 export async function POST(request: NextRequest) {
   const startTime = Date.now();
 
+  // Pre-validate input before starting SSE stream
+  // This ensures validation errors return proper 400 status
+  let formData: FormData;
+  let parsedInput: { images: ParsedImage[]; applicationData: ApplicationData };
+
+  try {
+    formData = await request.formData();
+    parsedInput = await parseMultiImageFormData(formData);
+  } catch (error) {
+    const message = error instanceof Error ? error.message : "Invalid request";
+    return new Response(JSON.stringify({ error: message }), {
+      status: 400,
+      headers: { "Content-Type": "application/json" },
+    });
+  }
+
+  const { images, applicationData } = parsedInput;
+
   const encoder = new TextEncoder();
 
   const stream = new ReadableStream({
@@ -155,11 +190,8 @@ export async function POST(request: NextRequest) {
       };
 
       try {
-        // Stage 1: Parse input
+        // Stage 1: Parse input (already validated above)
         send("progress", { stage: "parsing", message: "Parsing request...", elapsed: Date.now() - startTime });
-
-        const formData = await request.formData();
-        const { images, applicationData } = await parseMultiImageFormData(formData);
 
         const isMultiImage = images.length > 1;
         const imageSources: ImageSource[] = images.map((img, idx) => ({

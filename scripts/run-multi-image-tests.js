@@ -15,6 +15,42 @@ const API_URL = 'http://localhost:3000/api/verify-stream';
 const TEST_DATA_DIR = path.join(__dirname, '../src/test-data');
 const RESULTS_DIR = path.join(__dirname, '../src/test-data/test-results');
 
+// Retry configuration for rate limiting
+const RETRY_CONFIG = {
+  maxRetries: 3,
+  baseDelayMs: 2000,
+  maxDelayMs: 10000
+};
+
+// Retry helper with exponential backoff for rate limits
+async function fetchWithRetry(url, options, retryCount = 0) {
+  const { fetch: undiciFetch } = await import('undici');
+
+  try {
+    const response = await undiciFetch(url, options);
+
+    if (response.status === 429 && retryCount < RETRY_CONFIG.maxRetries) {
+      const delay = Math.min(
+        RETRY_CONFIG.baseDelayMs * Math.pow(2, retryCount),
+        RETRY_CONFIG.maxDelayMs
+      );
+      process.stdout.write(`\n     ⏳ Rate limited, retrying in ${delay/1000}s (attempt ${retryCount + 1}/${RETRY_CONFIG.maxRetries})...`);
+      await new Promise(r => setTimeout(r, delay));
+      return fetchWithRetry(url, options, retryCount + 1);
+    }
+
+    return response;
+  } catch (err) {
+    if (retryCount < RETRY_CONFIG.maxRetries && err.code === 'ECONNRESET') {
+      const delay = RETRY_CONFIG.baseDelayMs * Math.pow(2, retryCount);
+      process.stdout.write(`\n     ⏳ Connection reset, retrying in ${delay/1000}s...`);
+      await new Promise(r => setTimeout(r, delay));
+      return fetchWithRetry(url, options, retryCount + 1);
+    }
+    throw err;
+  }
+}
+
 // Multi-image test scenarios
 const MULTI_IMAGE_TESTS = [
   {
@@ -239,7 +275,7 @@ async function runSingleTest(test) {
     }
 
     // Create form data
-    const { FormData, fetch: undiciFetch } = await import('undici');
+    const { FormData } = await import('undici');
     const formData = new FormData();
 
     // Add images
@@ -252,16 +288,20 @@ async function runSingleTest(test) {
     formData.set('imageLabels', JSON.stringify(imageLabels));
     formData.set('applicationData', JSON.stringify(test.applicationData));
 
-    // Make request
+    // Make request with retry logic for rate limits
     const startTime = Date.now();
-    const response = await undiciFetch(API_URL, {
+    const response = await fetchWithRetry(API_URL, {
       method: 'POST',
       body: formData,
     });
     // Note: SSE returns immediately, full processing time is until stream ends
 
     if (!response.ok) {
-      result.error = `HTTP ${response.status}`;
+      if (response.status === 429) {
+        result.error = `Rate limited after ${RETRY_CONFIG.maxRetries} retries`;
+      } else {
+        result.error = `HTTP ${response.status}`;
+      }
       return result;
     }
 

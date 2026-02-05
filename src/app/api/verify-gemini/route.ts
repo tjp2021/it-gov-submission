@@ -21,6 +21,14 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
       );
     }
 
+    // Validate image is not empty (minimum 100 bytes for valid image)
+    if (imageFile.size < 100) {
+      return NextResponse.json(
+        { error: "Image file is empty or too small" },
+        { status: 400 }
+      );
+    }
+
     if (!applicationDataJson) {
       return NextResponse.json(
         { error: "No application data provided" },
