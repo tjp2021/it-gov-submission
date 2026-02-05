@@ -5,12 +5,14 @@ import FieldResultCard from "./FieldResultCard";
 
 interface VerificationResultsProps {
   result: VerificationResult;
+  labelImage?: string | null;
   onFieldOverride: (fieldName: string, action: "accepted" | "confirmed_issue") => void;
   onReset: () => void;
 }
 
 export default function VerificationResults({
   result,
+  labelImage,
   onFieldOverride,
   onReset,
 }: VerificationResultsProps) {
@@ -95,6 +97,18 @@ export default function VerificationResults({
         </p>
       </div>
 
+      {/* Label Image for Reference */}
+      {labelImage && (
+        <div className="border border-gray-200 rounded-lg p-4">
+          <h3 className="text-sm font-medium text-gray-700 mb-3">Label Image (for reference)</h3>
+          <img
+            src={labelImage}
+            alt="Uploaded label"
+            className="max-w-full max-h-64 mx-auto rounded border border-gray-300"
+          />
+        </div>
+      )}
+
       {/* Field Results */}
       <div className="space-y-4">
         <h3 className="text-lg font-semibold text-gray-800">
@@ -113,7 +127,8 @@ export default function VerificationResults({
       <div className="flex gap-4 pt-4 border-t border-gray-200">
         <button
           onClick={onReset}
-          className="px-4 py-2 bg-blue-600 text-white font-medium rounded-lg hover:bg-blue-700 transition-colors"
+          className="px-4 py-2 text-white font-medium rounded-lg hover:opacity-90 transition-colors"
+          style={{ backgroundColor: '#1e3a5f' }}
         >
           🔄 Verify Another
         </button>
@@ -130,7 +145,7 @@ export default function VerificationResults({
         <summary className="cursor-pointer text-gray-500 hover:text-gray-700">
           Show extracted raw data
         </summary>
-        <pre className="mt-2 p-4 bg-gray-100 rounded-lg overflow-x-auto text-xs">
+        <pre className="mt-2 p-4 bg-gray-100 rounded-lg overflow-x-auto text-xs text-black">
           {JSON.stringify(result.extractedFields, null, 2)}
         </pre>
       </details>

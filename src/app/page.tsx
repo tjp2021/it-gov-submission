@@ -24,7 +24,6 @@ export default function Home() {
   const [error, setError] = useState<string | null>(null);
   const [loadingStartTime, setLoadingStartTime] = useState<number>(0);
   const [streamMessage, setStreamMessage] = useState<string>("");
-  const [streamElapsed, setStreamElapsed] = useState<number>(0);
   const [streamFields, setStreamFields] = useState<FieldResult[]>([]);
 
   const handleImageSelect = useCallback((file: File, preview: string) => {
@@ -64,7 +63,6 @@ export default function Home() {
     setState("loading");
     setLoadingStartTime(Date.now());
     setStreamMessage("Starting...");
-    setStreamElapsed(0);
     setStreamFields([]);
 
     try {
@@ -111,7 +109,6 @@ export default function Home() {
               switch (eventType) {
                 case "progress":
                   setStreamMessage(data.message);
-                  setStreamElapsed(data.elapsed);
                   break;
                 case "field":
                   setStreamFields(prev => [...prev, data as FieldResult]);
@@ -222,7 +219,6 @@ export default function Home() {
             <LoadingState
               startTime={loadingStartTime}
               streamMessage={streamMessage}
-              streamElapsed={streamElapsed}
               streamFields={streamFields}
             />
           )}

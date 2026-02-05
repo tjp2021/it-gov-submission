@@ -68,6 +68,30 @@ We need test images that simulate real-world conditions (glare, angles, blur, lo
 
 **Verdict**: Overkill for our needs; compositing is simpler.
 
+### Option 5: Ideogram 3.0 Remix (TESTED 2026-02-04)
+**Approach**: Use Ideogram's Remix API with high "image_weight" (preservation strength) to transform our label PNG into a bottle photo while preserving the text.
+
+**Pros**:
+- Specifically designed for text rendering
+- "Remix" feature claims to preserve reference image content
+- Strength parameter (0-100) controls preservation level
+
+**Cons**:
+- **STILL GARBLES TEXT** even at 100% strength
+- "Kentucky Straight Bourbon Whiskey" → "Kentucky Sirdiyut Boucbon Wiackey" (at 85%)
+- "Kentucky Straight Bourbon Whiskoy", "45% Ale./Vol." (at 100%)
+- Government warning completely unreadable
+
+**Test Results (2026-02-04)**:
+```
+Strength 85%: Heavy garbling - unusable
+Strength 100%: Minor garbling - still unusable for verification
+```
+
+**Root Cause**: AI image generation models learn visual PATTERNS, not character SEQUENCES. Even "text-preserving" features re-render text based on what the model thinks letters should look like, not character-by-character copying.
+
+**Verdict**: Confirmed that NO AI image generation can reliably preserve exact text. Compositing is the only solution.
+
 ## Decision
 
 **Use Option 2: Image Compositing** with the following approach:
@@ -110,3 +134,11 @@ We need test images that simulate real-world conditions (glare, angles, blur, lo
 2. **Separate test purposes**: Ground-truth tests (verify matching logic) need different images than stress tests (verify extraction robustness).
 
 3. **Control vs realism tradeoff**: For verification testing, control over content is more valuable than photorealism.
+
+4. **"Text-preserving" AI features don't work** (2026-02-04): Even Ideogram 3.0's Remix with 100% image_weight (strength) still garbles text. The term "preserve" in AI contexts means "preserve visual style/layout" NOT "preserve exact characters". This is a fundamental limitation of how diffusion models work - they generate pixels from learned distributions, not copy pixels from references.
+
+5. **Programmatic compositing is the only reliable solution**: For any testing that requires exact text verification:
+   - Generate blank templates with AI (no text = no garbling)
+   - Composite controlled text/labels programmatically
+   - Apply effects (blur, brightness) programmatically
+   - This guarantees 100% text accuracy

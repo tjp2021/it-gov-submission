@@ -39,7 +39,7 @@ export default function ApplicationForm({
             type="text"
             value={data.brandName}
             onChange={(e) => handleChange("brandName", e.target.value)}
-            className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-base"
+            className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-base text-black placeholder:text-gray-500"
             placeholder="e.g., Old Tom Distillery"
           />
         </div>
@@ -57,7 +57,7 @@ export default function ApplicationForm({
             type="text"
             value={data.classType}
             onChange={(e) => handleChange("classType", e.target.value)}
-            className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-base"
+            className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-base text-black placeholder:text-gray-500"
             placeholder="e.g., Kentucky Straight Bourbon Whiskey"
           />
         </div>
@@ -75,7 +75,7 @@ export default function ApplicationForm({
             type="text"
             value={data.alcoholContent}
             onChange={(e) => handleChange("alcoholContent", e.target.value)}
-            className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-base"
+            className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-base text-black placeholder:text-gray-500"
             placeholder="e.g., 45% Alc./Vol. (90 Proof)"
           />
         </div>
@@ -93,7 +93,7 @@ export default function ApplicationForm({
             type="text"
             value={data.netContents}
             onChange={(e) => handleChange("netContents", e.target.value)}
-            className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-base"
+            className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-base text-black placeholder:text-gray-500"
             placeholder="e.g., 750 mL"
           />
         </div>
@@ -111,7 +111,7 @@ export default function ApplicationForm({
             type="text"
             value={data.nameAddress}
             onChange={(e) => handleChange("nameAddress", e.target.value)}
-            className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-base"
+            className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-base text-black placeholder:text-gray-500"
             placeholder="e.g., Old Tom Distillery, Louisville, KY"
           />
         </div>
@@ -129,7 +129,7 @@ export default function ApplicationForm({
             type="text"
             value={data.countryOfOrigin || ""}
             onChange={(e) => handleChange("countryOfOrigin", e.target.value)}
-            className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-base"
+            className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-base text-black placeholder:text-gray-500"
             placeholder="e.g., Scotland (leave blank for domestic)"
           />
         </div>
@@ -151,7 +151,7 @@ export default function ApplicationForm({
           value={data.governmentWarning}
           onChange={(e) => handleChange("governmentWarning", e.target.value)}
           rows={4}
-          className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm font-mono"
+          className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm font-mono text-black"
         />
       </div>
 

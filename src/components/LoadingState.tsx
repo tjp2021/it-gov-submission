@@ -6,14 +6,12 @@ import type { FieldResult } from "@/lib/types";
 interface LoadingStateProps {
   startTime: number;
   streamMessage?: string;
-  streamElapsed?: number;
   streamFields?: FieldResult[];
 }
 
 export default function LoadingState({
   startTime,
   streamMessage,
-  streamElapsed,
   streamFields = []
 }: LoadingStateProps) {
   const [elapsed, setElapsed] = useState(0);
@@ -25,8 +23,6 @@ export default function LoadingState({
     return () => clearInterval(interval);
   }, [startTime]);
 
-  // Use local timer unless streaming has started (streamElapsed > 0)
-  const displayElapsed = streamElapsed && streamElapsed > 0 ? streamElapsed : elapsed;
   const displayMessage = streamMessage ?? "Processing...";
 
   const getStatusIcon = (status: string) => {
@@ -61,7 +57,7 @@ export default function LoadingState({
           {displayMessage}
         </p>
         <p className="text-sm text-gray-500 mt-1">
-          {(displayElapsed / 1000).toFixed(1)}s elapsed
+          {(elapsed / 1000).toFixed(1)}s elapsed
         </p>
       </div>
 

@@ -73,13 +73,13 @@ export default function FieldResultCard({
       <div className="grid grid-cols-1 md:grid-cols-2 gap-3 text-sm">
         <div>
           <span className="text-gray-500 block mb-1">Application:</span>
-          <span className="font-mono bg-white px-2 py-1 rounded border border-gray-200 block break-words">
+          <span className="font-mono bg-white px-2 py-1 rounded border border-gray-200 block break-words text-black">
             {result.applicationValue || "—"}
           </span>
         </div>
         <div>
           <span className="text-gray-500 block mb-1">Label:</span>
-          <span className="font-mono bg-white px-2 py-1 rounded border border-gray-200 block break-words">
+          <span className="font-mono bg-white px-2 py-1 rounded border border-gray-200 block break-words text-black">
             {result.extractedValue || "Not found"}
           </span>
         </div>
