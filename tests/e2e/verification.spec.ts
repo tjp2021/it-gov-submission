@@ -19,8 +19,8 @@ test.describe('Label Verification', () => {
     // Wait for results - either loading state or final results
     await expect(page.locator('text=/Processed in|Analyzing|elapsed/')).toBeVisible({ timeout: 15000 });
 
-    // Final results should appear
-    await expect(page.locator('text=Brand Name')).toBeVisible({ timeout: 15000 });
+    // Final results should appear - use exact match to avoid matching "Brand name match"
+    await expect(page.getByText('Brand Name', { exact: true })).toBeVisible({ timeout: 15000 });
   });
 
   test('displays all field results after verification', async ({ page }) => {
@@ -31,12 +31,12 @@ test.describe('Label Verification', () => {
     // Click verify
     await page.click('button:has-text("Verify Label")');
 
-    // Wait for field results to appear
-    await expect(page.locator('text=Brand Name')).toBeVisible({ timeout: 15000 });
-    await expect(page.locator('text=Class/Type')).toBeVisible();
-    await expect(page.locator('text=Alcohol Content')).toBeVisible();
-    await expect(page.locator('text=Net Contents')).toBeVisible();
-    await expect(page.locator('text=Name & Address')).toBeVisible();
+    // Wait for field results to appear - use exact match to avoid matching status messages
+    await expect(page.getByText('Brand Name', { exact: true })).toBeVisible({ timeout: 15000 });
+    await expect(page.getByText('Class/Type', { exact: true })).toBeVisible();
+    await expect(page.getByText('Alcohol Content', { exact: true })).toBeVisible();
+    await expect(page.getByText('Net Contents', { exact: true })).toBeVisible();
+    await expect(page.getByText('Name & Address', { exact: true })).toBeVisible();
     await expect(page.locator('text=Gov Warning — Present')).toBeVisible();
 
     // Should show processing time
@@ -53,8 +53,8 @@ test.describe('Label Verification', () => {
     // Click verify
     await page.click('button:has-text("Verify Label")');
 
-    // Wait for results
-    await expect(page.locator('text=Brand Name')).toBeVisible({ timeout: 15000 });
+    // Wait for results - use exact match to avoid matching status messages
+    await expect(page.getByText('Brand Name', { exact: true })).toBeVisible({ timeout: 15000 });
 
     const elapsed = Date.now() - startTime;
 
@@ -100,7 +100,8 @@ test.describe('Label Verification', () => {
     await page.click('text=Try with example data');
     await expect(page.locator('img[alt="Label preview"]')).toBeVisible({ timeout: 5000 });
     await page.click('button:has-text("Verify Label")');
-    await expect(page.locator('text=Brand Name')).toBeVisible({ timeout: 15000 });
+    // Use exact match to avoid matching status messages like "Brand name match"
+    await expect(page.getByText('Brand Name', { exact: true })).toBeVisible({ timeout: 15000 });
 
     // Click reset
     await page.click('text=Verify Another');
