@@ -327,21 +327,32 @@ GOVERNMENT WARNING: (1) According to the Surgeon General, women should not drink
 
 ### 16. Batch Upload (3 images)
 
-**Images:** Upload 3 different label images from `real/` folder
-**Expected:** All process successfully
+**Images:** `16-batch-A-perfect.png`, `16-batch-B-imported.png`, `16-batch-C-case.png`
+**Expected:** All 3 process successfully
 
-- [ ] Navigate to Batch page
-- [ ] Upload 3 images
-- [ ] All 3 show individual results
-- [ ] Summary dashboard displays
+**Application Data for each image:**
+
+| Image | Brand Name | Class/Type | Alcohol | Net Contents | Name/Address | Country |
+|-------|------------|------------|---------|--------------|--------------|---------|
+| A | Old Tom Distillery | Kentucky Straight Bourbon Whiskey | 45% Alc./Vol. (90 Proof) | 750 mL | Old Tom Distillery, Louisville, Kentucky | *(empty)* |
+| B | Glenfiddich | Single Malt Scotch Whisky | 40% Alc./Vol. (80 Proof) | 750 mL | William Grant & Sons, Dufftown, Banffshire, Scotland | Scotland |
+| C | Stone's Throw | Small Batch Bourbon Whiskey | 46% Alc./Vol. | 750 mL | Stone's Throw Distillery, Frankfort, Kentucky | *(empty)* |
+
+*(Use standard government warning for all)*
+
+- [ ] Navigate to Batch page (/batch)
+- [ ] Upload all 3 images at once (drag & drop or multi-select)
+- [ ] All 3 show individual results with PASS status
+- [ ] Summary dashboard displays pass/fail counts
+- [ ] Can click to drill down into each result
 
 ### 17. Batch Limit (10 max)
 
-**Images:** Try to upload 12 images
+**Images:** Try to upload 12 images (use images 01-15 from this folder)
 **Expected:** Only 10 accepted
 
 - [ ] Error message appears when exceeding 10
-- [ ] First 10 images retained
+- [ ] Clear feedback about the limit
 
 ---
 
