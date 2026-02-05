@@ -83,9 +83,9 @@ From the take-home document (Jenny Park interview):
 │  │    │  Check 2: Header ALL CAPS                               │ │ │
 │  │    │  └─ PASS if "GOVERNMENT WARNING:", FAIL otherwise      │ │ │
 │  │    │                                                         │ │ │
-│  │    │  Check 3: Header BOLD  ◄──── THE PROBLEM               │ │ │
+│  │    │  Check 3: Header BOLD  [category: "confirmation"]       │ │ │
 │  │    │  └─ ALWAYS returns WARNING                             │ │ │
-│  │    │  └─ Cannot reliably detect from photos                 │ │ │
+│  │    │  └─ Does not affect overall status (see Part 10)       │ │ │
 │  │    │                                                         │ │ │
 │  │    │  Check 4: Text Word-for-Word                            │ │ │
 │  │    │  └─ PASS if exact match, FAIL with word-diff otherwise │ │ │
@@ -94,9 +94,10 @@ From the take-home document (Jenny Park interview):
 │                          ▼                                           │
 │  ┌────────────────────────────────────────────────────────────────┐ │
 │  │ 6. computeOverallStatus()                                      │ │
+│  │    automatedResults = filter(category === "automated")        │ │
 │  │    if (hasUnresolvedFail) return "FAIL";                       │ │
-│  │    if (hasWarningOrNotFound) return "REVIEW";  ◄── ALWAYS HIT │ │
-│  │    return "PASS";  ◄── NEVER REACHED                          │ │
+│  │    if (hasWarningOrNotFound) return "REVIEW";                  │ │
+│  │    return "PASS";  ◄── NOW REACHABLE (bold excluded)          │ │
 │  └───────────────────────┬────────────────────────────────────────┘ │
 │                          ▼                                           │
 │                   SSE: complete event                                │
@@ -188,7 +189,9 @@ Also indistinguishable:
 
 ---
 
-## Part 5: The PASS/REVIEW/FAIL Paradox
+## Part 5: The PASS/REVIEW/FAIL Paradox (Before Fix)
+
+> **Note:** Parts 5-9 document the problem as it existed before the category architecture fix. See **Part 10** for the resolution. These sections are preserved as historical context showing the analytical process.
 
 ### The Status Computation
 
@@ -257,7 +260,7 @@ Bold check implementation (warning-check.ts):
 
 ---
 
-## Part 6: The Test Architecture
+## Part 6: The Test Architecture (Before Fix)
 
 ### Test Expectations vs Reality
 
@@ -372,7 +375,7 @@ sample-applications.json:
 
 ---
 
-## Part 9: Options for Resolution
+## Part 9: Options for Resolution (Before Fix)
 
 ### Option A: Accept REVIEW as Success (Current)
 

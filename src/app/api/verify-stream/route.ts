@@ -4,12 +4,12 @@ import { compareField } from "@/lib/comparison";
 import { verifyGovernmentWarning } from "@/lib/warning-check";
 import { FIELD_CONFIG, STANDARD_WARNING_TEXT } from "@/lib/constants";
 import { mergeExtractions, getUnresolvedConflicts } from "@/lib/merge-extraction";
+import { computeOverallStatus, buildPendingConfirmations } from "@/lib/verify-single";
 import type {
   ApplicationData,
   ExtractedFields,
   FieldResult,
   VerificationResult,
-  OverallStatus,
   MatchType,
   ImageSource,
   ImageLabel,
@@ -17,41 +17,10 @@ import type {
   MergedExtraction,
   MultiImageFieldResult,
   MultiImageVerificationResult,
-  PendingConfirmation,
 } from "@/lib/types";
 
 export const runtime = "nodejs";
 export const maxDuration = 60; // Increased for multi-image processing
-
-function computeOverallStatus(fieldResults: FieldResult[]): OverallStatus {
-  // Only consider "automated" category results for status aggregation
-  // "confirmation" category (e.g., bold check) requires agent action but doesn't block PASS
-  const automatedResults = fieldResults.filter(r => r.category === "automated");
-
-  const hasUnresolvedFail = automatedResults.some(
-    (r) => r.status === "FAIL" && !r.agentOverride
-  );
-  const hasWarningOrNotFound = automatedResults.some(
-    (r) => r.status === "WARNING" || r.status === "NOT_FOUND"
-  );
-
-  if (hasUnresolvedFail) return "FAIL";
-  if (hasWarningOrNotFound) return "REVIEW";
-  return "PASS";
-}
-
-function buildPendingConfirmations(fieldResults: FieldResult[]): PendingConfirmation[] {
-  // Build pending confirmations from "confirmation" category results
-  return fieldResults
-    .filter(r => r.category === "confirmation")
-    .map(r => ({
-      id: r.fieldName,
-      label: r.fieldName.replace("Gov Warning — ", ""),
-      description: r.details,
-      aiAssessment: r.extractedValue || undefined,
-      confirmed: false,
-    }));
-}
 
 function getExtractedValue(
   fields: ExtractedFields,

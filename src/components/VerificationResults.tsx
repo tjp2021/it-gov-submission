@@ -1,9 +1,11 @@
 "use client";
 
+import { useState } from "react";
 import type {
   VerificationResult,
   MultiImageVerificationResult,
   ImageLabel,
+  PendingConfirmation,
 } from "@/lib/types";
 import FieldResultCard from "./FieldResultCard";
 
@@ -71,6 +73,25 @@ export default function VerificationResults({
   const config = statusConfig[result.overallStatus];
   const isMultiImage = isMultiImageResult(result);
 
+  // Pending confirmations state
+  const [confirmations, setConfirmations] = useState<Record<string, boolean>>(
+    () => {
+      const initial: Record<string, boolean> = {};
+      for (const pc of result.pendingConfirmations || []) {
+        initial[pc.id] = pc.confirmed;
+      }
+      return initial;
+    }
+  );
+
+  const handleConfirmation = (id: string, confirmed: boolean) => {
+    setConfirmations(prev => ({ ...prev, [id]: confirmed }));
+  };
+
+  const allConfirmed = (result.pendingConfirmations || []).every(
+    pc => confirmations[pc.id]
+  );
+
   // Count results by status
   const counts = result.fieldResults.reduce(
     (acc, r) => {
@@ -91,7 +112,7 @@ export default function VerificationResults({
     if (isMultiImage) {
       const exportData = {
         exportedAt: new Date().toISOString(),
-        version: "2.0",
+        version: "2.1",
         imageCount: result.imageCount,
         images: result.images.map((img) => ({
           id: img.imageId,
@@ -99,6 +120,11 @@ export default function VerificationResults({
           fileName: img.fileName,
         })),
         overallStatus: result.overallStatus,
+        pendingConfirmations: (result.pendingConfirmations || []).map(pc => ({
+          ...pc,
+          confirmed: confirmations[pc.id] || false,
+          confirmedAt: confirmations[pc.id] ? new Date().toISOString() : undefined,
+        })),
         mergedExtraction: {
           fields: result.mergedExtraction.fields,
           fieldSources: Object.fromEntries(
@@ -160,6 +186,11 @@ export default function VerificationResults({
         exportedAt: new Date().toISOString(),
         overallStatus: result.overallStatus,
         processingTimeMs: result.processingTimeMs,
+        pendingConfirmations: (result.pendingConfirmations || []).map(pc => ({
+          ...pc,
+          confirmed: confirmations[pc.id] || false,
+          confirmedAt: confirmations[pc.id] ? new Date().toISOString() : undefined,
+        })),
         fieldResults: result.fieldResults,
         summary: {
           totalFields: result.fieldResults.length,
@@ -209,6 +240,13 @@ export default function VerificationResults({
         <p className="text-sm text-gray-500 mt-1">
           Processed in {(result.processingTimeMs / 1000).toFixed(1)}s
         </p>
+        {result.pendingConfirmations?.length > 0 && (
+          <p className="text-sm text-amber-700 mt-2 font-medium">
+            {allConfirmed
+              ? "All confirmations completed"
+              : `${result.pendingConfirmations.length} pending confirmation${result.pendingConfirmations.length > 1 ? "s" : ""} below`}
+          </p>
+        )}
       </div>
 
       {/* Label Images for Reference */}
@@ -242,20 +280,71 @@ export default function VerificationResults({
         </div>
       )}
 
-      {/* Field Results */}
+      {/* Field Results — automated checks only */}
       <div className="space-y-4">
         <h3 className="text-lg font-semibold text-gray-800">
-          Field-by-Field Results
+          Automated Verification Results
         </h3>
-        {result.fieldResults.map((fieldResult, index) => (
-          <FieldResultCard
-            key={`${fieldResult.fieldName}-${index}`}
-            result={fieldResult}
-            imagePreviews={imagePreviews}
-            onOverride={(action) => onFieldOverride(fieldResult.fieldName, action)}
-          />
-        ))}
+        {result.fieldResults
+          .filter((r) => r.category === "automated")
+          .map((fieldResult, index) => (
+            <FieldResultCard
+              key={`${fieldResult.fieldName}-${index}`}
+              result={fieldResult}
+              imagePreviews={imagePreviews}
+              onOverride={(action) => onFieldOverride(fieldResult.fieldName, action)}
+            />
+          ))}
       </div>
+
+      {/* Pending Confirmations */}
+      {result.pendingConfirmations?.length > 0 && (
+        <div className="space-y-3">
+          <h3 className="text-lg font-semibold text-gray-800">
+            Agent Confirmations Required
+          </h3>
+          <p className="text-sm text-gray-600">
+            These checks cannot be automated reliably and require visual confirmation.
+          </p>
+          {result.pendingConfirmations.map((pc) => (
+            <div
+              key={pc.id}
+              className={`rounded-lg border-2 p-4 ${
+                confirmations[pc.id]
+                  ? "border-green-200 bg-green-50"
+                  : "border-amber-200 bg-amber-50"
+              }`}
+            >
+              <label className="flex items-start gap-3 cursor-pointer">
+                <input
+                  type="checkbox"
+                  checked={confirmations[pc.id] || false}
+                  onChange={(e) => handleConfirmation(pc.id, e.target.checked)}
+                  className="mt-1 h-4 w-4 rounded border-gray-300 text-green-600 focus:ring-green-500"
+                />
+                <div className="flex-1">
+                  <div className="font-semibold text-gray-800">
+                    {pc.label}
+                  </div>
+                  <p className="text-sm text-gray-600 mt-1">{pc.description}</p>
+                  {pc.aiAssessment && (
+                    <p className="text-xs text-gray-500 mt-1">
+                      AI assessment: {pc.aiAssessment}
+                    </p>
+                  )}
+                </div>
+                <span className={`text-xs font-medium px-2 py-0.5 rounded ${
+                  confirmations[pc.id]
+                    ? "bg-green-100 text-green-700"
+                    : "bg-amber-100 text-amber-700"
+                }`}>
+                  {confirmations[pc.id] ? "Confirmed" : "Pending"}
+                </span>
+              </label>
+            </div>
+          ))}
+        </div>
+      )}
 
       {/* Actions */}
       <div className="flex gap-4 pt-4 border-t border-gray-200">

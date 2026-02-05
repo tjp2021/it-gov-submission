@@ -20,6 +20,7 @@ import type {
   MergedExtraction,
 } from "@/lib/types";
 import { resolveConflict, allConflictsResolved } from "@/lib/merge-extraction";
+import { computeOverallStatus } from "@/lib/verify-single";
 
 type AppState = "input" | "extracting" | "conflict" | "comparing" | "results";
 
@@ -255,22 +256,8 @@ export default function Home() {
       return r;
     });
 
-    // Recompute overall status
-    const hasUnresolvedFail = updatedResults.some(
-      (r) => r.status === "FAIL" && !r.agentOverride
-    );
-    const hasWarningOrNotFound = updatedResults.some(
-      (r) => r.status === "WARNING" || r.status === "NOT_FOUND"
-    );
-
-    let overallStatus: "PASS" | "FAIL" | "REVIEW";
-    if (hasUnresolvedFail) {
-      overallStatus = "FAIL";
-    } else if (hasWarningOrNotFound) {
-      overallStatus = "REVIEW";
-    } else {
-      overallStatus = "PASS";
-    }
+    // Recompute overall status using shared logic (respects field categories)
+    const overallStatus = computeOverallStatus(updatedResults);
 
     setResult({
       ...result,

@@ -17,7 +17,7 @@ import type {
   PendingConfirmation,
 } from "@/lib/types";
 
-function computeOverallStatus(fieldResults: FieldResult[]): OverallStatus {
+export function computeOverallStatus(fieldResults: FieldResult[]): OverallStatus {
   // Only consider "automated" category results for status aggregation
   // "confirmation" category (e.g., bold check) requires agent action but doesn't block PASS
   const automatedResults = fieldResults.filter(r => r.category === "automated");
@@ -34,7 +34,7 @@ function computeOverallStatus(fieldResults: FieldResult[]): OverallStatus {
   return "PASS";
 }
 
-function buildPendingConfirmations(fieldResults: FieldResult[]): PendingConfirmation[] {
+export function buildPendingConfirmations(fieldResults: FieldResult[]): PendingConfirmation[] {
   return fieldResults
     .filter(r => r.category === "confirmation")
     .map(r => ({
