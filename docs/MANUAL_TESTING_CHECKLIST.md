@@ -2,7 +2,9 @@
 
 **Deployed URL:** https://gov-submission.vercel.app
 
-**Test Images Location:** `src/test-data/sample-labels/real/`
+**Test Images Location:** `src/test-data/manual-test-images/`
+
+All 15 test images are numbered to match the checklist. Open the folder in Finder and drag/drop directly to the browser.
 
 **Standard Government Warning** (copy/paste for all tests):
 ```
@@ -22,7 +24,7 @@ GOVERNMENT WARNING: (1) According to the Surgeon General, women should not drink
 
 ## 1. Happy Path - Perfect Match
 
-**Image:** `label-perfect-clean.png`
+**Image:** `01-perfect-match.png`
 **Expected:** PASS
 
 | Field | Value |
@@ -43,7 +45,7 @@ GOVERNMENT WARNING: (1) According to the Surgeon General, women should not drink
 
 ## 2. Case Mismatch (Fuzzy Matching)
 
-**Image:** `label-case-mismatch-clean.png`
+**Image:** `02-case-mismatch.png`
 **Expected:** PASS
 
 | Field | Value |
@@ -63,7 +65,7 @@ GOVERNMENT WARNING: (1) According to the Surgeon General, women should not drink
 
 ## 3. ABV Mismatch - Should FAIL
 
-**Image:** `label-wrong-abv-clean.png`
+**Image:** `03-abv-mismatch-FAIL.png`
 **Expected:** FAIL
 
 | Field | Value |
@@ -83,7 +85,7 @@ GOVERNMENT WARNING: (1) According to the Surgeon General, women should not drink
 
 ## 4. Imported Product with Country of Origin
 
-**Image:** `label-imported-clean.png`
+**Image:** `04-imported-product.png`
 **Expected:** PASS
 
 | Field | Value |
@@ -103,7 +105,7 @@ GOVERNMENT WARNING: (1) According to the Surgeon General, women should not drink
 
 ## 5. Volume Conversion: mL to fl oz
 
-**Image:** `label-ml-to-floz-clean.png`
+**Image:** `05-volume-ml-to-floz.png`
 **Expected:** PASS
 
 | Field | Value |
@@ -123,7 +125,7 @@ GOVERNMENT WARNING: (1) According to the Surgeon General, women should not drink
 
 ## 6. Volume Conversion: fl oz to mL
 
-**Image:** `label-floz-to-ml-clean.png`
+**Image:** `06-volume-floz-to-ml.png`
 **Expected:** PASS
 
 | Field | Value |
@@ -143,7 +145,7 @@ GOVERNMENT WARNING: (1) According to the Surgeon General, women should not drink
 
 ## 7. Volume Conversion: Liters to mL
 
-**Image:** `label-liters-clean.png`
+**Image:** `07-volume-liters-to-ml.png`
 **Expected:** PASS
 
 | Field | Value |
@@ -163,7 +165,7 @@ GOVERNMENT WARNING: (1) According to the Surgeon General, women should not drink
 
 ## 8. Volume Mismatch - Should FAIL
 
-**Image:** `label-perfect-clean.png`
+**Image:** `08-volume-mismatch-FAIL.png`
 **Expected:** FAIL
 
 | Field | Value |
@@ -183,7 +185,7 @@ GOVERNMENT WARNING: (1) According to the Surgeon General, women should not drink
 
 ## 9. Proof to ABV Conversion
 
-**Image:** `label-proof-to-abv-clean.png`
+**Image:** `09-proof-to-abv.png`
 **Expected:** PASS
 
 | Field | Value |
@@ -203,7 +205,7 @@ GOVERNMENT WARNING: (1) According to the Surgeon General, women should not drink
 
 ## 10. Address Abbreviations
 
-**Image:** `label-address-abbrev-clean.png`
+**Image:** `10-address-abbrev.png`
 **Expected:** PASS
 
 | Field | Value |
@@ -223,7 +225,7 @@ GOVERNMENT WARNING: (1) According to the Surgeon General, women should not drink
 
 ## 11. Missing Government Warning - Should FAIL
 
-**Image:** `label-no-warning-clean.png`
+**Image:** `11-missing-warning-FAIL.png`
 **Expected:** FAIL
 
 | Field | Value |
@@ -243,7 +245,7 @@ GOVERNMENT WARNING: (1) According to the Surgeon General, women should not drink
 
 ## 12. Warning Header in Title Case - Should FAIL
 
-**Image:** `label-warning-titlecase-clean.png`
+**Image:** `12-warning-titlecase-FAIL.png`
 **Expected:** FAIL
 
 | Field | Value |
@@ -263,7 +265,7 @@ GOVERNMENT WARNING: (1) According to the Surgeon General, women should not drink
 
 ## 13. High ABV (Overproof)
 
-**Image:** `label-high-abv-clean.png`
+**Image:** `13-high-abv.png`
 **Expected:** PASS
 
 | Field | Value |
@@ -283,7 +285,7 @@ GOVERNMENT WARNING: (1) According to the Surgeon General, women should not drink
 
 ## 14. Low ABV
 
-**Image:** `label-low-abv-clean.png`
+**Image:** `14-low-abv.png`
 **Expected:** PASS
 
 | Field | Value |
@@ -303,7 +305,7 @@ GOVERNMENT WARNING: (1) According to the Surgeon General, women should not drink
 
 ## 15. Unicode Brand Name
 
-**Image:** `label-unicode-brand-clean.png`
+**Image:** `15-unicode-brand.png`
 **Expected:** PASS
 
 | Field | Value |
