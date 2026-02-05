@@ -14,19 +14,36 @@ import type {
   VerificationResult,
   OverallStatus,
   MatchType,
+  PendingConfirmation,
 } from "@/lib/types";
 
 function computeOverallStatus(fieldResults: FieldResult[]): OverallStatus {
-  const hasUnresolvedFail = fieldResults.some(
+  // Only consider "automated" category results for status aggregation
+  // "confirmation" category (e.g., bold check) requires agent action but doesn't block PASS
+  const automatedResults = fieldResults.filter(r => r.category === "automated");
+
+  const hasUnresolvedFail = automatedResults.some(
     (r) => r.status === "FAIL" && !r.agentOverride
   );
-  const hasWarningOrNotFound = fieldResults.some(
+  const hasWarningOrNotFound = automatedResults.some(
     (r) => r.status === "WARNING" || r.status === "NOT_FOUND"
   );
 
   if (hasUnresolvedFail) return "FAIL";
   if (hasWarningOrNotFound) return "REVIEW";
   return "PASS";
+}
+
+function buildPendingConfirmations(fieldResults: FieldResult[]): PendingConfirmation[] {
+  return fieldResults
+    .filter(r => r.category === "confirmation")
+    .map(r => ({
+      id: r.fieldName,
+      label: r.fieldName.replace("Gov Warning — ", ""),
+      description: r.details,
+      aiAssessment: r.extractedValue || undefined,
+      confirmed: false,
+    }));
 }
 
 function getExtractedValue(
@@ -136,6 +153,7 @@ export async function verifySingleLabel(
       matchType: config.matchType as MatchType,
       confidence: matchResult.confidence,
       details: matchResult.details,
+      category: "automated",
     });
   }
 
@@ -146,10 +164,12 @@ export async function verifySingleLabel(
   fieldResults.push(...warningResults);
 
   const overallStatus = computeOverallStatus(fieldResults);
+  const pendingConfirmations = buildPendingConfirmations(fieldResults);
   const processingTimeMs = Date.now() - startTime;
 
   const result: SingleVerificationResult = {
     overallStatus,
+    pendingConfirmations,
     processingTimeMs,
     extractedFields,
     fieldResults,

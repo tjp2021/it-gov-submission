@@ -57,6 +57,18 @@ Switched to Gemini 2.0 Flash, which averages ~2.5 seconds per label — 2x faste
 
 **Solution:** Extracted shared logic into `src/lib/verify-single.ts`. Both endpoints now use the same `verifySingleLabel()` function. Single source of truth.
 
+### Government Warning: All-in-One Status → Category Separation
+
+**Problem:** The bold formatting check on the government warning header always returned WARNING because bold detection from photos is unreliable (71% max accuracy — see `docs/BOLD_DETECTION_ANALYSIS.md`). Since `computeOverallStatus()` treated all field results equally, any WARNING meant the overall status was REVIEW. This made PASS unreachable for every label, even perfect ones.
+
+**Why it mattered:** Tests needed workarounds ("accept REVIEW when we expected PASS if the only issue is bold"). The status "PASS" existed in the type system but was dead code. Agents saw REVIEW for every label and had to mentally separate "REVIEW because of real issues" from "REVIEW because bold can't be checked."
+
+**Solution:** Introduced a `category` field on every `FieldResult` — either `"automated"` (contributes to PASS/FAIL/REVIEW) or `"confirmation"` (requires agent action, doesn't block PASS). Bold is the only `"confirmation"` field. Status aggregation filters to automated-only. Confirmation fields become `pendingConfirmations[]` on the response.
+
+**Result:** A perfect label now returns PASS with 1 pending confirmation (bold). An imperfect label returns FAIL or REVIEW based on automated checks only. No workarounds needed in tests. Single-image test suite: 14/14 pass.
+
+**See:** `docs/GOVERNMENT_WARNING_PARADOX.md` for the full problem analysis and resolution.
+
 ### Testing: Unit Tests → E2E Tests
 
 **Initial approach:** Unit tests for matching functions.
@@ -81,7 +93,7 @@ A government warning must be word-for-word exact. ABV needs numeric comparison w
 Jaro-Winkler returns a normalized 0-1 score natively, emphasizes prefix matching (important for brand names where the beginning is most distinctive), and runs at O(m+n) versus Levenshtein's O(m×n). It's the standard algorithm for name matching in compliance screening (AML, sanctions). The 0.85 threshold was validated against test label pairs.
 
 **Government warning checked in four parts, not one.**
-Presence, header capitalization (ALL CAPS — reliable text check), header bold emphasis (best-effort visual assessment — always flagged for agent review since bold detection from photos is inherently unreliable), and word-for-word text accuracy with word-level diff output. A single fuzzy match over the entire warning would miss formatting violations that matter for 27 CFR Part 16 compliance.
+Presence, header capitalization (ALL CAPS — reliable text check), header bold emphasis (best-effort visual assessment), and word-for-word text accuracy with word-level diff output. A single fuzzy match over the entire warning would miss formatting violations that matter for 27 CFR Part 16 compliance. The bold check is categorized as `"confirmation"` rather than `"automated"` — it surfaces as a pending confirmation for the agent without blocking the overall PASS/FAIL status. See `docs/GOVERNMENT_WARNING_PARADOX.md` for the full analysis of why bold detection cannot be automated and how the category system resolves this.
 
 **SSE streaming for batch results.**
 Rather than waiting for all labels to complete, results stream to the client as each finishes. This provides immediate feedback and makes the tool feel responsive even when processing 10 labels.
@@ -122,7 +134,7 @@ The 5-second single-label requirement from Sarah is met. Batch processing suppor
 
 These are honest constraints of this prototype, not bugs.
 
-**Bold detection is best-effort.** Neither Gemini nor traditional OCR can reliably determine font weight from a photograph. The tool reports a visual assessment but always flags bold detection as WARNING for agent review. Capitalization detection (ALL CAPS) is reliable and checked separately.
+**Bold detection is best-effort.** Neither Gemini nor traditional OCR can reliably determine font weight from a photograph (max 71% accuracy across all approaches tested — see `docs/BOLD_DETECTION_ANALYSIS.md`). The bold check is categorized as a `"confirmation"` field — it surfaces as a pending confirmation for the agent to address, but does not block PASS status. This separation means a perfect label returns PASS with a pending bold confirmation, rather than being stuck at REVIEW. Capitalization detection (ALL CAPS) is reliable and checked separately as an `"automated"` field.
 
 **Batch uses single application data.** The current batch mode verifies multiple label images against the same application data (useful for front/back/side labels of one product). Full batch processing with per-label application data would require CSV upload or a more complex UI.
 

@@ -230,15 +230,23 @@ For compliance decisions, this error rate is unacceptable.
 // src/lib/warning-check.ts
 results.push({
   fieldName: "Gov Warning — Header Bold",
-  status: "WARNING", // Always WARNING — agent must visually confirm
+  status: "WARNING",    // Always WARNING — agent must visually confirm
   confidence: 0.5,
   details: boldDetails,
+  category: "confirmation",  // Does not block PASS — agent confirms separately
 });
 ```
 
+The bold check is categorized as `"confirmation"` rather than `"automated"`. This means:
+- It does **not** affect the overall PASS/FAIL/REVIEW status
+- It appears as a `pendingConfirmation` in the API response
+- The agent must still confirm it, but a perfect label returns PASS instead of REVIEW
+
+See `docs/GOVERNMENT_WARNING_PARADOX.md` Part 10 for the full architecture.
+
 ### UI Behavior
-- Bold check always shows WARNING status
-- Agent sees Accept/Confirm Issue buttons
+- Bold check shows WARNING status in field results
+- Agent sees pending confirmation for bold verification
 - Label image displayed for visual reference
 
 ---
@@ -307,13 +315,14 @@ The 20-30% efficiency gain from Option B is not worth any compliance risk, howev
 // src/lib/warning-check.ts - INTENTIONALLY always WARNING
 results.push({
   fieldName: "Gov Warning — Header Bold",
-  status: "WARNING", // Always WARNING — compliance decision
+  status: "WARNING",    // Always WARNING — compliance decision
   confidence: 0.5,
   details: boldDetails,
+  category: "confirmation",  // Separated from automated status aggregation
 });
 ```
 
-This is not a technical limitation we couldn't solve—it's a deliberate compliance-first design choice backed by tradeoff analysis.
+This is not a technical limitation we couldn't solve — it's a deliberate compliance-first design choice backed by tradeoff analysis. The bold check is always WARNING, but categorized as `"confirmation"` so it doesn't block overall PASS status. The agent still must confirm it.
 
 ---
 

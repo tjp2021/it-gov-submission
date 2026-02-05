@@ -60,8 +60,8 @@ const MULTI_IMAGE_TESTS = [
       { file: 'labels/label-perfect.html', label: 'front' },
       { file: 'labels/label-perfect.html', label: 'back' },
     ],
-    // PASS or REVIEW acceptable - AI extraction has variance
-    expectedResult: 'PASS_OR_REVIEW',
+    // Bold check is now "confirmation" category - doesn't block PASS
+    expectedResult: 'PASS',
     expectedImageCount: 2,
     applicationData: {
       brandName: 'Old Tom Distillery',
@@ -81,8 +81,8 @@ const MULTI_IMAGE_TESTS = [
       { file: 'labels/label-perfect.html', label: 'back' },
       { file: 'labels/label-perfect.html', label: 'neck' },
     ],
-    // PASS or REVIEW acceptable - AI extraction has variance
-    expectedResult: 'PASS_OR_REVIEW',
+    // Bold check is now "confirmation" category - doesn't block PASS
+    expectedResult: 'PASS',
     expectedImageCount: 3,
     applicationData: {
       brandName: 'Old Tom Distillery',
@@ -139,8 +139,8 @@ const MULTI_IMAGE_TESTS = [
     images: [
       { file: 'labels/label-perfect.html', label: 'front' },
     ],
-    // PASS or REVIEW acceptable - AI variance affects even single images
-    expectedResult: 'PASS_OR_REVIEW',
+    // Bold check is now "confirmation" category - doesn't block PASS
+    expectedResult: 'PASS',
     expectedImageCount: 1,
     applicationData: {
       brandName: 'Old Tom Distillery',
@@ -362,16 +362,6 @@ async function runSingleTest(test) {
         result.passed = false;
         result.reason = 'Expected conflicts but none detected';
       }
-    } else if (test.expectedResult === 'PASS_OR_REVIEW') {
-      // Multi-image tests: PASS or REVIEW both acceptable due to AI variance
-      const actual = result.actualResult.toUpperCase();
-      if (actual === 'PASS' || actual === 'REVIEW') {
-        result.passed = true;
-        result.notes = `Got ${actual} (PASS or REVIEW both acceptable)`;
-      } else {
-        result.passed = false;
-        result.reason = `Expected PASS or REVIEW, got ${actual}`;
-      }
     } else {
       // Normal comparison
       const expected = test.expectedResult.toUpperCase();
@@ -379,18 +369,15 @@ async function runSingleTest(test) {
 
       if (expected === actual) {
         result.passed = true;
-      } else if (expected === 'PASS' && actual === 'REVIEW') {
-        // REVIEW acceptable if only bold warning
-        const nonBoldIssues = (data.fieldResults || []).filter(
-          f => (f.status === 'WARNING' || f.status === 'FAIL') &&
-               f.fieldName !== 'Gov Warning — Header Bold'
+      } else {
+        // With category architecture, bold check doesn't block PASS
+        // If we get REVIEW when expecting PASS, it's a genuine automated field issue
+        const issueFields = (data.fieldResults || []).filter(
+          f => f.category === 'automated' && (f.status === 'WARNING' || f.status === 'FAIL' || f.status === 'NOT_FOUND')
         );
-        if (nonBoldIssues.length === 0) {
-          result.passed = true;
-          result.notes = 'REVIEW acceptable - only bold warning';
-        } else {
-          result.reason = `Non-bold issues: ${nonBoldIssues.map(f => f.fieldName).join(', ')}`;
-        }
+        result.reason = issueFields.length > 0
+          ? `Automated field issues: ${issueFields.map(f => f.fieldName).join(', ')}`
+          : `Expected ${expected}, got ${actual}`;
       }
     }
 

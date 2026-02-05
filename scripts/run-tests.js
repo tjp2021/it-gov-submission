@@ -292,24 +292,16 @@ async function runSingleTest(scenario) {
     result.rawResponse = data;
 
     // Compare result
+    // With the new architecture, bold check is "confirmation" category and doesn't block PASS
+    // So PASS now means PASS - no workaround needed
     const expected = scenario.expectedResult.toUpperCase();
     const actual = result.actualResult.toUpperCase();
 
     if (expected === actual) {
       result.passed = true;
-    } else if (expected === 'PASS' && actual === 'REVIEW') {
-      // REVIEW is acceptable for PASS ONLY if the sole warning is bold detection
-      // Bold detection from images is inherently unreliable - agent must visually confirm
-      // All other fields should match properly with correct normalization
-      const nonBoldWarnings = data.fieldResults.filter(
-        f => (f.status === 'WARNING' || f.status === 'FAIL') &&
-             f.fieldName !== 'Gov Warning — Header Bold'
-      );
-      if (nonBoldWarnings.length === 0) {
-        result.passed = true;
-        result.note = 'REVIEW acceptable - only bold warning';
-      }
     }
+    // Note: pendingConfirmations contains the bold check for agent to confirm
+    // but it no longer affects the overall status
 
     return result;
 

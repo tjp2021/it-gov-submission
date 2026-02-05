@@ -23,6 +23,7 @@ export function verifyGovernmentWarning(
     details: extracted.governmentWarning
       ? "Warning statement found on label"
       : "WARNING STATEMENT NOT FOUND ON LABEL",
+    category: "automated",
   });
 
   // Check 2: "GOVERNMENT WARNING:" header in all caps (RELIABLE — text comparison)
@@ -46,6 +47,7 @@ export function verifyGovernmentWarning(
         : headerStatus === "NOT_FOUND"
           ? "Warning header not found"
           : `Header format: ${extracted.governmentWarningHeaderFormat} — must be ALL CAPS per 27 CFR Part 16`,
+    category: "automated",
   });
 
   // Check 3: Header appears bold (BEST-EFFORT — visual assessment from image)
@@ -77,6 +79,7 @@ export function verifyGovernmentWarning(
     matchType: "strict",
     confidence: 0.5,
     details: boldDetails,
+    category: "confirmation",  // Does not block PASS — agent confirms separately
   });
 
   // Check 4: Complete text match (word-for-word)
@@ -91,6 +94,7 @@ export function verifyGovernmentWarning(
       matchType: "strict",
       confidence: textMatch.confidence,
       details: textMatch.details,
+      category: "automated",
     });
   } else {
     results.push({
@@ -101,6 +105,7 @@ export function verifyGovernmentWarning(
       matchType: "strict",
       confidence: 0,
       details: "Cannot verify text — warning not found on label",
+      category: "automated",
     });
   }
 

@@ -1,8 +1,10 @@
-# The Government Warning Problem - Complete Technical Summary
+# The Government Warning Problem — And How We Solved It
 
 ## Overview
 
-This document explains why every verification in the TTB Label Verification tool returns `REVIEW` instead of `PASS`, and why this is intentional behavior rather than a bug.
+This document records a design problem we discovered, analyzed, and resolved. The bold formatting check for government warnings made `PASS` unreachable — every verification returned `REVIEW` regardless of label quality. We solved this by introducing field categories that separate automatable checks from human-confirmation checks, so the overall status reflects what the system can actually verify while still surfacing what the agent must confirm.
+
+**Status: RESOLVED** — see Part 10 for the solution.
 
 ---
 
@@ -443,5 +445,84 @@ PASS is unreachable not due to a bug, but because we chose compliance over autom
 
 ---
 
+## Part 10: The Resolution — Field Categories
+
+### The Insight
+
+The paradox existed because we treated all checks equally in status aggregation. But not all checks are equal:
+
+- **Automated checks** (presence, caps, text match, field comparisons) — the system can verify these with high confidence. Their results should determine PASS/FAIL/REVIEW.
+- **Confirmation checks** (bold formatting) — the system cannot verify these reliably. They should be surfaced to the agent separately, without blocking the overall status.
+
+Mixing these two categories in a single status pipeline guaranteed that the unverifiable check would always contaminate the verifiable ones.
+
+### The Architecture Change
+
+We introduced a `category` field on every `FieldResult`:
+
+```typescript
+export type FieldCategory = "automated" | "confirmation";
+```
+
+**Status aggregation now filters by category:**
+
+```typescript
+function computeOverallStatus(fieldResults: FieldResult[]): OverallStatus {
+  const automatedResults = fieldResults.filter(r => r.category === "automated");
+  // Only automated results determine PASS/FAIL/REVIEW
+}
+```
+
+**Confirmation checks become pending confirmations:**
+
+```typescript
+function buildPendingConfirmations(fieldResults: FieldResult[]): PendingConfirmation[] {
+  return fieldResults
+    .filter(r => r.category === "confirmation")
+    .map(r => ({ id: r.fieldName, label: ..., confirmed: false }));
+}
+```
+
+### What Changed
+
+| Component | Before | After |
+|-----------|--------|-------|
+| Bold check category | (none — treated same as all checks) | `"confirmation"` |
+| All other checks | (none) | `"automated"` |
+| `computeOverallStatus()` | Aggregates ALL field results | Aggregates only `automated` results |
+| `VerificationResult` | No pending confirmations | `pendingConfirmations[]` array |
+| Perfect label status | REVIEW (always) | **PASS** + 1 pending confirmation |
+| Test workarounds | PASS→REVIEW exception in test runners | Removed — PASS means PASS |
+
+### Files Changed
+
+| File | Change |
+|------|--------|
+| `src/lib/types.ts` | Added `FieldCategory`, `PendingConfirmation`, `category` on `FieldResult` |
+| `src/lib/warning-check.ts` | Tagged bold as `"confirmation"`, all others as `"automated"` |
+| `src/app/api/verify-stream/route.ts` | Filter by category in `computeOverallStatus()`, added `buildPendingConfirmations()` |
+| `src/lib/verify-single.ts` | Same changes for single-image endpoint |
+| `scripts/run-tests.js` | Removed PASS→REVIEW workaround |
+| `scripts/run-multi-image-tests.js` | Changed expectations from `PASS_OR_REVIEW` to `PASS`, removed workaround |
+
+### Why This Is Better
+
+1. **PASS now means something.** A perfect label returns PASS — the system verified everything it can verify.
+2. **Bold check isn't lost.** It appears as a pending confirmation the agent must address. The regulatory requirement is still enforced, just not by the status pipeline.
+3. **No workarounds.** Tests directly assert expected outcomes. No "accept REVIEW when we meant PASS" logic.
+4. **Extensible.** If other checks become unreliable in the future (e.g., address matching on certain label types), they can be moved to `"confirmation"` without breaking the status model.
+5. **Honest architecture.** The system tells you what it knows (automated status) and what it needs help with (pending confirmations) separately, rather than collapsing both into a single ambiguous signal.
+
+### Test Results After Change
+
+| Suite | Result |
+|-------|--------|
+| Single-image (14 tests) | 14/14 PASS — B1-perfect now returns PASS |
+| Multi-image (5 tests) | 4/5 PASS — M1 intermittent due to AI extraction variance on Brand Name |
+| Input validation (8 tests) | 8/8 PASS |
+
+---
+
 *Document created: 2026-02-05*
-*For questions or help, see this document and `docs/BOLD_DETECTION_ANALYSIS.md`*
+*Resolution implemented: 2026-02-05*
+*See also: `docs/BOLD_DETECTION_ANALYSIS.md` for empirical bold detection testing*

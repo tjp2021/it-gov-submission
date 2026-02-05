@@ -46,8 +46,23 @@ export type FieldStatus =
   | "NOT_FOUND"
   | "OVERRIDDEN";
 
+// Category for field results - determines how they affect overall status
+// "automated" - contributes to PASS/FAIL/REVIEW status
+// "confirmation" - requires agent confirmation, does not block PASS
+export type FieldCategory = "automated" | "confirmation";
+
 // Overall verification status
 export type OverallStatus = "PASS" | "FAIL" | "REVIEW";
+
+// Pending confirmation that agent must complete (e.g., bold check)
+export interface PendingConfirmation {
+  id: string;
+  label: string;
+  description: string;
+  aiAssessment?: string;
+  confirmed: boolean;
+  confirmedAt?: string;
+}
 
 // Agent override action
 export interface AgentOverride {
@@ -64,12 +79,14 @@ export interface FieldResult {
   matchType: MatchType;
   confidence: number;
   details: string;
+  category: FieldCategory;  // "automated" or "confirmation"
   agentOverride?: AgentOverride;
 }
 
 // Complete verification response
 export interface VerificationResult {
   overallStatus: OverallStatus;
+  pendingConfirmations: PendingConfirmation[];  // Agent must confirm these
   processingTimeMs: number;
   extractedFields: ExtractedFields;
   fieldResults: FieldResult[];

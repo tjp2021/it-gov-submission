@@ -17,22 +17,40 @@ import type {
   MergedExtraction,
   MultiImageFieldResult,
   MultiImageVerificationResult,
+  PendingConfirmation,
 } from "@/lib/types";
 
 export const runtime = "nodejs";
 export const maxDuration = 60; // Increased for multi-image processing
 
 function computeOverallStatus(fieldResults: FieldResult[]): OverallStatus {
-  const hasUnresolvedFail = fieldResults.some(
+  // Only consider "automated" category results for status aggregation
+  // "confirmation" category (e.g., bold check) requires agent action but doesn't block PASS
+  const automatedResults = fieldResults.filter(r => r.category === "automated");
+
+  const hasUnresolvedFail = automatedResults.some(
     (r) => r.status === "FAIL" && !r.agentOverride
   );
-  const hasWarningOrNotFound = fieldResults.some(
+  const hasWarningOrNotFound = automatedResults.some(
     (r) => r.status === "WARNING" || r.status === "NOT_FOUND"
   );
 
   if (hasUnresolvedFail) return "FAIL";
   if (hasWarningOrNotFound) return "REVIEW";
   return "PASS";
+}
+
+function buildPendingConfirmations(fieldResults: FieldResult[]): PendingConfirmation[] {
+  // Build pending confirmations from "confirmation" category results
+  return fieldResults
+    .filter(r => r.category === "confirmation")
+    .map(r => ({
+      id: r.fieldName,
+      label: r.fieldName.replace("Gov Warning — ", ""),
+      description: r.details,
+      aiAssessment: r.extractedValue || undefined,
+      confirmed: false,
+    }));
 }
 
 function getExtractedValue(
@@ -315,6 +333,7 @@ export async function POST(request: NextRequest) {
             matchType: config.matchType as MatchType,
             confidence: matchResult.confidence,
             details: matchResult.details,
+            category: "automated",  // Standard fields contribute to overall status
             // Multi-image specific fields
             sources: sources.length > 0 ? sources : undefined,
             confirmedOnImages: sources.length > 0 ? sources.length : undefined,
@@ -358,11 +377,13 @@ export async function POST(request: NextRequest) {
 
         // Stage 4: Final result
         const overallStatus = computeOverallStatus(fieldResults);
+        const pendingConfirmations = buildPendingConfirmations(fieldResults);
         const processingTimeMs = Date.now() - startTime;
 
         if (isMultiImage && mergedExtraction) {
           const result: MultiImageVerificationResult = {
             overallStatus,
+            pendingConfirmations,
             processingTimeMs,
             extractedFields,
             fieldResults,
@@ -378,6 +399,7 @@ export async function POST(request: NextRequest) {
           // Single image - return standard result for backward compatibility
           const result: VerificationResult = {
             overallStatus,
+            pendingConfirmations,
             processingTimeMs,
             extractedFields,
             fieldResults,
