@@ -96,6 +96,15 @@ Comprehensive empirical testing of all field matching logic.
 | 1 L | 33.8 fl oz | 0.03% ✅ |
 | 1.75 L | 59.2 fl oz | 0.05% ✅ |
 
+**Known Limitations** (not supported):
+| Format | Example | Why Not Supported |
+|--------|---------|-------------------|
+| Word fractions | "half gallon" | Informal, not on TTB labels |
+| Historical notation | "1/5" (a fifth) | TTB standardized to metric (750 mL) |
+| Fraction notation | "1/2 gallon" | Use "1892 mL" or "64 fl oz" instead |
+
+TTB standard fills use metric (mL, L) or fl oz - these edge cases don't appear on compliant labels.
+
 ---
 
 ## 5. Name & Address Matching
