@@ -161,23 +161,37 @@ export interface ParsedVolume {
 }
 
 export function parseVolume(s: string): ParsedVolume | null {
-  const normalized = s.toLowerCase().trim();
+  let workingString = s.toLowerCase().trim();
 
   // Sort units by length (longest first) to avoid partial matches
   const sortedUnits = Object.entries(ML_CONVERSIONS).sort(
     (a, b) => b[0].length - a[0].length
   );
 
+  // Find ALL volume matches and sum them (handles "1 PINT. 0.9 FL. OZ." = 500mL)
+  // Remove matched portions to avoid double-counting overlapping patterns
+  let totalMl = 0;
+  let matchFound = false;
+
   for (const [unit, mlFactor] of sortedUnits) {
     const escapedUnit = unit.replace(/\./g, "\\.");
-    const regex = new RegExp(`(\\d+\\.?\\d*)\\s*${escapedUnit}`, "i");
-    const match = normalized.match(regex);
-    if (match) {
-      return {
-        valueMl: parseFloat(match[1]) * mlFactor,
-        original: s.trim(),
-      };
+    const regex = new RegExp(`(\\d+\\.?\\d*)\\s*${escapedUnit}(?![a-z])`, "gi");
+    let match;
+    while ((match = regex.exec(workingString)) !== null) {
+      totalMl += parseFloat(match[1]) * mlFactor;
+      matchFound = true;
+      // Replace matched portion with spaces to prevent re-matching
+      workingString = workingString.slice(0, match.index) +
+        " ".repeat(match[0].length) +
+        workingString.slice(match.index + match[0].length);
     }
+  }
+
+  if (matchFound) {
+    return {
+      valueMl: totalMl,
+      original: s.trim(),
+    };
   }
 
   return null;
