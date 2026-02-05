@@ -1,3 +1,9 @@
+import {
+  ML_CONVERSIONS,
+  ADDRESS_ABBREVIATIONS,
+  ADDRESS_PREFIXES_TO_STRIP,
+} from "./constants";
+
 /**
  * Jaro-Winkler similarity algorithm
  * Returns a value between 0 (no similarity) and 1 (exact match)
@@ -149,8 +155,6 @@ export function parseABV(s: string): ParsedABV | null {
  * Parse volume from various formats
  * Returns value normalized to milliliters
  */
-import { ML_CONVERSIONS } from "./constants";
-
 export interface ParsedVolume {
   valueMl: number;
   original: string;
@@ -183,8 +187,6 @@ export function parseVolume(s: string): ParsedVolume | null {
  * Normalize address for comparison
  * Expands common abbreviations and strips production phrases
  */
-import { ADDRESS_ABBREVIATIONS, ADDRESS_PREFIXES_TO_STRIP } from "./constants";
-
 export function normalizeAddress(s: string): string {
   let normalized = s.toLowerCase();
 
@@ -216,13 +218,177 @@ export function normalizeAddress(s: string): string {
 
 /**
  * Normalize country of origin for comparison
- * Handles "Product of X" format
+ * Uses ISO 3166 library to handle international variations:
+ * - USA, U.S.A., United States -> "United States of America"
+ * - Deutschland -> "Germany"
+ * - Italia -> "Italy"
+ * - España -> "Spain"
  */
+import countries from "i18n-iso-countries";
+import enLocale from "i18n-iso-countries/langs/en.json";
+import deLocale from "i18n-iso-countries/langs/de.json";
+import esLocale from "i18n-iso-countries/langs/es.json";
+import itLocale from "i18n-iso-countries/langs/it.json";
+import frLocale from "i18n-iso-countries/langs/fr.json";
+import ptLocale from "i18n-iso-countries/langs/pt.json";
+import huLocale from "i18n-iso-countries/langs/hu.json";
+
+// Register locales for multi-language country name lookup
+countries.registerLocale(enLocale);
+countries.registerLocale(deLocale);
+countries.registerLocale(esLocale);
+countries.registerLocale(itLocale);
+countries.registerLocale(frLocale);
+countries.registerLocale(ptLocale);
+countries.registerLocale(huLocale);
+
+// TTB-specific regions that are valid but not ISO countries
+const TTB_VALID_REGIONS: Record<string, string> = {
+  "scotland": "scotland",
+  "england": "england",
+  "wales": "wales",
+  "northern ireland": "northern ireland",
+  "puerto rico": "puerto rico",
+  "u.s. virgin islands": "u.s. virgin islands",
+};
+
+// Archaic/alternative country names not in ISO library
+const COUNTRY_SPECIAL_CASES: Record<string, string> = {
+  // Ancient/native names
+  "hellas": "GR",
+  "eire": "IE",
+  "nippon": "JP",
+  "nihon": "JP",
+  "zhongguo": "CN",
+
+  // Old country names (pre-rename)
+  "burma": "MM",
+  "swaziland": "SZ",
+  "macedonia": "MK",
+  "czechoslovakia": "CZ", // Historical
+  "yugoslavia": "RS", // Maps to Serbia as successor
+  "ussr": "RU", // Maps to Russia as successor
+  "soviet union": "RU",
+
+  // Common abbreviations
+  "nz": "NZ",
+  "sa": "ZA", // South Africa
+  "rsa": "ZA",
+};
+
+// Wine/spirit regions mapped to their countries
+// These are NOT countries but appear on labels as origin designations
+const REGION_TO_COUNTRY: Record<string, string> = {
+  // French wine regions
+  "champagne": "france",
+  "burgundy": "france",
+  "bourgogne": "france",
+  "bordeaux": "france",
+  "alsace": "france",
+  "loire": "france",
+  "rhone": "france",
+  "provence": "france",
+
+  // French spirit regions
+  "cognac": "france",
+  "armagnac": "france",
+
+  // Italian wine regions
+  "tuscany": "italy",
+  "toscana": "italy",
+  "piedmont": "italy",
+  "piemonte": "italy",
+  "veneto": "italy",
+  "sicily": "italy",
+  "sicilia": "italy",
+
+  // Spanish wine regions
+  "rioja": "spain",
+  "ribera del duero": "spain",
+  "priorat": "spain",
+  "jerez": "spain",
+  "sherry": "spain",
+
+  // German wine regions
+  "mosel": "germany",
+  "rheingau": "germany",
+  "pfalz": "germany",
+
+  // Portuguese regions
+  "douro": "portugal",
+  "porto": "portugal",
+  "madeira": "portugal",
+
+  // Scotch whisky regions (map to Scotland, not UK)
+  "islay": "scotland",
+  "speyside": "scotland",
+  "highland": "scotland",
+  "lowland": "scotland",
+  "campbeltown": "scotland",
+
+  // US regions
+  "napa": "united states of america",
+  "napa valley": "united states of america",
+  "sonoma": "united states of america",
+  "oregon": "united states of america",
+  "willamette": "united states of america",
+  "kentucky": "united states of america",
+  "tennessee": "united states of america",
+};
+
 export function normalizeCountryOfOrigin(s: string): string {
   let normalized = s.trim();
 
-  // Strip "Product of" prefix (case insensitive)
-  normalized = normalized.replace(/^product\s+of\s+/i, "");
+  // Strip "Product of" in multiple languages
+  const productOfPatterns = [
+    /^product\s+of\s+/i,           // English
+    /^produit\s+de\s+/i,           // French
+    /^producto\s+de\s+/i,          // Spanish
+    /^prodotto\s+d[ie']\s*/i,      // Italian
+    /^produkt\s+aus\s+/i,          // German
+    /^produto\s+de\s+/i,           // Portuguese
+    /^made\s+in\s+/i,              // Common alternative
+    /^produced\s+in\s+/i,          // Common alternative
+    /^imported\s+from\s+/i,        // Common alternative
+  ];
 
-  return normalized;
+  for (const pattern of productOfPatterns) {
+    normalized = normalized.replace(pattern, "");
+  }
+
+  const lowered = normalized.toLowerCase();
+
+  // Check TTB-valid regions first (Scotland for Scotch, etc.)
+  if (TTB_VALID_REGIONS[lowered]) {
+    return TTB_VALID_REGIONS[lowered];
+  }
+
+  // Check wine/spirit regions and map to country
+  if (REGION_TO_COUNTRY[lowered]) {
+    return REGION_TO_COUNTRY[lowered];
+  }
+
+  // Check special cases (archaic names not in ISO)
+  if (COUNTRY_SPECIAL_CASES[lowered]) {
+    const code = COUNTRY_SPECIAL_CASES[lowered];
+    return countries.getName(code, "en")?.toLowerCase() || lowered;
+  }
+
+  // Try to find ISO country code in multiple languages
+  const code =
+    countries.getAlpha2Code(normalized, "en") ||
+    countries.getAlpha2Code(normalized, "de") ||
+    countries.getAlpha2Code(normalized, "es") ||
+    countries.getAlpha2Code(normalized, "it") ||
+    countries.getAlpha2Code(normalized, "fr") ||
+    countries.getAlpha2Code(normalized, "pt") ||
+    countries.getAlpha2Code(normalized, "hu");
+
+  if (code) {
+    // Return canonical English name
+    return countries.getName(code, "en")?.toLowerCase() || normalized.toLowerCase();
+  }
+
+  // Fallback: return as-is (lowercased for comparison)
+  return normalized.toLowerCase();
 }

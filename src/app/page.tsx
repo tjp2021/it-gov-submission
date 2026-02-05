@@ -204,7 +204,7 @@ export default function Home() {
               href="/batch"
               className="flex flex-col items-end"
             >
-              <span className="px-4 py-2 text-sm bg-gray-200 hover:bg-gray-300 rounded-lg">
+              <span className="px-4 py-2 text-sm bg-navy-700 text-white hover:bg-navy-800 rounded-lg" style={{ backgroundColor: '#1e3a5f' }}>
                 Batch Mode →
               </span>
               <span className="text-xs text-gray-500 mt-1">
@@ -228,6 +228,7 @@ export default function Home() {
           {state === "results" && result && (
             <VerificationResults
               result={result}
+              labelImage={imagePreview}
               onFieldOverride={handleFieldOverride}
               onReset={handleReset}
             />
@@ -268,9 +269,10 @@ export default function Home() {
                 disabled={!imageFile}
                 className={`w-full py-4 text-lg font-semibold rounded-lg transition-colors ${
                   imageFile
-                    ? "bg-blue-600 text-white hover:bg-blue-700"
-                    : "bg-gray-300 text-gray-500 cursor-not-allowed"
+                    ? "text-white hover:opacity-90"
+                    : "text-white opacity-60 cursor-not-allowed"
                 }`}
+                style={{ backgroundColor: '#1e3a5f' }}
               >
                 ▶ Verify Label
               </button>
@@ -281,7 +283,7 @@ export default function Home() {
         {/* Footer */}
         <footer className="mt-8 text-center text-sm text-gray-500">
           <p>
-            Prototype for TTB Compliance Division • Built with Claude Vision
+            Prototype for TTB Compliance Division • Built with Gemini Flash
           </p>
         </footer>
       </div>

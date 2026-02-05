@@ -24,7 +24,7 @@ export const ML_CONVERSIONS: Record<string, number> = {
 export const FIELD_CONFIG = {
   brandName: {
     displayName: "Brand Name",
-    matchType: "fuzzy" as const,
+    matchType: "brand" as const,
     required: true,
   },
   classType: {

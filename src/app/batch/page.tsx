@@ -211,7 +211,7 @@ export default function BatchPage() {
               href="/"
               className="flex flex-col items-end"
             >
-              <span className="px-4 py-2 text-sm bg-gray-200 hover:bg-gray-300 rounded-lg">
+              <span className="px-4 py-2 text-sm text-white hover:opacity-90 rounded-lg" style={{ backgroundColor: '#1e3a5f' }}>
                 ← Single Mode
               </span>
               <span className="text-xs text-gray-500 mt-1">
@@ -231,8 +231,9 @@ export default function BatchPage() {
               <div className="w-full max-w-md mx-auto">
                 <div className="h-4 bg-gray-200 rounded-full overflow-hidden">
                   <div
-                    className="h-full bg-blue-600 transition-all duration-300"
+                    className="h-full transition-all duration-300"
                     style={{
+                      backgroundColor: '#1e3a5f',
                       width: `${(progress.current / progress.total) * 100}%`,
                     }}
                   />
@@ -283,11 +284,8 @@ export default function BatchPage() {
               <button
                 onClick={handleVerifyBatch}
                 disabled={files.length === 0}
-                className={`w-full py-4 text-lg font-semibold rounded-lg transition-colors ${
-                  files.length > 0
-                    ? "bg-blue-600 text-white hover:bg-blue-700"
-                    : "bg-gray-300 text-gray-500 cursor-not-allowed"
-                }`}
+                className="w-full py-4 text-lg font-semibold rounded-lg transition-colors text-white hover:opacity-90 disabled:opacity-60 disabled:cursor-not-allowed"
+                style={{ backgroundColor: '#1e3a5f' }}
               >
                 ▶ Verify {files.length} Label{files.length !== 1 ? "s" : ""}
               </button>
@@ -298,7 +296,7 @@ export default function BatchPage() {
         {/* Footer */}
         <footer className="mt-8 text-center text-sm text-gray-500">
           <p>
-            Prototype for TTB Compliance Division • Built with Claude Vision
+            Prototype for TTB Compliance Division • Built with Gemini Flash
           </p>
         </footer>
       </div>

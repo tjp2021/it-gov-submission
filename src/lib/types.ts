@@ -29,11 +29,13 @@ export interface ExtractedFields {
 // Match types for different field comparison strategies
 export type MatchType =
   | "strict"
+  | "brand"
   | "numeric"
   | "fuzzy"
   | "abv"
   | "volume"
-  | "address";
+  | "address"
+  | "country";
 
 // Status for individual field verification
 export type FieldStatus =

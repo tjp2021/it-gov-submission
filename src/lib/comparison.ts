@@ -168,6 +168,7 @@ export function matchNetContents(
 /**
  * Fuzzy matching for brand name, class/type
  * Uses Jaro-Winkler with 0.85 threshold
+ * Also checks word-level matching to catch single-word differences like "Tim" vs "Tom"
  */
 export function fuzzyMatch(
   extracted: string | null,
@@ -195,6 +196,33 @@ export function fuzzyMatch(
   }
 
   const similarity = jaroWinkler(a, b);
+
+  // Word-level check: ensure each significant word matches
+  // This catches "Old Tim" vs "Old Tom" where string-level similarity is high but word differs
+  const wordsA = a.split(/\s+/).filter(w => w.length > 2);
+  const wordsB = b.split(/\s+/).filter(w => w.length > 2);
+
+  let mismatchedWord: string | null = null;
+  for (const wordB of wordsB) {
+    // Find best matching word in extracted
+    let bestMatch = 0;
+    for (const wordA of wordsA) {
+      bestMatch = Math.max(bestMatch, jaroWinkler(wordA, wordB));
+    }
+    // If any expected word doesn't have a good match, flag it
+    if (bestMatch < 0.85) {
+      mismatchedWord = wordB;
+      break;
+    }
+  }
+
+  if (mismatchedWord) {
+    return {
+      status: "FAIL",
+      confidence: similarity,
+      details: `Word mismatch detected: "${mismatchedWord}" not found in label`,
+    };
+  }
 
   if (similarity >= threshold) {
     return {
@@ -315,6 +343,44 @@ export function countryMatch(
 }
 
 /**
+ * Brand name matching - strict with human review for differences
+ * Brands are legal identities: "Absolut" ≠ "Absolute"
+ * Only exact match after normalization passes automatically
+ */
+export function brandMatch(
+  extracted: string | null,
+  expected: string
+): MatchResult {
+  if (!extracted) {
+    return {
+      status: "NOT_FOUND",
+      confidence: 0,
+      details: "Brand name not found on label",
+    };
+  }
+
+  const a = normalizeText(extracted);
+  const b = normalizeText(expected);
+
+  // Exact match after normalization (handles case, punctuation, whitespace)
+  if (a === b) {
+    return {
+      status: "PASS",
+      confidence: 1.0,
+      details: "Brand name match",
+    };
+  }
+
+  // Any difference requires human verification - brands are legal identities
+  const similarity = jaroWinkler(a, b);
+  return {
+    status: "WARNING",
+    confidence: similarity,
+    details: `Brand name differs: "${extracted}" vs "${expected}" — requires verification (${(similarity * 100).toFixed(0)}% similar)`,
+  };
+}
+
+/**
  * Route field comparison to appropriate matching function
  */
 export function compareField(
@@ -326,6 +392,8 @@ export function compareField(
   switch (matchType) {
     case "strict":
       return strictMatch(extracted, expected);
+    case "brand":
+      return brandMatch(extracted, expected);
     case "country":
       return countryMatch(extracted, expected);
     case "abv":

@@ -26,7 +26,7 @@
       "id": "B1-perfect",
       "group": "basic",
       "description": "Perfect match - all fields correct (happy path)",
-      "htmlFile": "labels/label-perfect.html",
+      "htmlFile": "automated/basic/label-perfect.png",
       "expectedResult": "PASS",
       "applicationData": {
         "brandName": "Old Tom Distillery",
@@ -42,7 +42,7 @@
       "id": "B2-case-mismatch",
       "group": "basic",
       "description": "Dave scenario - brand name case mismatch (STONE'S THROW vs Stone's Throw)",
-      "htmlFile": "labels/label-case-mismatch.html",
+      "htmlFile": "automated/basic/label-case-mismatch.png",
       "expectedResult": "PASS",
       "expectedReason": "Fuzzy match handles case difference after normalization",
       "applicationData": {
@@ -59,7 +59,7 @@
       "id": "B3-wrong-abv",
       "group": "basic",
       "description": "ABV mismatch - label shows 14.5% but application has 13.5%",
-      "htmlFile": "labels/label-wrong-abv.html",
+      "htmlFile": "automated/basic/label-wrong-abv.png",
       "expectedResult": "FAIL",
       "expectedReason": "Numeric mismatch on ABV (1% difference)",
       "applicationData": {
@@ -76,7 +76,7 @@
       "id": "B4-warning-titlecase",
       "group": "basic",
       "description": "Jenny scenario - Government Warning in title case instead of ALL CAPS",
-      "htmlFile": "labels/label-warning-titlecase.html",
+      "htmlFile": "automated/basic/label-warning-titlecase.png",
       "expectedResult": "FAIL",
       "expectedReason": "Header format violation - must be ALL CAPS per 27 CFR Part 16",
       "applicationData": {
@@ -93,7 +93,7 @@
       "id": "B5-no-warning",
       "group": "basic",
       "description": "Missing government warning entirely",
-      "htmlFile": "labels/label-no-warning.html",
+      "htmlFile": "automated/basic/label-no-warning.png",
       "expectedResult": "FAIL",
       "expectedReason": "Government warning not found on label",
       "applicationData": {
@@ -110,7 +110,7 @@
       "id": "B6-imported",
       "group": "basic",
       "description": "Imported spirit with country of origin - full field coverage",
-      "htmlFile": "labels/label-imported.html",
+      "htmlFile": "automated/basic/label-imported.png",
       "expectedResult": "PASS",
       "expectedReason": "All fields match including country of origin",
       "applicationData": {
@@ -124,10 +124,78 @@
       }
     },
     {
+      "id": "B7-wrong-brand",
+      "group": "basic",
+      "description": "Wrong brand name - label shows 'Old Tom Distillery' but app has 'Jack Daniel's'",
+      "htmlFile": "automated/basic/label-perfect.png",
+      "expectedResult": "REVIEW",
+      "expectedReason": "Brand differences always require human review (strict brand matching policy)",
+      "applicationData": {
+        "brandName": "Jack Daniel's",
+        "classType": "Kentucky Straight Bourbon Whiskey",
+        "alcoholContent": "45% Alc./Vol. (90 Proof)",
+        "netContents": "750 mL",
+        "nameAddress": "Old Tom Distillery, Louisville, Kentucky",
+        "countryOfOrigin": "",
+        "governmentWarning": "GOVERNMENT WARNING: (1) According to the Surgeon General, women should not drink alcoholic beverages during pregnancy because of the risk of birth defects. (2) Consumption of alcoholic beverages impairs your ability to drive a car or operate machinery, and may cause health problems."
+      }
+    },
+    {
+      "id": "B8-wrong-type",
+      "group": "basic",
+      "description": "Wrong class/type - label shows 'Kentucky Straight Bourbon Whiskey' but app has 'Russian Vodka'",
+      "htmlFile": "automated/basic/label-perfect.png",
+      "expectedResult": "FAIL",
+      "expectedReason": "Completely different class/type should fail fuzzy match",
+      "applicationData": {
+        "brandName": "Old Tom Distillery",
+        "classType": "Russian Vodka",
+        "alcoholContent": "45% Alc./Vol. (90 Proof)",
+        "netContents": "750 mL",
+        "nameAddress": "Old Tom Distillery, Louisville, Kentucky",
+        "countryOfOrigin": "",
+        "governmentWarning": "GOVERNMENT WARNING: (1) According to the Surgeon General, women should not drink alcoholic beverages during pregnancy because of the risk of birth defects. (2) Consumption of alcoholic beverages impairs your ability to drive a car or operate machinery, and may cause health problems."
+      }
+    },
+    {
+      "id": "B9-wrong-volume",
+      "group": "basic",
+      "description": "Wrong volume - label shows '750 mL' but app has '1.75 L' (1750 mL)",
+      "htmlFile": "automated/basic/label-perfect.png",
+      "expectedResult": "FAIL",
+      "expectedReason": "Volume mismatch (750 mL vs 1750 mL) should fail numeric comparison",
+      "applicationData": {
+        "brandName": "Old Tom Distillery",
+        "classType": "Kentucky Straight Bourbon Whiskey",
+        "alcoholContent": "45% Alc./Vol. (90 Proof)",
+        "netContents": "1.75 L",
+        "nameAddress": "Old Tom Distillery, Louisville, Kentucky",
+        "countryOfOrigin": "",
+        "governmentWarning": "GOVERNMENT WARNING: (1) According to the Surgeon General, women should not drink alcoholic beverages during pregnancy because of the risk of birth defects. (2) Consumption of alcoholic beverages impairs your ability to drive a car or operate machinery, and may cause health problems."
+      }
+    },
+    {
+      "id": "B10-wrong-address",
+      "group": "basic",
+      "description": "Wrong address - label shows 'Old Tom Distillery, Louisville, Kentucky' but app has completely different",
+      "htmlFile": "automated/basic/label-perfect.png",
+      "expectedResult": "FAIL",
+      "expectedReason": "Completely different address should fail fuzzy match",
+      "applicationData": {
+        "brandName": "Old Tom Distillery",
+        "classType": "Kentucky Straight Bourbon Whiskey",
+        "alcoholContent": "45% Alc./Vol. (90 Proof)",
+        "netContents": "750 mL",
+        "nameAddress": "Acme Spirits Corporation, 999 Industrial Blvd, Newark, New Jersey 07102",
+        "countryOfOrigin": "",
+        "governmentWarning": "GOVERNMENT WARNING: (1) According to the Surgeon General, women should not drink alcoholic beverages during pregnancy because of the risk of birth defects. (2) Consumption of alcoholic beverages impairs your ability to drive a car or operate machinery, and may cause health problems."
+      }
+    },
+    {
       "id": "I1-proof-to-abv",
       "group": "intermediate",
       "description": "Proof to ABV conversion - label shows 90 Proof, app has 45%",
-      "htmlFile": "labels/label-proof-to-abv.html",
+      "htmlFile": "automated/intermediate/label-proof-to-abv.png",
       "expectedResult": "PASS",
       "expectedReason": "90 Proof = 45% ABV via conversion",
       "applicationData": {
@@ -144,7 +212,7 @@
       "id": "I2-ml-to-floz",
       "group": "intermediate",
       "description": "mL to fl oz conversion - label shows 750 mL, app has 25.4 fl oz",
-      "htmlFile": "labels/label-ml-to-floz.html",
+      "htmlFile": "automated/intermediate/label-ml-to-floz.png",
       "expectedResult": "PASS",
       "expectedReason": "750 mL ≈ 25.4 fl oz via conversion (within 0.5% tolerance)",
       "applicationData": {
@@ -161,7 +229,7 @@
       "id": "I3-address-abbrev",
       "group": "intermediate",
       "description": "Address abbreviations - label has St./Ste./KY, app has full words",
-      "htmlFile": "labels/label-address-abbrev.html",
+      "htmlFile": "automated/intermediate/label-address-abbrev.png",
       "expectedResult": "PASS",
       "expectedReason": "Address normalization expands abbreviations before comparison",
       "applicationData": {
@@ -178,9 +246,9 @@
       "id": "I4-punctuation",
       "group": "intermediate",
       "description": "Punctuation variance - label has apostrophe, app doesn't",
-      "htmlFile": "labels/label-punctuation.html",
-      "expectedResult": "PASS",
-      "expectedReason": "Normalization handles apostrophe differences",
+      "htmlFile": "automated/intermediate/label-punctuation.png",
+      "expectedResult": "REVIEW",
+      "expectedReason": "Brand name 'Maker's Mark' vs 'Makers Mark' requires human review (apostrophe is part of trademark)",
       "applicationData": {
         "brandName": "Makers Mark",
         "classType": "Kentucky Bourbon Whisky",
@@ -195,7 +263,7 @@
       "id": "A1-glare",
       "group": "advanced",
       "description": "Wine label with glare/reflection from lighting",
-      "htmlFile": "labels/label-a1-glare.png",
+      "htmlFile": "automated/advanced/label-a1-glare.png",
       "expectedResult": "REVIEW",
       "expectedReason": "Glare may obscure some fields, requiring manual verification",
       "applicationData": {
@@ -212,7 +280,7 @@
       "id": "A2-angled",
       "group": "advanced",
       "description": "Whiskey label photographed at 45-degree angle",
-      "htmlFile": "labels/label-a2-angled.png",
+      "htmlFile": "automated/advanced/label-a2-angled.png",
       "expectedResult": "PASS",
       "expectedReason": "Claude Vision should handle moderate perspective distortion",
       "applicationData": {
@@ -229,7 +297,7 @@
       "id": "A3-lowlight",
       "group": "advanced",
       "description": "Beer label in dim bar lighting",
-      "htmlFile": "labels/label-a3-lowlight.png",
+      "htmlFile": "automated/advanced/label-a3-lowlight.png",
       "expectedResult": "REVIEW",
       "expectedReason": "Low contrast may affect text extraction accuracy",
       "applicationData": {
@@ -246,7 +314,7 @@
       "id": "A4-blurry",
       "group": "advanced",
       "description": "Slightly out of focus vodka label",
-      "htmlFile": "labels/label-a4-blurry.png",
+      "htmlFile": "automated/advanced/label-a4-blurry.png",
       "expectedResult": "REVIEW",
       "expectedReason": "Blur may reduce OCR confidence",
       "applicationData": {
@@ -263,7 +331,7 @@
       "id": "A5-partial",
       "group": "advanced",
       "description": "Gin label partially covered by hand holding bottle",
-      "htmlFile": "labels/label-a5-partial.png",
+      "htmlFile": "automated/advanced/label-a5-partial.png",
       "expectedResult": "REVIEW",
       "expectedReason": "Partial occlusion requires careful extraction",
       "applicationData": {
@@ -280,7 +348,7 @@
       "id": "C1-wine-blur",
       "group": "composite",
       "description": "Wine label with slight blur (focus issues)",
-      "htmlFile": "labels/label-c1-wine-blur.png",
+      "htmlFile": "automated/composite/label-c1-wine-blur.png",
       "expectedResult": "FAIL",
       "expectedReason": "ABV mismatch should be detected despite blur",
       "applicationData": {
@@ -297,7 +365,7 @@
       "id": "C2-whiskey-lowlight",
       "group": "composite",
       "description": "Bourbon label in dim lighting conditions",
-      "htmlFile": "labels/label-c2-whiskey-lowlight.png",
+      "htmlFile": "automated/composite/label-c2-whiskey-lowlight.png",
       "expectedResult": "PASS",
       "expectedReason": "All fields should match despite low contrast",
       "applicationData": {
@@ -314,7 +382,7 @@
       "id": "C3-beer-warm",
       "group": "composite",
       "description": "Beer label under warm lighting",
-      "htmlFile": "labels/label-c3-beer-warm.png",
+      "htmlFile": "automated/composite/label-c3-beer-warm.png",
       "expectedResult": "FAIL",
       "expectedReason": "Warning header format violation should be detected",
       "applicationData": {
@@ -331,7 +399,7 @@
       "id": "C4-vodka-noise",
       "group": "composite",
       "description": "Vodka label with compression artifacts",
-      "htmlFile": "labels/label-c4-vodka-noise.png",
+      "htmlFile": "automated/composite/label-c4-vodka-noise.png",
       "expectedResult": "FAIL",
       "expectedReason": "Missing government warning should be detected",
       "applicationData": {
@@ -348,7 +416,7 @@
       "id": "S1-high-abv",
       "group": "stress",
       "description": "Extreme high ABV (75.5% / 151 Proof) - overproof rum",
-      "htmlFile": "labels/label-high-abv.html",
+      "htmlFile": "automated/stress/label-high-abv.png",
       "expectedResult": "PASS",
       "expectedReason": "Should parse high ABV values correctly",
       "applicationData": {
@@ -365,7 +433,7 @@
       "id": "S2-low-abv",
       "group": "stress",
       "description": "Extreme low ABV (0.5%) - low alcohol wine",
-      "htmlFile": "labels/label-low-abv.html",
+      "htmlFile": "automated/stress/label-low-abv.png",
       "expectedResult": "PASS",
       "expectedReason": "Should parse low ABV values correctly",
       "applicationData": {
@@ -382,7 +450,7 @@
       "id": "S3-odd-proof",
       "group": "stress",
       "description": "Odd proof number (101 Proof = 50.5% ABV) - proof only on label",
-      "htmlFile": "labels/label-odd-proof.html",
+      "htmlFile": "automated/stress/label-odd-proof.png",
       "expectedResult": "PASS",
       "expectedReason": "Should convert 101 Proof to 50.5% ABV correctly",
       "applicationData": {
@@ -399,7 +467,7 @@
       "id": "S4-liters",
       "group": "stress",
       "description": "Volume in liters (1.75 L) - should convert to mL",
-      "htmlFile": "labels/label-liters.html",
+      "htmlFile": "automated/stress/label-liters.png",
       "expectedResult": "PASS",
       "expectedReason": "1.75 L = 1750 mL should match",
       "applicationData": {
@@ -416,7 +484,7 @@
       "id": "S5-multiline-address",
       "group": "stress",
       "description": "Multi-line address with production phrase prefix",
-      "htmlFile": "labels/label-multiline-address.html",
+      "htmlFile": "automated/stress/label-multiline-address.png",
       "expectedResult": "PASS",
       "expectedReason": "Should strip 'Vinted and Bottled by' and match normalized address",
       "applicationData": {
@@ -433,7 +501,7 @@
       "id": "S6-truncated-warning",
       "group": "stress",
       "description": "Government warning missing 'and may cause health problems' clause",
-      "htmlFile": "labels/label-truncated-warning.html",
+      "htmlFile": "automated/stress/label-truncated-warning.png",
       "expectedResult": "FAIL",
       "expectedReason": "Truncated warning text should fail verification",
       "applicationData": {
@@ -450,7 +518,7 @@
       "id": "S7-unicode-brand",
       "group": "stress",
       "description": "Brand name with accented characters (Château Élégance)",
-      "htmlFile": "labels/label-unicode-brand.html",
+      "htmlFile": "automated/stress/label-unicode-brand.png",
       "expectedResult": "PASS",
       "expectedReason": "Should handle unicode accented characters in brand name",
       "applicationData": {
@@ -467,7 +535,7 @@
       "id": "S8-floz-to-ml",
       "group": "stress",
       "description": "Reverse volume conversion - label has FL OZ, application has mL",
-      "htmlFile": "labels/label-floz-to-ml.html",
+      "htmlFile": "automated/stress/label-floz-to-ml.png",
       "expectedResult": "PASS",
       "expectedReason": "12 FL OZ ≈ 355 mL should match within tolerance",
       "applicationData": {

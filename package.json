@@ -7,7 +7,9 @@
     "build": "next build && cp -r .next/static .next/standalone/.next/ && cp -r public .next/standalone/",
     "start": "next start",
     "lint": "next lint",
-    "test": "node scripts/run-tests.js",
+    "test": "node scripts/run-tests.js && node scripts/test-bold-comprehensive.js",
+    "test:verify": "node scripts/run-tests.js",
+    "test:bold": "node scripts/test-bold-comprehensive.js",
     "test:all": "node scripts/run-tests.js --all",
     "test:advanced": "node scripts/run-tests.js advanced",
     "test:screenshots": "node scripts/screenshot-labels.js",
@@ -20,6 +22,7 @@
   "dependencies": {
     "@anthropic-ai/sdk": "^0.39.0",
     "@google/generative-ai": "^0.24.1",
+    "i18n-iso-countries": "^7.14.0",
     "next": "^16.1.6",
     "react": "^18.3.1",
     "react-dom": "^18.3.1"
