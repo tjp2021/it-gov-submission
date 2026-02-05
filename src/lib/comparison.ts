@@ -13,6 +13,7 @@ import {
   FUZZY_MATCH_THRESHOLD,
   ADDRESS_MATCH_THRESHOLD,
   VOLUME_TOLERANCE,
+  CLASS_TYPE_ABBREVIATIONS,
 } from "./constants";
 
 /**
@@ -248,6 +249,82 @@ export function fuzzyMatch(
 }
 
 /**
+ * Expand class/type abbreviations (IPA -> India Pale Ale)
+ */
+function expandClassTypeAbbreviations(text: string): string {
+  let expanded = text.toLowerCase();
+  for (const [abbr, full] of Object.entries(CLASS_TYPE_ABBREVIATIONS)) {
+    // Match whole word only
+    const regex = new RegExp(`\\b${abbr}\\b`, "gi");
+    expanded = expanded.replace(regex, full);
+  }
+  return expanded;
+}
+
+/**
+ * Class/Type matching with abbreviation expansion
+ * IPA matches "India Pale Ale", VSOP matches "Very Superior Old Pale"
+ */
+export function classTypeMatch(
+  extracted: string | null,
+  expected: string
+): MatchResult {
+  if (!extracted) {
+    return {
+      status: "NOT_FOUND",
+      confidence: 0,
+      details: "Class/Type not found on label",
+    };
+  }
+
+  // Expand abbreviations before comparison
+  const a = normalizeText(expandClassTypeAbbreviations(extracted));
+  const b = normalizeText(expandClassTypeAbbreviations(expected));
+
+  // Exact match after normalization and abbreviation expansion
+  if (a === b) {
+    return {
+      status: "PASS",
+      confidence: 1.0,
+      details: "Class/Type match",
+    };
+  }
+
+  // Check if one contains the other (e.g., "Pale Ale" in "India Pale Ale")
+  if (a.includes(b) || b.includes(a)) {
+    return {
+      status: "PASS",
+      confidence: 0.95,
+      details: "Class/Type match (one contains the other)",
+    };
+  }
+
+  const similarity = jaroWinkler(a, b);
+
+  if (similarity >= FUZZY_MATCH_THRESHOLD) {
+    return {
+      status: "PASS",
+      confidence: similarity,
+      details: `Class/Type match (${(similarity * 100).toFixed(0)}% similar)`,
+    };
+  }
+
+  if (similarity >= 0.6) {
+    return {
+      status: "WARNING",
+      confidence: similarity,
+      details: `Class/Type partial match (${(similarity * 100).toFixed(0)}%) — review recommended`,
+    };
+  }
+
+  return {
+    status: "FAIL",
+    confidence: similarity,
+    details: `Class/Type mismatch: "${extracted}" vs "${expected}"`,
+  };
+}
+
+/**
  * Address matching with lower threshold
  * Uses 0.70 threshold and defaults to WARNING for anything below 100%
  */
@@ -394,6 +471,8 @@ export function compareField(
       return strictMatch(extracted, expected);
     case "brand":
       return brandMatch(extracted, expected);
+    case "classType":
+      return classTypeMatch(extracted, expected);
     case "country":
       return countryMatch(extracted, expected);
     case "abv":

@@ -48,6 +48,28 @@ export const ML_CONVERSIONS: Record<string, number> = {
   gal: 3785.41,
 };
 
+// Class/Type abbreviations (common alcohol industry abbreviations)
+export const CLASS_TYPE_ABBREVIATIONS: Record<string, string> = {
+  // Beer styles
+  ipa: "india pale ale",
+  dipa: "double india pale ale",
+  neipa: "new england india pale ale",
+  apa: "american pale ale",
+  epa: "english pale ale",
+  esb: "extra special bitter",
+  // Cognac/Brandy grades
+  vs: "very special",
+  vsop: "very superior old pale",
+  xo: "extra old",
+  // Whiskey
+  // Wine
+  rsv: "reserve",
+  res: "reserve",
+  // General
+  ltd: "limited",
+  sr: "special reserve",
+};
+
 // Field configuration for verification
 export const FIELD_CONFIG = {
   brandName: {
@@ -57,7 +79,7 @@ export const FIELD_CONFIG = {
   },
   classType: {
     displayName: "Class/Type",
-    matchType: "fuzzy" as const,
+    matchType: "classType" as const,
     required: true,
   },
   alcoholContent: {

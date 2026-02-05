@@ -30,6 +30,7 @@ export interface ExtractedFields {
 export type MatchType =
   | "strict"
   | "brand"
+  | "classType"
   | "numeric"
   | "fuzzy"
   | "abv"
