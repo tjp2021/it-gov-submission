@@ -14,9 +14,13 @@ export const ML_CONVERSIONS: Record<string, number> = {
   "fl oz": 29.5735,
   "fl. oz": 29.5735,
   "fl.oz": 29.5735,
+  "fl. oz.": 29.5735,
   oz: 29.5735, // In beverage context, oz = fl oz
+  pint: 473.176,
   pt: 473.176,
+  quart: 946.353,
   qt: 946.353,
+  gallon: 3785.41,
   gal: 3785.41,
 };
 

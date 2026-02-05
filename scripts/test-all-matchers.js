@@ -64,9 +64,13 @@ const ML_CONVERSIONS = {
   "fl oz": 29.5735,
   "fl. oz": 29.5735,
   "fl.oz": 29.5735,
+  "fl. oz.": 29.5735,
   oz: 29.5735,
+  pint: 473.176,
   pt: 473.176,
+  quart: 946.353,
   qt: 946.353,
+  gallon: 3785.41,
   gal: 3785.41,
 };
 
@@ -83,17 +87,26 @@ function parseABV(s) {
 }
 
 function parseVolume(s) {
-  const normalized = s.toLowerCase().trim();
+  let workingString = s.toLowerCase().trim();
   const sortedUnits = Object.entries(ML_CONVERSIONS).sort((a, b) => b[0].length - a[0].length);
+
+  // Find ALL volume matches and sum them (handles "1 PINT. 0.9 FL. OZ." = 500mL)
+  let totalMl = 0;
+  let matchFound = false;
+
   for (const [unit, mlFactor] of sortedUnits) {
     const escapedUnit = unit.replace(/\./g, "\\.");
-    const regex = new RegExp(`(\\d+\\.?\\d*)\\s*${escapedUnit}`, "i");
-    const match = normalized.match(regex);
-    if (match) {
-      return { valueMl: parseFloat(match[1]) * mlFactor, original: s.trim() };
+    const regex = new RegExp(`(\\d+\\.?\\d*)\\s*${escapedUnit}(?![a-z])`, "gi");
+    let match;
+    while ((match = regex.exec(workingString)) !== null) {
+      totalMl += parseFloat(match[1]) * mlFactor;
+      matchFound = true;
+      // Replace matched portion to prevent re-matching
+      workingString = workingString.slice(0, match.index) + " ".repeat(match[0].length) + workingString.slice(match.index + match[0].length);
     }
   }
-  return null;
+
+  return matchFound ? { valueMl: totalMl, original: s.trim() } : null;
 }
 
 const ADDRESS_ABBREVIATIONS = {
@@ -310,6 +323,12 @@ const VOLUME_TESTS = [
   { app: "750 mL", label: "1L", shouldPass: false, reason: "Different size" },
   { app: "750 mL", label: "375 mL", shouldPass: false, reason: "Half size" },
   { app: "1L", label: "750 mL", shouldPass: false, reason: "Different liter size" },
+
+  // Compound volumes (real label formats like "1 PINT. 0.9 FL. OZ." = 500mL)
+  { app: "500 mL", label: "1 PINT. 0.9 FL. OZ.", shouldPass: true, reason: "Compound pint + fl oz" },
+  { app: "1 PINT. 0.9 FL. OZ.", label: "500 mL", shouldPass: true, reason: "Reverse compound" },
+  { app: "16.9 fl oz", label: "1 PINT. 0.9 FL. OZ.", shouldPass: true, reason: "Fl oz vs compound" },
+  { app: "1 pint 0.9 fl oz", label: "500mL", shouldPass: true, reason: "Compound without periods" },
 
   // Edge cases
   { app: "50cl", label: "500mL", shouldPass: true, reason: "Centiliters" },
