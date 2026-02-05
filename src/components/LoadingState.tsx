@@ -25,7 +25,8 @@ export default function LoadingState({
     return () => clearInterval(interval);
   }, [startTime]);
 
-  const displayElapsed = streamElapsed ?? elapsed;
+  // Use local timer unless streaming has started (streamElapsed > 0)
+  const displayElapsed = streamElapsed && streamElapsed > 0 ? streamElapsed : elapsed;
   const displayMessage = streamMessage ?? "Processing...";
 
   const getStatusIcon = (status: string) => {
