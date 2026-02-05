@@ -95,32 +95,25 @@ export function wordDiff(expected: string, found: string): string {
   const expectedWords = expected.split(/\s+/);
   const foundWords = found.split(/\s+/);
 
-  const missing: string[] = [];
-  const extra: string[] = [];
-  const changed: string[] = [];
-
-  // Simple comparison - not a true LCS but sufficient for our needs
   const foundSet = new Set(foundWords);
   const expectedSet = new Set(expectedWords);
 
-  for (const word of expectedWords) {
-    if (!foundSet.has(word)) {
-      missing.push(word);
-    }
-  }
+  const missing = expectedWords.filter(w => !foundSet.has(w));
+  const extra = foundWords.filter(w => !expectedSet.has(w));
 
-  for (const word of foundWords) {
-    if (!expectedSet.has(word)) {
-      extra.push(word);
-    }
+  // If most words are missing, show a simpler message
+  const missingRatio = missing.length / expectedWords.length;
+  if (missingRatio > 0.5) {
+    return `Text significantly differs (${Math.round(missingRatio * 100)}% mismatch)`;
   }
 
   const parts: string[] = [];
   if (missing.length > 0) {
-    parts.push(`Missing: "${missing.join(", ")}"`);
+    // Show as phrase, not comma-separated words
+    parts.push(`Missing: "${missing.join(" ")}"`);
   }
   if (extra.length > 0) {
-    parts.push(`Extra: "${extra.join(", ")}"`);
+    parts.push(`Extra: "${extra.join(" ")}"`);
   }
 
   return parts.length > 0 ? parts.join("; ") : "Text differs";
