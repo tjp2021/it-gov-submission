@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>Test Label - Old Tom Back</title>
+  <style>
+    body {
+      margin: 0;
+      padding: 40px;
+      background: #1a1a1a;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      font-family: Arial, sans-serif;
+    }
+    .label {
+      width: 400px;
+      background: #fff;
+      border: 2px solid #ccc;
+      border-radius: 4px;
+      padding: 20px;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+    }
+    .producer {
+      text-align: center;
+      font-size: 12px;
+      color: #333;
+      margin-bottom: 20px;
+      line-height: 1.6;
+    }
+    .warning {
+      padding: 15px;
+      background: #f9f9f9;
+      border: 1px solid #ddd;
+      font-size: 9px;
+      line-height: 1.4;
+      color: #333;
+    }
+    .warning-header {
+      font-weight: bold;
+      text-transform: uppercase;
+    }
+    .upc {
+      margin-top: 20px;
+      text-align: center;
+    }
+    .upc-bars {
+      display: inline-block;
+      background: repeating-linear-gradient(
+        90deg,
+        #000 0px, #000 2px,
+        #fff 2px, #fff 4px
+      );
+      width: 120px;
+      height: 40px;
+      border: 2px solid #000;
+    }
+    .upc-number {
+      font-family: monospace;
+      font-size: 10px;
+      margin-top: 5px;
+    }
+  </style>
+</head>
+<body>
+  <!-- BACK LABEL: Contains producer address, government warning, UPC -->
+  <div class="label">
+    <div class="producer">
+      Produced and Bottled By<br>
+      <strong>Old Tom Distillery</strong><br>
+      123 Bourbon Lane<br>
+      Louisville, Kentucky 40202
+    </div>
+
+    <div class="warning">
+      <span class="warning-header">GOVERNMENT WARNING:</span> (1) According to the Surgeon General, women should not drink alcoholic beverages during pregnancy because of the risk of birth defects. (2) Consumption of alcoholic beverages impairs your ability to drive a car or operate machinery, and may cause health problems.
+    </div>
+
+    <div class="upc">
+      <div class="upc-bars"></div>
+      <div class="upc-number">0 12345 67890 5</div>
+    </div>
+  </div>
+</body>
+</html>

@@ -159,13 +159,42 @@ Accuracy Match: 18/18 (100%)
 
 ---
 
+## Multi-Image Performance (2026-02-05)
+
+With the multi-image upload feature, extractions run in parallel using `Promise.all`. This means processing time is bounded by the slowest image, not the sum of all images.
+
+### Benchmark Results
+
+| Images | Latency | Notes |
+|--------|---------|-------|
+| 1 image | ~2.5s | Baseline |
+| 2 images | ~2.4s | Parallel extraction |
+| 3 images | **2.42s** | Tested with front/back/neck |
+| 6 images | ~3.0s | Projected (API concurrency limits) |
+
+**Key finding:** Multi-image adds negligible overhead. 3 images take the same time as 1 image because extractions run concurrently.
+
+### Breakdown (3 images)
+
+| Phase | Time | Notes |
+|-------|------|-------|
+| Image upload/parse | ~50ms | Form data processing |
+| Parallel extraction | ~2.2s | 3 Gemini API calls concurrent |
+| Merge logic | ~10ms | JavaScript, no I/O |
+| Field comparison | ~50ms | Matching + warning checks |
+| SSE streaming | ~20ms | Response serialization |
+| **Total** | **~2.4s** | Well under 5s requirement |
+
+---
+
 ## Current Recommendation
 
 **Use Gemini Flash as primary extraction engine.**
 
 | Requirement | Target | Actual | Status |
 |-------------|--------|--------|--------|
-| Latency | ≤5s | 2.5s avg | ✅ |
+| Latency (single) | ≤5s | 2.5s avg | ✅ |
+| Latency (multi-image) | ≤5s | 2.4s avg | ✅ |
 | Accuracy | 100% | 100% | ✅ |
 | Cost | N/A | 30x cheaper | ✅ |
 

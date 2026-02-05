@@ -338,36 +338,115 @@ GOVERNMENT WARNING: (1) According to the Surgeon General, women should not drink
 
 ---
 
-## Batch Processing Tests
+## Multi-Image Processing Tests
 
-### 16. Batch Upload (3 images)
+### 16. Multi-Image Upload (Front + Back + Neck)
 
-**Images:** `16-batch-A-perfect.png`, `16-batch-B-imported.png`, `16-batch-C-case.png`
-**Expected:** All 3 process (likely REVIEW/FAIL due to gov warning text extraction) — **verify batch processing works**
+**Purpose:** Test merged extraction from multiple images of the same product
 
-**Application Data for each image:**
+**Test Setup:**
+1. Generate test images from HTML labels:
+   ```bash
+   node scripts/composite-labels.js src/test-data/labels/label-oldtom-front.html
+   node scripts/composite-labels.js src/test-data/labels/label-oldtom-back.html
+   node scripts/composite-labels.js src/test-data/labels/label-oldtom-neck.html
+   ```
+2. Or create screenshots from the HTML files directly
 
-| Image | Brand Name | Class/Type | Alcohol | Net Contents | Name/Address | Country |
-|-------|------------|------------|---------|--------------|--------------|---------|
-| A | Old Tom Distillery | Kentucky Straight Bourbon Whiskey | 45% Alc./Vol. (90 Proof) | 750 mL | Old Tom Distillery, Louisville, Kentucky | *(empty)* |
-| B | Glenfiddich | Single Malt Scotch Whisky | 40% Alc./Vol. (80 Proof) | 750 mL | William Grant & Sons, Dufftown, Banffshire, Scotland | Scotland |
-| C | Stone's Throw | Small Batch Bourbon Whiskey | 46% Alc./Vol. | 750 mL | Stone's Throw Distillery, Frankfort, Kentucky | *(empty)* |
+**Application Data:**
 
-*(Use standard government warning for all)*
+| Field | Value |
+|-------|-------|
+| Brand Name | Old Tom Distillery |
+| Class/Type | Kentucky Straight Bourbon Whiskey |
+| Alcohol Content | 45% Alc./Vol. |
+| Net Contents | 750 mL |
+| Name/Address | Old Tom Distillery, 123 Bourbon Lane, Louisville, Kentucky 40202 |
+| Country of Origin | *(leave empty)* |
+| Government Warning | *(standard warning)* |
 
-- [ ] Navigate to Batch page (/batch)
-- [ ] Upload all 3 images at once (drag & drop or multi-select)
-- [ ] All 3 process and show individual results
-- [ ] Summary dashboard displays counts correctly
-- [ ] Can click to drill down into each result
+**Steps:**
+- [ ] Upload all 3 images at once (drag & drop or click to multi-select)
+- [ ] Verify grid shows all 3 images with label selectors (Front/Back/Neck)
+- [ ] Change labels using dropdown if needed
+- [ ] Click "Verify Labels (3)"
+- [ ] Observe progress showing each image being analyzed
 
-### 17. Batch Limit (10 max)
+**Expected Results:**
+- [ ] Brand Name shows "Found on: [F] [N]" (confirmed on 2 images)
+- [ ] ABV shows "Found on: [F] [N]" (confirmed on 2 images)
+- [ ] Address shows "Found on: [B]" (back label only)
+- [ ] Government Warning shows "Found on: [B]" (back label only)
+- [ ] Overall result shows "Based on 3 images"
+- [ ] Field cards display "2 images agree" badge where applicable
 
-**Images:** Try to upload 12 images (use images 01-15 from this folder)
-**Expected:** Only 10 accepted
+### 17. Conflict Resolution
 
-- [ ] Error message appears when exceeding 10
-- [ ] Clear feedback about the limit
+**Purpose:** Test conflict detection and human resolution workflow
+
+**Test Setup:**
+1. Generate test images with intentional ABV conflict:
+   ```bash
+   node scripts/composite-labels.js src/test-data/labels/label-conflict-front.html
+   node scripts/composite-labels.js src/test-data/labels/label-conflict-neck.html
+   ```
+
+**Application Data:**
+
+| Field | Value |
+|-------|-------|
+| Brand Name | Green Valley Spirits |
+| Class/Type | Premium Vodka |
+| Alcohol Content | 45% Alc./Vol. |
+| Net Contents | 750 mL |
+| Name/Address | Green Valley Spirits, Portland, Oregon |
+| Country of Origin | *(leave empty)* |
+| Government Warning | *(standard warning)* |
+
+**Steps:**
+- [ ] Upload front label (45% ABV) and neck label (46% ABV)
+- [ ] Assign "Front" and "Neck" labels
+- [ ] Click "Verify Labels (2)"
+- [ ] After extraction, conflict panel appears
+
+**Expected Results:**
+- [ ] Conflict panel shows: "Conflicting Values Detected"
+- [ ] Alcohol Content field shows two options: "45%" and "46%"
+- [ ] Each option shows source image thumbnail
+- [ ] Progress shows "0 of 1 conflicts resolved"
+- [ ] "Continue to Results" button is disabled
+- [ ] Select "45%" option (matches application data)
+- [ ] Progress updates to "1 of 1 resolved"
+- [ ] "Continue to Results" button becomes enabled
+- [ ] Click continue, verify ABV shows as PASS with "Resolved conflict" badge
+
+### 18. Multi-Image Export
+
+**Purpose:** Verify JSON export includes multi-image metadata
+
+**Steps:**
+- [ ] Complete a multi-image verification (use scenario 16)
+- [ ] Click "Export Results"
+- [ ] Open downloaded JSON file
+
+**Expected Export Contents:**
+- [ ] `version: "2.0"`
+- [ ] `imageCount: 3`
+- [ ] `images` array with id, label, fileName for each
+- [ ] `mergedExtraction.fieldSources` showing which images found each field
+- [ ] `fieldResults` with `sources`, `confirmedOnImages` for each field
+
+### 19. Image Limit (6 max)
+
+**Purpose:** Test upload limit enforcement
+
+**Steps:**
+- [ ] Try to upload 7 images at once
+- [ ] Expected: Only 6 accepted with message
+
+**Expected Results:**
+- [ ] Clear error message about 6-image limit
+- [ ] Can still remove images and add new ones
 
 ---
 

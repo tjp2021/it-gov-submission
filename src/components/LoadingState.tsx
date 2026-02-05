@@ -5,11 +5,16 @@ import type { FieldResult } from "@/lib/types";
 interface LoadingStateProps {
   streamMessage?: string;
   streamFields?: FieldResult[];
+  extractionProgress?: {
+    completed: number;
+    total: number;
+  };
 }
 
 export default function LoadingState({
   streamMessage,
-  streamFields = []
+  streamFields = [],
+  extractionProgress,
 }: LoadingStateProps) {
   const displayMessage = streamMessage ?? "Processing...";
 
@@ -44,6 +49,26 @@ export default function LoadingState({
         <p className="text-lg font-medium text-gray-700">
           {displayMessage}
         </p>
+        {/* Multi-image extraction progress */}
+        {extractionProgress && extractionProgress.total > 1 && (
+          <div className="mt-3">
+            <div className="flex justify-center gap-1 mb-2">
+              {Array.from({ length: extractionProgress.total }).map((_, i) => (
+                <div
+                  key={i}
+                  className={`w-3 h-3 rounded-full transition-colors ${
+                    i < extractionProgress.completed
+                      ? "bg-green-500"
+                      : "bg-gray-300"
+                  }`}
+                />
+              ))}
+            </div>
+            <p className="text-sm text-gray-500">
+              {extractionProgress.completed} of {extractionProgress.total} images analyzed
+            </p>
+          </div>
+        )}
       </div>
 
       {/* Streaming field results */}

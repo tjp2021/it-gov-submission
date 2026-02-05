@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>Test Label - Old Tom Neck</title>
+  <style>
+    body {
+      margin: 0;
+      padding: 40px;
+      background: #1a1a1a;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      font-family: Georgia, serif;
+    }
+    .label {
+      width: 200px;
+      height: 120px;
+      background: linear-gradient(135deg, #2c1810 0%, #4a2c17 100%);
+      border: 2px solid #8b4513;
+      border-radius: 100px 100px 20px 20px;
+      padding: 15px 20px;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+    }
+    .brand {
+      text-align: center;
+      font-size: 14px;
+      font-weight: bold;
+      color: #f5e6d3;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+    }
+    .abv {
+      text-align: center;
+      font-size: 18px;
+      font-weight: bold;
+      color: #d4af37;
+      margin-top: 10px;
+    }
+    .proof {
+      text-align: center;
+      font-size: 10px;
+      color: #c0a080;
+      margin-top: 2px;
+    }
+  </style>
+</head>
+<body>
+  <!-- NECK LABEL: Contains brand name, ABV (matches front) -->
+  <div class="label">
+    <div class="brand">OLD TOM DISTILLERY</div>
+    <div class="abv">45%</div>
+    <div class="proof">90 Proof</div>
+  </div>
+</body>
+</html>

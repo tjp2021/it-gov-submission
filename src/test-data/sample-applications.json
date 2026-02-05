@@ -19,6 +19,10 @@
     "stress": {
       "name": "Group 5: Stress Tests",
       "description": "Edge cases for numeric parsing, unicode, complex addresses, and warning validation"
+    },
+    "multiImage": {
+      "name": "Group 6: Multi-Image",
+      "description": "Test cases for multi-image upload with merged extraction and conflict resolution"
     }
   },
   "labels": [
@@ -544,6 +548,67 @@
         "alcoholContent": "4.5% Alc./Vol.",
         "netContents": "355 mL",
         "nameAddress": "Sierra Brewing Co., Tucson, Arizona",
+        "countryOfOrigin": "",
+        "governmentWarning": "GOVERNMENT WARNING: (1) According to the Surgeon General, women should not drink alcoholic beverages during pregnancy because of the risk of birth defects. (2) Consumption of alcoholic beverages impairs your ability to drive a car or operate machinery, and may cause health problems."
+      }
+    },
+    {
+      "id": "M1-multi-oldtom",
+      "group": "multiImage",
+      "description": "Multi-image: Old Tom front/back/neck - all fields should merge correctly",
+      "images": [
+        "labels/label-oldtom-front.html",
+        "labels/label-oldtom-back.html",
+        "labels/label-oldtom-neck.html"
+      ],
+      "expectedResult": "PASS",
+      "expectedReason": "All three images should merge to provide complete label data with brand confirmed on front+neck",
+      "applicationData": {
+        "brandName": "Old Tom Distillery",
+        "classType": "Kentucky Straight Bourbon Whiskey",
+        "alcoholContent": "45% Alc./Vol.",
+        "netContents": "750 mL",
+        "nameAddress": "Old Tom Distillery, 123 Bourbon Lane, Louisville, Kentucky 40202",
+        "countryOfOrigin": "",
+        "governmentWarning": "GOVERNMENT WARNING: (1) According to the Surgeon General, women should not drink alcoholic beverages during pregnancy because of the risk of birth defects. (2) Consumption of alcoholic beverages impairs your ability to drive a car or operate machinery, and may cause health problems."
+      }
+    },
+    {
+      "id": "M2-multi-conflict",
+      "group": "multiImage",
+      "description": "Multi-image: Conflicting ABV values between front (45%) and neck (46%)",
+      "images": [
+        "labels/label-conflict-front.html",
+        "labels/label-conflict-neck.html"
+      ],
+      "expectedResult": "REVIEW",
+      "expectedReason": "ABV conflict between images requires human resolution - front shows 45%, neck shows 46%",
+      "applicationData": {
+        "brandName": "Green Valley Spirits",
+        "classType": "Premium Vodka",
+        "alcoholContent": "45% Alc./Vol.",
+        "netContents": "750 mL",
+        "nameAddress": "Green Valley Spirits, Portland, Oregon",
+        "countryOfOrigin": "",
+        "governmentWarning": "GOVERNMENT WARNING: (1) According to the Surgeon General, women should not drink alcoholic beverages during pregnancy because of the risk of birth defects. (2) Consumption of alcoholic beverages impairs your ability to drive a car or operate machinery, and may cause health problems."
+      }
+    },
+    {
+      "id": "M3-front-back-only",
+      "group": "multiImage",
+      "description": "Multi-image: Front and back labels only (common 2-image scenario)",
+      "images": [
+        "labels/label-oldtom-front.html",
+        "labels/label-oldtom-back.html"
+      ],
+      "expectedResult": "PASS",
+      "expectedReason": "Front provides brand/ABV/volume, back provides address/warning - should merge cleanly",
+      "applicationData": {
+        "brandName": "Old Tom Distillery",
+        "classType": "Kentucky Straight Bourbon Whiskey",
+        "alcoholContent": "45% Alc./Vol.",
+        "netContents": "750 mL",
+        "nameAddress": "Old Tom Distillery, 123 Bourbon Lane, Louisville, Kentucky 40202",
         "countryOfOrigin": "",
         "governmentWarning": "GOVERNMENT WARNING: (1) According to the Surgeon General, women should not drink alcoholic beverages during pregnancy because of the risk of birth defects. (2) Consumption of alcoholic beverages impairs your ability to drive a car or operate machinery, and may cause health problems."
       }

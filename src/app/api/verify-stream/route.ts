@@ -3,6 +3,7 @@ import { extractWithGemini } from "@/lib/gemini-extraction";
 import { compareField } from "@/lib/comparison";
 import { verifyGovernmentWarning } from "@/lib/warning-check";
 import { FIELD_CONFIG, STANDARD_WARNING_TEXT } from "@/lib/constants";
+import { mergeExtractions, getUnresolvedConflicts } from "@/lib/merge-extraction";
 import type {
   ApplicationData,
   ExtractedFields,
@@ -10,10 +11,16 @@ import type {
   VerificationResult,
   OverallStatus,
   MatchType,
+  ImageSource,
+  ImageLabel,
+  ImageExtraction,
+  MergedExtraction,
+  MultiImageFieldResult,
+  MultiImageVerificationResult,
 } from "@/lib/types";
 
 export const runtime = "nodejs";
-export const maxDuration = 30;
+export const maxDuration = 60; // Increased for multi-image processing
 
 function computeOverallStatus(fieldResults: FieldResult[]): OverallStatus {
   const hasUnresolvedFail = fieldResults.some(
@@ -49,10 +56,94 @@ function getExtractedValue(
   return typeof value === "string" ? value : null;
 }
 
+interface ParsedImage {
+  index: number;
+  file: File;
+  label: ImageLabel;
+}
+
+async function parseMultiImageFormData(formData: FormData): Promise<{
+  images: ParsedImage[];
+  applicationData: ApplicationData;
+}> {
+  const applicationDataJson = formData.get("applicationData") as string | null;
+
+  if (!applicationDataJson) {
+    throw new Error("Missing application data");
+  }
+
+  const applicationData: ApplicationData = JSON.parse(applicationDataJson);
+
+  // Parse image labels
+  const imageLabelsJson = formData.get("imageLabels") as string | null;
+  const imageLabels: Record<string, ImageLabel> = imageLabelsJson
+    ? JSON.parse(imageLabelsJson)
+    : {};
+
+  // Collect all images
+  const images: ParsedImage[] = [];
+
+  // Check for single image (backward compatibility)
+  const singleImage = formData.get("labelImage") as File | null;
+  if (singleImage) {
+    images.push({
+      index: 0,
+      file: singleImage,
+      label: imageLabels["0"] || "front",
+    });
+  }
+
+  // Check for multi-image format: labelImage_0, labelImage_1, etc.
+  for (let i = 0; i < 6; i++) {
+    const image = formData.get(`labelImage_${i}`) as File | null;
+    if (image) {
+      images.push({
+        index: i,
+        file: image,
+        label: imageLabels[String(i)] || "other",
+      });
+    }
+  }
+
+  if (images.length === 0) {
+    throw new Error("No images provided");
+  }
+
+  return { images, applicationData };
+}
+
+async function extractFromImage(
+  file: File,
+  imageId: string,
+  label: ImageLabel,
+  fileName: string
+): Promise<ImageExtraction> {
+  const startTime = Date.now();
+
+  const imageBuffer = await file.arrayBuffer();
+  const imageBase64 = Buffer.from(imageBuffer).toString("base64");
+  const mimeType = file.type as "image/jpeg" | "image/png" | "image/webp" | "image/gif";
+
+  const extractionResult = await extractWithGemini(imageBase64, mimeType);
+
+  if (!extractionResult.success) {
+    throw new Error(`Extraction failed for ${fileName}: ${extractionResult.error}`);
+  }
+
+  return {
+    source: {
+      imageId,
+      imageLabel: label,
+      fileName,
+    },
+    fields: extractionResult.fields,
+    processingTimeMs: Date.now() - startTime,
+  };
+}
+
 export async function POST(request: NextRequest) {
   const startTime = Date.now();
 
-  // Create a streaming response using Server-Sent Events
   const encoder = new TextEncoder();
 
   const stream = new ReadableStream({
@@ -68,49 +159,94 @@ export async function POST(request: NextRequest) {
         send("progress", { stage: "parsing", message: "Parsing request...", elapsed: Date.now() - startTime });
 
         const formData = await request.formData();
-        const imageFile = formData.get("labelImage") as File | null;
-        const applicationDataJson = formData.get("applicationData") as string | null;
+        const { images, applicationData } = await parseMultiImageFormData(formData);
 
-        if (!imageFile || !applicationDataJson) {
-          send("error", { error: "Missing image or application data" });
-          controller.close();
-          return;
+        const isMultiImage = images.length > 1;
+        const imageSources: ImageSource[] = images.map((img, idx) => ({
+          imageId: `img-${idx}`,
+          imageLabel: img.label,
+          fileName: img.file.name,
+        }));
+
+        send("progress", {
+          stage: "processing",
+          message: `Processing ${images.length} image${images.length > 1 ? "s" : ""}...`,
+          imageCount: images.length,
+          elapsed: Date.now() - startTime,
+        });
+
+        // Stage 2: Extract from all images in parallel
+        const extractionPromises = images.map((img, idx) => {
+          const imageId = `img-${idx}`;
+          send("image_extraction_start", {
+            imageId,
+            label: img.label,
+            index: idx,
+            total: images.length,
+          });
+
+          return extractFromImage(img.file, imageId, img.label, img.file.name)
+            .then((result) => {
+              send("image_extraction_complete", {
+                imageId,
+                label: img.label,
+                fields: result.fields,
+                processingTimeMs: result.processingTimeMs,
+              });
+              return result;
+            });
+        });
+
+        const imageExtractions = await Promise.all(extractionPromises);
+
+        let extractedFields: ExtractedFields;
+        let mergedExtraction: MergedExtraction | null = null;
+        let fieldSourcesMap: Record<string, ImageSource[]> = {};
+
+        if (isMultiImage) {
+          // Merge extractions from multiple images
+          send("progress", { stage: "merging", message: "Merging extractions...", elapsed: Date.now() - startTime });
+
+          mergedExtraction = mergeExtractions(imageExtractions);
+          extractedFields = mergedExtraction.fields;
+
+          // Build field sources map
+          for (const [fieldKey, sourced] of Object.entries(mergedExtraction.fieldSources)) {
+            fieldSourcesMap[fieldKey] = sourced.sources;
+          }
+
+          // Notify about conflicts
+          if (mergedExtraction.conflicts.length > 0) {
+            send("conflict_detected", {
+              conflictCount: mergedExtraction.conflicts.length,
+              conflicts: mergedExtraction.conflicts,
+            });
+          }
+
+          send("merge_complete", {
+            mergedFields: extractedFields,
+            conflictCount: mergedExtraction.conflicts.length,
+          });
+        } else {
+          // Single image - use directly
+          extractedFields = imageExtractions[0].fields;
+
+          // All fields from single image
+          const singleSource = imageSources[0];
+          const fieldKeys = ["brandName", "classType", "alcoholContent", "netContents", "nameAddress", "countryOfOrigin", "governmentWarning"];
+          for (const key of fieldKeys) {
+            if (getExtractedValue(extractedFields, key)) {
+              fieldSourcesMap[key] = [singleSource];
+            }
+          }
         }
 
-        let applicationData: ApplicationData;
-        try {
-          applicationData = JSON.parse(applicationDataJson);
-        } catch {
-          send("error", { error: "Invalid application data JSON" });
-          controller.close();
-          return;
-        }
-
-        // Stage 2: Process image
-        send("progress", { stage: "processing", message: "Processing image...", elapsed: Date.now() - startTime });
-
-        const imageBuffer = await imageFile.arrayBuffer();
-        const imageBase64 = Buffer.from(imageBuffer).toString("base64");
-        const mimeType = imageFile.type as "image/jpeg" | "image/png" | "image/webp" | "image/gif";
-
-        // Stage 3: Extract with Gemini Flash
-        send("progress", { stage: "extracting", message: "Analyzing label with AI...", elapsed: Date.now() - startTime });
-
-        const extractionResult = await extractWithGemini(imageBase64, mimeType);
-
-        if (!extractionResult.success) {
-          send("error", { error: `Extraction failed: ${extractionResult.error}` });
-          controller.close();
-          return;
-        }
-
-        const extractedFields = extractionResult.fields;
         send("progress", { stage: "extracted", message: "Label analyzed", elapsed: Date.now() - startTime });
 
-        // Stage 4: Compare fields
+        // Stage 3: Compare fields
         send("progress", { stage: "comparing", message: "Comparing fields...", elapsed: Date.now() - startTime });
 
-        const fieldResults: FieldResult[] = [];
+        const fieldResults: MultiImageFieldResult[] = [];
         const standardFields = [
           "brandName",
           "classType",
@@ -136,7 +272,10 @@ export async function POST(request: NextRequest) {
             applicationValue || ""
           );
 
-          const fieldResult: FieldResult = {
+          const sources = fieldSourcesMap[fieldKey] || [];
+          const conflict = mergedExtraction?.conflicts.find(c => c.fieldKey === fieldKey);
+
+          const fieldResult: MultiImageFieldResult = {
             fieldName: config.displayName,
             applicationValue: applicationValue || "",
             extractedValue,
@@ -144,11 +283,28 @@ export async function POST(request: NextRequest) {
             matchType: config.matchType as MatchType,
             confidence: matchResult.confidence,
             details: matchResult.details,
+            // Multi-image specific fields
+            sources: sources.length > 0 ? sources : undefined,
+            confirmedOnImages: sources.length > 0 ? sources.length : undefined,
+            hadConflict: conflict !== undefined,
+            conflictResolution: conflict?.selectedValue
+              ? {
+                  selectedValue: conflict.selectedValue,
+                  selectedFromImage: conflict.candidates.find(
+                    c => c.value === conflict.selectedValue
+                  )?.sources[0]?.imageId || "",
+                  rejectedValues: conflict.candidates
+                    .filter(c => c.value !== conflict.selectedValue)
+                    .map(c => ({
+                      value: c.value,
+                      fromImages: c.sources.map(s => s.imageId),
+                    })),
+                  resolvedAt: conflict.selectedAt || new Date().toISOString(),
+                }
+              : undefined,
           };
 
           fieldResults.push(fieldResult);
-
-          // Stream each field result as it's computed
           send("field", fieldResult);
         }
 
@@ -159,22 +315,45 @@ export async function POST(request: NextRequest) {
         );
 
         for (const warningResult of warningResults) {
-          fieldResults.push(warningResult);
-          send("field", warningResult);
+          const multiImageWarningResult: MultiImageFieldResult = {
+            ...warningResult,
+            sources: fieldSourcesMap["governmentWarning"],
+            confirmedOnImages: fieldSourcesMap["governmentWarning"]?.length,
+          };
+          fieldResults.push(multiImageWarningResult);
+          send("field", multiImageWarningResult);
         }
 
-        // Stage 5: Final result
+        // Stage 4: Final result
         const overallStatus = computeOverallStatus(fieldResults);
         const processingTimeMs = Date.now() - startTime;
 
-        const result: VerificationResult = {
-          overallStatus,
-          processingTimeMs,
-          extractedFields,
-          fieldResults,
-        };
+        if (isMultiImage && mergedExtraction) {
+          const result: MultiImageVerificationResult = {
+            overallStatus,
+            processingTimeMs,
+            extractedFields,
+            fieldResults,
+            // Multi-image specific
+            imageCount: images.length,
+            images: imageSources,
+            mergedExtraction,
+            unresolvedConflicts: getUnresolvedConflicts(mergedExtraction),
+          };
 
-        send("complete", result);
+          send("complete", result);
+        } else {
+          // Single image - return standard result for backward compatibility
+          const result: VerificationResult = {
+            overallStatus,
+            processingTimeMs,
+            extractedFields,
+            fieldResults,
+          };
+
+          send("complete", result);
+        }
+
         controller.close();
 
       } catch (error) {

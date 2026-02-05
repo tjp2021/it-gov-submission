@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>Test Label - Conflict Front (ABV 45%)</title>
+  <style>
+    body {
+      margin: 0;
+      padding: 40px;
+      background: #1a1a1a;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      font-family: Georgia, serif;
+    }
+    .label {
+      width: 400px;
+      background: linear-gradient(135deg, #e8f4e8 0%, #c8e6c9 100%);
+      border: 3px solid #2e7d32;
+      border-radius: 8px;
+      padding: 30px;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+    }
+    .brand {
+      text-align: center;
+      font-size: 28px;
+      font-weight: bold;
+      color: #1b5e20;
+      margin-bottom: 10px;
+      text-transform: uppercase;
+      letter-spacing: 2px;
+    }
+    .class-type {
+      text-align: center;
+      font-size: 14px;
+      color: #388e3c;
+      margin-bottom: 20px;
+      font-style: italic;
+    }
+    .details {
+      display: flex;
+      justify-content: space-between;
+      margin: 20px 0;
+      padding: 15px;
+      background: rgba(255,255,255,0.7);
+      border-radius: 4px;
+    }
+    .detail-item {
+      text-align: center;
+    }
+    .detail-label {
+      font-size: 10px;
+      color: #666;
+      text-transform: uppercase;
+    }
+    .detail-value {
+      font-size: 14px;
+      font-weight: bold;
+      color: #1b5e20;
+    }
+  </style>
+</head>
+<body>
+  <!-- CONFLICT TEST FRONT: ABV shows 45% -->
+  <div class="label">
+    <div class="brand">Green Valley Spirits</div>
+    <div class="class-type">Premium Vodka</div>
+
+    <div class="details">
+      <div class="detail-item">
+        <div class="detail-label">Alcohol</div>
+        <div class="detail-value">45% Alc./Vol.</div>
+      </div>
+      <div class="detail-item">
+        <div class="detail-label">Net Contents</div>
+        <div class="detail-value">750 mL</div>
+      </div>
+    </div>
+  </div>
+</body>
+</html>

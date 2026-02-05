@@ -100,3 +100,77 @@ export interface MatchResult {
   confidence: number;
   details: string;
 }
+
+// =============================================
+// Multi-Image Upload Types
+// =============================================
+
+// Image label identifying which part of the product this image shows
+export type ImageLabel = "front" | "back" | "neck" | "side" | "detail" | "other";
+
+// Image identification for source tracking
+export interface ImageSource {
+  imageId: string;
+  imageLabel: ImageLabel;
+  fileName: string;
+}
+
+// Uploaded image with metadata (client-side)
+export interface UploadedImage {
+  id: string;
+  file: File;
+  preview: string;
+  label: ImageLabel;
+}
+
+// Extraction result from a single image
+export interface ImageExtraction {
+  source: ImageSource;
+  fields: ExtractedFields;
+  processingTimeMs: number;
+}
+
+// Field value with source tracking (which images it was found on)
+export interface SourcedFieldValue {
+  value: string;
+  sources: ImageSource[];
+}
+
+// Conflict requiring human resolution
+export interface FieldConflict {
+  fieldKey: string;
+  fieldDisplayName: string;
+  candidates: SourcedFieldValue[];
+  selectedValue?: string;
+  selectedAt?: string;
+}
+
+// Merged extraction from multiple images
+export interface MergedExtraction {
+  fields: ExtractedFields;
+  fieldSources: Record<string, SourcedFieldValue>;
+  conflicts: FieldConflict[];
+  imageExtractions: ImageExtraction[];
+}
+
+// Extended field result with source tracking (for multi-image)
+export interface MultiImageFieldResult extends FieldResult {
+  sources?: ImageSource[];
+  confirmedOnImages?: number;
+  hadConflict?: boolean;
+  conflictResolution?: {
+    selectedValue: string;
+    selectedFromImage: string;
+    rejectedValues: Array<{ value: string; fromImages: string[] }>;
+    resolvedAt: string;
+  };
+}
+
+// Final verification result for multi-image flow
+export interface MultiImageVerificationResult extends VerificationResult {
+  imageCount: number;
+  images: ImageSource[];
+  mergedExtraction: MergedExtraction;
+  unresolvedConflicts: FieldConflict[];
+  fieldResults: MultiImageFieldResult[];
+}

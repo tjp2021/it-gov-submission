@@ -2,32 +2,61 @@
 
 import { useState, useCallback } from "react";
 import Link from "next/link";
-import LabelUploader from "@/components/LabelUploader";
+import MultiImageUploader from "@/components/MultiImageUploader";
 import ApplicationForm, {
   defaultApplicationData,
 } from "@/components/ApplicationForm";
 import VerificationResults from "@/components/VerificationResults";
 import LoadingState from "@/components/LoadingState";
+import ConflictResolutionPanel from "@/components/ConflictResolutionPanel";
 import DemoButton from "@/components/DemoButton";
-import type { ApplicationData, VerificationResult, FieldResult } from "@/lib/types";
+import type {
+  ApplicationData,
+  VerificationResult,
+  MultiImageVerificationResult,
+  FieldResult,
+  UploadedImage,
+  FieldConflict,
+  MergedExtraction,
+} from "@/lib/types";
+import { resolveConflict, allConflictsResolved } from "@/lib/merge-extraction";
 
-type AppState = "input" | "loading" | "results";
+type AppState = "input" | "extracting" | "conflict" | "comparing" | "results";
+
+// Type guard to check if result is multi-image
+function isMultiImageResult(
+  result: VerificationResult | MultiImageVerificationResult
+): result is MultiImageVerificationResult {
+  return "imageCount" in result && result.imageCount > 1;
+}
 
 export default function Home() {
   const [state, setState] = useState<AppState>("input");
-  const [imageFile, setImageFile] = useState<File | null>(null);
-  const [imagePreview, setImagePreview] = useState<string | null>(null);
+  const [images, setImages] = useState<UploadedImage[]>([]);
   const [applicationData, setApplicationData] = useState<ApplicationData>(
     defaultApplicationData
   );
-  const [result, setResult] = useState<VerificationResult | null>(null);
+  const [result, setResult] = useState<VerificationResult | MultiImageVerificationResult | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [streamMessage, setStreamMessage] = useState<string>("");
   const [streamFields, setStreamFields] = useState<FieldResult[]>([]);
 
-  const handleImageSelect = useCallback((file: File, preview: string) => {
-    setImageFile(file);
-    setImagePreview(preview);
+  // Multi-image specific state
+  const [mergedExtraction, setMergedExtraction] = useState<MergedExtraction | null>(null);
+  const [conflicts, setConflicts] = useState<FieldConflict[]>([]);
+  const [extractionProgress, setExtractionProgress] = useState<{
+    completed: number;
+    total: number;
+  }>({ completed: 0, total: 0 });
+
+  // Build image previews map for conflict panel
+  const imagePreviews = images.reduce<Record<string, string>>((acc, img, idx) => {
+    acc[`img-${idx}`] = img.preview;
+    return acc;
+  }, {});
+
+  const handleImagesChange = useCallback((newImages: UploadedImage[]) => {
+    setImages(newImages);
     setError(null);
   }, []);
 
@@ -39,8 +68,12 @@ export default function Home() {
         const response = await fetch(imageUrl);
         const blob = await response.blob();
         const file = new File([blob], "demo-label.png", { type: "image/png" });
-        setImageFile(file);
-        setImagePreview(imageUrl);
+        setImages([{
+          id: `img-demo-${Date.now()}`,
+          file,
+          preview: imageUrl,
+          label: "front",
+        }]);
       }
       setError(null);
     },
@@ -48,8 +81,8 @@ export default function Home() {
   );
 
   const handleVerify = async () => {
-    if (!imageFile) {
-      setError("Please upload a label image");
+    if (images.length === 0) {
+      setError("Please upload at least one label image");
       return;
     }
 
@@ -59,13 +92,23 @@ export default function Home() {
     }
 
     setError(null);
-    setState("loading");
+    setState("extracting");
     setStreamMessage("Starting...");
     setStreamFields([]);
+    setMergedExtraction(null);
+    setConflicts([]);
+    setExtractionProgress({ completed: 0, total: images.length });
 
     try {
       const formData = new FormData();
-      formData.append("labelImage", imageFile);
+
+      // Send images in multi-image format
+      const imageLabels: Record<string, string> = {};
+      images.forEach((img, idx) => {
+        formData.append(`labelImage_${idx}`, img.file);
+        imageLabels[String(idx)] = img.label;
+      });
+      formData.append("imageLabels", JSON.stringify(imageLabels));
       formData.append("applicationData", JSON.stringify(applicationData));
 
       const response = await fetch("/api/verify-stream", {
@@ -87,6 +130,7 @@ export default function Home() {
       }
 
       let buffer = "";
+      let completedExtractions = 0;
 
       while (true) {
         const { done, value } = await reader.read();
@@ -107,14 +151,53 @@ export default function Home() {
               switch (eventType) {
                 case "progress":
                   setStreamMessage(data.message);
+                  if (data.stage === "comparing") {
+                    setState("comparing");
+                  }
                   break;
+
+                case "image_extraction_start":
+                  setStreamMessage(`Analyzing ${data.label} image (${data.index + 1}/${data.total})...`);
+                  break;
+
+                case "image_extraction_complete":
+                  completedExtractions++;
+                  setExtractionProgress({
+                    completed: completedExtractions,
+                    total: images.length,
+                  });
+                  break;
+
+                case "conflict_detected":
+                  // Conflicts detected - will handle after merge_complete
+                  break;
+
+                case "merge_complete":
+                  if (data.conflictCount > 0) {
+                    // We have conflicts - pause for resolution
+                    // Note: conflicts are in the merge_complete data indirectly via conflict_detected
+                  }
+                  setStreamMessage(`Merged ${images.length} images`);
+                  break;
+
                 case "field":
                   setStreamFields(prev => [...prev, data as FieldResult]);
                   break;
+
                 case "complete":
-                  setResult(data as VerificationResult);
-                  setState("results");
+                  const resultData = data as VerificationResult | MultiImageVerificationResult;
+                  setResult(resultData);
+
+                  // Check if there are unresolved conflicts
+                  if (isMultiImageResult(resultData) && resultData.unresolvedConflicts.length > 0) {
+                    setMergedExtraction(resultData.mergedExtraction);
+                    setConflicts(resultData.unresolvedConflicts);
+                    setState("conflict");
+                  } else {
+                    setState("results");
+                  }
                   return;
+
                 case "error":
                   throw new Error(data.error);
               }
@@ -128,6 +211,28 @@ export default function Home() {
       setError(err instanceof Error ? err.message : "Verification failed");
       setState("input");
     }
+  };
+
+  const handleConflictResolve = (fieldKey: string, selectedValue: string) => {
+    if (!mergedExtraction) return;
+
+    const updated = resolveConflict(mergedExtraction, fieldKey, selectedValue);
+    setMergedExtraction(updated);
+
+    // Update conflicts state to show resolution
+    setConflicts(
+      conflicts.map(c =>
+        c.fieldKey === fieldKey
+          ? { ...c, selectedValue, selectedAt: new Date().toISOString() }
+          : c
+      )
+    );
+  };
+
+  const handleContinueAfterConflicts = () => {
+    // All conflicts resolved, move to results
+    // The result already has the data, we just need to transition
+    setState("results");
   };
 
   const handleFieldOverride = (
@@ -176,12 +281,17 @@ export default function Home() {
 
   const handleReset = () => {
     setState("input");
-    setImageFile(null);
-    setImagePreview(null);
+    setImages([]);
     setApplicationData(defaultApplicationData);
     setResult(null);
     setError(null);
+    setMergedExtraction(null);
+    setConflicts([]);
+    setExtractionProgress({ completed: 0, total: 0 });
   };
+
+  // Check if all conflicts are resolved
+  const allResolved = conflicts.every(c => c.selectedValue !== undefined);
 
   return (
     <main className="min-h-screen bg-gray-100 py-8 px-4">
@@ -202,7 +312,7 @@ export default function Home() {
               className="flex flex-col items-end"
             >
               <span className="px-4 py-2 text-sm bg-navy-700 text-white hover:bg-navy-800 rounded-lg" style={{ backgroundColor: '#1e3a5f' }}>
-                Batch Mode →
+                Batch Mode
               </span>
               <span className="text-xs text-gray-500 mt-1">
                 Verify up to 300 labels at once
@@ -213,17 +323,53 @@ export default function Home() {
 
         {/* Main Content */}
         <div className="bg-white rounded-xl shadow-lg p-6 md:p-8">
-          {state === "loading" && (
+          {(state === "extracting" || state === "comparing") && (
             <LoadingState
               streamMessage={streamMessage}
               streamFields={streamFields}
+              extractionProgress={images.length > 1 ? extractionProgress : undefined}
             />
+          )}
+
+          {state === "conflict" && (
+            <div className="space-y-6">
+              <ConflictResolutionPanel
+                conflicts={conflicts}
+                imagePreviews={imagePreviews}
+                onResolve={handleConflictResolve}
+              />
+
+              <div className="flex gap-4 pt-4 border-t border-gray-200">
+                <button
+                  onClick={handleContinueAfterConflicts}
+                  disabled={!allResolved}
+                  className={`px-6 py-3 font-semibold rounded-lg transition-colors ${
+                    allResolved
+                      ? "text-white hover:opacity-90"
+                      : "text-white opacity-60 cursor-not-allowed"
+                  }`}
+                  style={{ backgroundColor: '#1e3a5f' }}
+                >
+                  Continue to Results
+                </button>
+                <button
+                  onClick={handleReset}
+                  className="px-4 py-3 text-gray-600 font-medium rounded-lg border border-gray-300 hover:bg-gray-50"
+                >
+                  Start Over
+                </button>
+              </div>
+            </div>
           )}
 
           {state === "results" && result && (
             <VerificationResults
               result={result}
-              labelImage={imagePreview}
+              labelImages={images.map((img, idx) => ({
+                id: `img-${idx}`,
+                label: img.label,
+                preview: img.preview,
+              }))}
               onFieldOverride={handleFieldOverride}
               onReset={handleReset}
             />
@@ -236,10 +382,11 @@ export default function Home() {
                 <DemoButton onLoadDemo={handleLoadDemo} />
               </div>
 
-              {/* Label Upload */}
-              <LabelUploader
-                onImageSelect={handleImageSelect}
-                currentPreview={imagePreview}
+              {/* Multi-Image Upload */}
+              <MultiImageUploader
+                images={images}
+                onImagesChange={handleImagesChange}
+                maxImages={6}
               />
 
               {/* Divider */}
@@ -261,15 +408,15 @@ export default function Home() {
               {/* Verify Button */}
               <button
                 onClick={handleVerify}
-                disabled={!imageFile}
+                disabled={images.length === 0}
                 className={`w-full py-4 text-lg font-semibold rounded-lg transition-colors ${
-                  imageFile
+                  images.length > 0
                     ? "text-white hover:opacity-90"
                     : "text-white opacity-60 cursor-not-allowed"
                 }`}
                 style={{ backgroundColor: '#1e3a5f' }}
               >
-                ▶ Verify Label
+                Verify Label{images.length > 1 ? `s (${images.length})` : ""}
               </button>
             </div>
           )}
@@ -278,7 +425,7 @@ export default function Home() {
         {/* Footer */}
         <footer className="mt-8 text-center text-sm text-gray-500">
           <p>
-            Prototype for TTB Compliance Division • Built with Gemini Flash
+            Prototype for TTB Compliance Division - Built with Gemini Flash
           </p>
         </footer>
       </div>
