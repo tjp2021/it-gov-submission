@@ -58,19 +58,42 @@ function jaroWinkler(s1, s2) {
 }
 
 const ML_CONVERSIONS = {
+  // Milliliters
   ml: 1,
+  // Centiliters
   cl: 10,
+  // Liters
+  liters: 1000,
+  litres: 1000,
+  liter: 1000,
+  litre: 1000,
   l: 1000,
-  "fl oz": 29.5735,
-  "fl. oz": 29.5735,
-  "fl.oz": 29.5735,
+  // Fluid ounces
+  "fluid ounces": 29.5735,
+  "fluid ounce": 29.5735,
   "fl. oz.": 29.5735,
+  "fl oz.": 29.5735,
+  "fl. oz": 29.5735,
+  "fl oz": 29.5735,
+  "fl.oz.": 29.5735,
+  "fl.oz": 29.5735,
+  floz: 29.5735,
+  "oz.": 29.5735,
   oz: 29.5735,
+  // Pints
+  pints: 473.176,
   pint: 473.176,
+  "pt.": 473.176,
   pt: 473.176,
+  // Quarts
+  quarts: 946.353,
   quart: 946.353,
+  "qt.": 946.353,
   qt: 946.353,
+  // Gallons
+  gallons: 3785.41,
   gallon: 3785.41,
+  "gal.": 3785.41,
   gal: 3785.41,
 };
 
@@ -335,6 +358,26 @@ const VOLUME_TESTS = [
   { app: "70cl", label: "700mL", shouldPass: true, reason: "European bottle" },
   { app: "1 pt", label: "473 mL", shouldPass: true, reason: "Pint conversion" },
   { app: "1 qt", label: "946 mL", shouldPass: true, reason: "Quart conversion" },
+
+  // Plural forms
+  { app: "2 pints", label: "946 mL", shouldPass: true, reason: "Plural pints" },
+  { app: "2 quarts", label: "1893 mL", shouldPass: true, reason: "Plural quarts" },
+
+  // British spelling
+  { app: "1 litre", label: "1000 mL", shouldPass: true, reason: "British litre" },
+  { app: "750 ml", label: "0.75 litres", shouldPass: true, reason: "Litres plural" },
+
+  // Spelled out
+  { app: "12 fluid ounces", label: "355 mL", shouldPass: true, reason: "Fluid ounces spelled" },
+  { app: "1 liter", label: "1000 mL", shouldPass: true, reason: "Liter spelled" },
+
+  // With periods
+  { app: "1 pt.", label: "473 mL", shouldPass: true, reason: "pt. with period" },
+  { app: "1 qt.", label: "946 mL", shouldPass: true, reason: "qt. with period" },
+  { app: "12 oz.", label: "355 mL", shouldPass: true, reason: "oz. with period" },
+
+  // No space variations
+  { app: "12floz", label: "355 mL", shouldPass: true, reason: "floz no space" },
 ];
 
 function testVolume(tc) {

@@ -7,20 +7,44 @@ export const ADDRESS_MATCH_THRESHOLD = 0.70;
 export const VOLUME_TOLERANCE = 0.005; // 0.5% tolerance for volume conversions
 
 // Volume unit conversions to milliliters
+// Sorted by length (longest first) in parseVolume to avoid partial matches
 export const ML_CONVERSIONS: Record<string, number> = {
+  // Milliliters
   ml: 1,
+  // Centiliters
   cl: 10,
+  // Liters (multiple spellings)
+  liters: 1000,
+  litres: 1000,
+  liter: 1000,
+  litre: 1000,
   l: 1000,
-  "fl oz": 29.5735,
-  "fl. oz": 29.5735,
-  "fl.oz": 29.5735,
+  // Fluid ounces (many label variations)
+  "fluid ounces": 29.5735,
+  "fluid ounce": 29.5735,
   "fl. oz.": 29.5735,
-  oz: 29.5735, // In beverage context, oz = fl oz
+  "fl oz.": 29.5735,
+  "fl. oz": 29.5735,
+  "fl oz": 29.5735,
+  "fl.oz.": 29.5735,
+  "fl.oz": 29.5735,
+  floz: 29.5735,
+  "oz.": 29.5735,
+  oz: 29.5735,
+  // Pints
+  pints: 473.176,
   pint: 473.176,
+  "pt.": 473.176,
   pt: 473.176,
+  // Quarts
+  quarts: 946.353,
   quart: 946.353,
+  "qt.": 946.353,
   qt: 946.353,
+  // Gallons
+  gallons: 3785.41,
   gallon: 3785.41,
+  "gal.": 3785.41,
   gal: 3785.41,
 };
 
