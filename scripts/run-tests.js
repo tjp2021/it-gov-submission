@@ -12,7 +12,7 @@
 const fs = require('fs');
 const path = require('path');
 
-const API_URL = 'http://localhost:3000/api/verify';
+const API_URL = 'http://localhost:3000/api/verify-gemini';
 const TEST_DATA_DIR = path.join(__dirname, '../src/test-data');
 const RESULTS_DIR = path.join(__dirname, '../src/test-data/test-results');
 
@@ -191,8 +191,10 @@ function getLatencyIcon(ms) {
 }
 
 async function runSingleTest(scenario) {
-  const pngFileName = scenario.htmlFile.replace('labels/', '').replace('.html', '.png');
-  const pngPath = path.join(TEST_DATA_DIR, 'sample-labels', pngFileName);
+  // htmlFile now contains the full path like "automated/basic/label-perfect.png"
+  const imagePath = scenario.htmlFile;
+  const pngPath = path.join(TEST_DATA_DIR, 'sample-labels', imagePath);
+  const pngFileName = path.basename(imagePath);
 
   const result = {
     id: scenario.id,
@@ -204,7 +206,7 @@ async function runSingleTest(scenario) {
     passed: false,
     error: null,
     latencyMs: null,
-    imagePath: `sample-labels/${pngFileName}`,
+    imagePath: `sample-labels/${imagePath}`,
     imageExists: fs.existsSync(pngPath),
     applicationData: scenario.applicationData,
     fieldResults: null,

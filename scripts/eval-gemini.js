@@ -117,11 +117,13 @@ async function main() {
 }
 
 async function makeRequest(url, scenario) {
-  const pngFileName = scenario.htmlFile.replace('labels/', '').replace('.html', '.png');
-  const pngPath = path.join(TEST_DATA_DIR, 'sample-labels', pngFileName);
+  // htmlFile now contains the full path like "automated/basic/label-perfect.png"
+  const imagePath = scenario.htmlFile;
+  const pngPath = path.join(TEST_DATA_DIR, 'sample-labels', imagePath);
+  const pngFileName = require('path').basename(imagePath);
 
   if (!fs.existsSync(pngPath)) {
-    return { error: `PNG not found: ${pngFileName}` };
+    return { error: `PNG not found: ${imagePath}` };
   }
 
   const imageBuffer = fs.readFileSync(pngPath);
