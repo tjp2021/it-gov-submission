@@ -22,7 +22,6 @@ export default function Home() {
   );
   const [result, setResult] = useState<VerificationResult | null>(null);
   const [error, setError] = useState<string | null>(null);
-  const [loadingStartTime, setLoadingStartTime] = useState<number>(0);
   const [streamMessage, setStreamMessage] = useState<string>("");
   const [streamFields, setStreamFields] = useState<FieldResult[]>([]);
 
@@ -61,7 +60,6 @@ export default function Home() {
 
     setError(null);
     setState("loading");
-    setLoadingStartTime(Date.now());
     setStreamMessage("Starting...");
     setStreamFields([]);
 
@@ -217,7 +215,6 @@ export default function Home() {
         <div className="bg-white rounded-xl shadow-lg p-6 md:p-8">
           {state === "loading" && (
             <LoadingState
-              startTime={loadingStartTime}
               streamMessage={streamMessage}
               streamFields={streamFields}
             />

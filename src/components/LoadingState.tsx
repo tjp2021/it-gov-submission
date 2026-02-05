@@ -1,28 +1,16 @@
 "use client";
 
-import { useState, useEffect } from "react";
 import type { FieldResult } from "@/lib/types";
 
 interface LoadingStateProps {
-  startTime: number;
   streamMessage?: string;
   streamFields?: FieldResult[];
 }
 
 export default function LoadingState({
-  startTime,
   streamMessage,
   streamFields = []
 }: LoadingStateProps) {
-  const [elapsed, setElapsed] = useState(0);
-
-  useEffect(() => {
-    const interval = setInterval(() => {
-      setElapsed(Date.now() - startTime);
-    }, 100);
-    return () => clearInterval(interval);
-  }, [startTime]);
-
   const displayMessage = streamMessage ?? "Processing...";
 
   const getStatusIcon = (status: string) => {
@@ -55,9 +43,6 @@ export default function LoadingState({
       <div className="text-center">
         <p className="text-lg font-medium text-gray-700">
           {displayMessage}
-        </p>
-        <p className="text-sm text-gray-500 mt-1">
-          {(elapsed / 1000).toFixed(1)}s elapsed
         </p>
       </div>
 
