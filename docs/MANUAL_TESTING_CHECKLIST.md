@@ -10,10 +10,12 @@ All 18 test images are numbered to match the checklist. Open the folder in Finde
 
 These are **bottle composite images** — realistic photos with labels rendered on bottles. Due to the small text size on the bottle labels:
 
-- **Gov Warning — Text Accuracy** will likely FAIL (OCR struggles with small text)
+- **Gov Warning — Text Accuracy** may FAIL (Gemini Vision can struggle with small/distant text)
 - **Gov Warning — Header Bold** will show WARNING (expected — always needs human verification)
 
 This is **realistic behavior** for real-world bottle photos. The automated e2e tests use raw label PNGs with clear text for reliable pass/fail validation.
+
+**Note:** We use Gemini Flash Vision (a VLM), not traditional OCR.
 
 **Standard Government Warning** (copy/paste for all tests):
 ```
@@ -51,7 +53,7 @@ GOVERNMENT WARNING: (1) According to the Surgeon General, women should not drink
 - [ ] Gov Warning — Present shows ✅
 - [ ] Gov Warning — Header Caps shows ✅
 - [ ] Gov Warning — Header Bold shows ⚠️ WARNING (expected — needs human verification)
-- [ ] Gov Warning — Text Accuracy may show ❌ FAIL (small text OCR limitation)
+- [ ] Gov Warning — Text Accuracy may show ❌ FAIL (small text small text extraction limitation)
 - [ ] Processing completes in < 5 seconds
 
 ---
@@ -59,7 +61,7 @@ GOVERNMENT WARNING: (1) According to the Surgeon General, women should not drink
 ## 2. Case Mismatch (Fuzzy Matching)
 
 **Image:** `02-case-mismatch.png`
-**Expected:** REVIEW or FAIL (gov warning OCR) — **verify brand matching works**
+**Expected:** REVIEW or FAIL (gov warning text extraction) — **verify brand matching works**
 
 | Field | Value |
 |-------|-------|
@@ -72,7 +74,7 @@ GOVERNMENT WARNING: (1) According to the Surgeon General, women should not drink
 | Government Warning | *(standard warning)* |
 
 - [ ] Brand Name shows ✅ (label has "STONE'S THROW" — fuzzy match handles case)
-- [ ] Gov Warning — Text Accuracy may show ❌ (OCR limitation)
+- [ ] Gov Warning — Text Accuracy may show ❌ (small text extraction limitation)
 
 ---
 
@@ -99,7 +101,7 @@ GOVERNMENT WARNING: (1) According to the Surgeon General, women should not drink
 ## 4. Imported Product with Country of Origin
 
 **Image:** `04-imported-product.png`
-**Expected:** REVIEW or FAIL (gov warning OCR) — **verify country of origin works**
+**Expected:** REVIEW or FAIL (gov warning text extraction) — **verify country of origin works**
 
 | Field | Value |
 |-------|-------|
@@ -112,14 +114,14 @@ GOVERNMENT WARNING: (1) According to the Surgeon General, women should not drink
 | Government Warning | *(standard warning)* |
 
 - [ ] Country of Origin shows ✅ (Scotland detected on label)
-- [ ] Gov Warning — Text Accuracy may show ❌ (OCR limitation)
+- [ ] Gov Warning — Text Accuracy may show ❌ (small text extraction limitation)
 
 ---
 
 ## 5. Volume Conversion: mL to fl oz
 
 **Image:** `05-volume-ml-to-floz.png`
-**Expected:** REVIEW or FAIL (gov warning OCR) — **verify volume conversion works**
+**Expected:** REVIEW or FAIL (gov warning text extraction) — **verify volume conversion works**
 
 | Field | Value |
 |-------|-------|
@@ -132,14 +134,14 @@ GOVERNMENT WARNING: (1) According to the Surgeon General, women should not drink
 | Government Warning | *(standard warning)* |
 
 - [ ] Net Contents shows ✅ (label shows 750 mL, converts to ~25.4 fl oz)
-- [ ] Gov Warning — Text Accuracy may show ❌ (OCR limitation)
+- [ ] Gov Warning — Text Accuracy may show ❌ (small text extraction limitation)
 
 ---
 
 ## 6. Volume Conversion: fl oz to mL
 
 **Image:** `06-volume-floz-to-ml.png`
-**Expected:** REVIEW or FAIL (gov warning OCR) — **verify volume conversion works**
+**Expected:** REVIEW or FAIL (gov warning text extraction) — **verify volume conversion works**
 
 | Field | Value |
 |-------|-------|
@@ -152,14 +154,14 @@ GOVERNMENT WARNING: (1) According to the Surgeon General, women should not drink
 | Government Warning | *(standard warning)* |
 
 - [ ] Net Contents shows ✅ (label shows 12 FL OZ, converts to ~355 mL)
-- [ ] Gov Warning — Text Accuracy may show ❌ (OCR limitation)
+- [ ] Gov Warning — Text Accuracy may show ❌ (small text extraction limitation)
 
 ---
 
 ## 7. Volume Conversion: Liters to mL
 
 **Image:** `07-volume-liters-to-ml.png`
-**Expected:** REVIEW or FAIL (gov warning OCR) — **verify volume conversion works**
+**Expected:** REVIEW or FAIL (gov warning text extraction) — **verify volume conversion works**
 
 | Field | Value |
 |-------|-------|
@@ -172,7 +174,7 @@ GOVERNMENT WARNING: (1) According to the Surgeon General, women should not drink
 | Government Warning | *(standard warning)* |
 
 - [ ] Net Contents shows ✅ (label shows 1.75 L = 1750 mL)
-- [ ] Gov Warning — Text Accuracy may show ❌ (OCR limitation)
+- [ ] Gov Warning — Text Accuracy may show ❌ (small text extraction limitation)
 
 ---
 
@@ -199,7 +201,7 @@ GOVERNMENT WARNING: (1) According to the Surgeon General, women should not drink
 ## 9. Proof to ABV Conversion
 
 **Image:** `09-proof-to-abv.png`
-**Expected:** REVIEW or FAIL (gov warning OCR) — **verify proof-to-ABV conversion works**
+**Expected:** REVIEW or FAIL (gov warning text extraction) — **verify proof-to-ABV conversion works**
 
 | Field | Value |
 |-------|-------|
@@ -212,14 +214,14 @@ GOVERNMENT WARNING: (1) According to the Surgeon General, women should not drink
 | Government Warning | *(standard warning)* |
 
 - [ ] Alcohol Content shows ✅ (label shows 90 Proof = 45% ABV)
-- [ ] Gov Warning — Text Accuracy may show ❌ (OCR limitation)
+- [ ] Gov Warning — Text Accuracy may show ❌ (small text extraction limitation)
 
 ---
 
 ## 10. Address Abbreviations
 
 **Image:** `10-address-abbrev.png`
-**Expected:** REVIEW or FAIL (gov warning OCR) — **verify address normalization works**
+**Expected:** REVIEW or FAIL (gov warning text extraction) — **verify address normalization works**
 
 | Field | Value |
 |-------|-------|
@@ -232,7 +234,7 @@ GOVERNMENT WARNING: (1) According to the Surgeon General, women should not drink
 | Government Warning | *(standard warning)* |
 
 - [ ] Name & Address shows ✅ (label has St., Ste., KY — normalization handles abbreviations)
-- [ ] Gov Warning — Text Accuracy may show ❌ (OCR limitation)
+- [ ] Gov Warning — Text Accuracy may show ❌ (small text extraction limitation)
 
 ---
 
@@ -279,7 +281,7 @@ GOVERNMENT WARNING: (1) According to the Surgeon General, women should not drink
 ## 13. High ABV (Overproof)
 
 **Image:** `13-high-abv.png`
-**Expected:** REVIEW or FAIL (gov warning OCR) — **verify high ABV parsing works**
+**Expected:** REVIEW or FAIL (gov warning text extraction) — **verify high ABV parsing works**
 
 | Field | Value |
 |-------|-------|
@@ -292,14 +294,14 @@ GOVERNMENT WARNING: (1) According to the Surgeon General, women should not drink
 | Government Warning | *(standard warning)* |
 
 - [ ] Alcohol Content shows ✅ (75.5% / 151 Proof parsed correctly)
-- [ ] Gov Warning — Text Accuracy may show ❌ (OCR limitation)
+- [ ] Gov Warning — Text Accuracy may show ❌ (small text extraction limitation)
 
 ---
 
 ## 14. Low ABV
 
 **Image:** `14-low-abv.png`
-**Expected:** REVIEW or FAIL (gov warning OCR) — **verify low ABV parsing works**
+**Expected:** REVIEW or FAIL (gov warning text extraction) — **verify low ABV parsing works**
 
 | Field | Value |
 |-------|-------|
@@ -312,14 +314,14 @@ GOVERNMENT WARNING: (1) According to the Surgeon General, women should not drink
 | Government Warning | *(standard warning)* |
 
 - [ ] Alcohol Content shows ✅ (0.5% parsed correctly)
-- [ ] Gov Warning — Text Accuracy may show ❌ (OCR limitation)
+- [ ] Gov Warning — Text Accuracy may show ❌ (small text extraction limitation)
 
 ---
 
 ## 15. Unicode Brand Name
 
 **Image:** `15-unicode-brand.png`
-**Expected:** REVIEW or FAIL (gov warning OCR) — **verify unicode handling works**
+**Expected:** REVIEW or FAIL (gov warning text extraction) — **verify unicode handling works**
 
 | Field | Value |
 |-------|-------|
@@ -332,7 +334,7 @@ GOVERNMENT WARNING: (1) According to the Surgeon General, women should not drink
 | Government Warning | *(standard warning)* |
 
 - [ ] Brand Name shows ✅ (accented characters handled)
-- [ ] Gov Warning — Text Accuracy may show ❌ (OCR limitation)
+- [ ] Gov Warning — Text Accuracy may show ❌ (small text extraction limitation)
 
 ---
 
@@ -341,7 +343,7 @@ GOVERNMENT WARNING: (1) According to the Surgeon General, women should not drink
 ### 16. Batch Upload (3 images)
 
 **Images:** `16-batch-A-perfect.png`, `16-batch-B-imported.png`, `16-batch-C-case.png`
-**Expected:** All 3 process (likely REVIEW/FAIL due to gov warning OCR) — **verify batch processing works**
+**Expected:** All 3 process (likely REVIEW/FAIL due to gov warning text extraction) — **verify batch processing works**
 
 **Application Data for each image:**
 
