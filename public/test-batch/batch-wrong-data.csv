@@ -1,0 +1,4 @@
+image_filename,brandName,classType,alcoholContent,netContents,nameAddress,countryOfOrigin
+label-perfect.png,Wrong Brand,Pinot Noir,12%,1 L,"Fake Company, Nowhere, Texas",
+label-case-mismatch.png,Totally Wrong,Lager,5%,355 mL,"Unknown LLC, Springfield, Illinois",
+label-imported.png,Fake Scotch,Blended Whiskey,35%,1 L,"Not Real Inc., Dallas, Texas",Canada

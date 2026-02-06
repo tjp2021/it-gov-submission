@@ -3,6 +3,7 @@
 import { useState, useCallback } from "react";
 import Link from "next/link";
 import BatchUploader from "@/components/BatchUploader";
+import BatchDemoButton from "@/components/BatchDemoButton";
 import BatchResults from "@/components/BatchResults";
 import type { MatchedBatchItem, VerificationResult } from "@/lib/types";
 
@@ -43,6 +44,7 @@ type SSEEvent = SSEResultEvent | SSECompleteEvent | SSEErrorEvent;
 export default function BatchPage() {
   const [state, setState] = useState<AppState>("input");
   const [matchedItems, setMatchedItems] = useState<MatchedBatchItem[]>([]);
+  const [demoLabel, setDemoLabel] = useState<string | null>(null);
   const [results, setResults] = useState<BatchResult[]>([]);
   const [error, setError] = useState<string | null>(null);
   const [progress, setProgress] = useState({ current: 0, total: 0 });
@@ -54,6 +56,13 @@ export default function BatchPage() {
 
   const handleClear = useCallback(() => {
     setMatchedItems([]);
+    setDemoLabel(null);
+    setError(null);
+  }, []);
+
+  const handleLoadBatchDemo = useCallback((items: MatchedBatchItem[], label: string) => {
+    setMatchedItems(items);
+    setDemoLabel(label);
     setError(null);
   }, []);
 
@@ -151,6 +160,7 @@ export default function BatchPage() {
   const handleReset = () => {
     setState("input");
     setMatchedItems([]);
+    setDemoLabel(null);
     setResults([]);
     setError(null);
     setProgress({ current: 0, total: 0 });
@@ -216,7 +226,30 @@ export default function BatchPage() {
           {/* Input State */}
           {state === "input" && (
             <div className="space-y-8">
-              <BatchUploader onReady={handleReady} onClear={handleClear} />
+              {/* Demo Banner or Demo Button + Uploader */}
+              {demoLabel ? (
+                <div className="p-4 bg-blue-50 border border-blue-200 rounded-lg">
+                  <div className="flex items-center justify-between mb-2">
+                    <span className="text-sm font-semibold text-blue-800">
+                      Demo loaded: {demoLabel}
+                    </span>
+                    <button
+                      onClick={handleClear}
+                      className="text-sm text-blue-600 hover:text-blue-800 font-medium"
+                    >
+                      Clear
+                    </button>
+                  </div>
+                  <p className="text-xs text-blue-700">
+                    {matchedItems.map((item) => item.brandName).join(", ")}
+                  </p>
+                </div>
+              ) : (
+                <>
+                  <BatchDemoButton onLoadDemo={handleLoadBatchDemo} />
+                  <BatchUploader onReady={handleReady} onClear={handleClear} />
+                </>
+              )}
 
               {/* Error Message */}
               {error && (
