@@ -40,6 +40,7 @@ export default function BatchResults({ results, onReset }: BatchResultsProps) {
         expected: f.applicationValue,
         extracted: f.extractedValue,
         confidence: f.confidence,
+        agentOverride: f.agentOverride || null,
       })),
     }));
 

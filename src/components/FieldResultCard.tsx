@@ -210,8 +210,12 @@ export default function FieldResultCard({
 
       {/* Override status */}
       {result.agentOverride && (
-        <div className="text-sm text-blue-600 pt-2 border-t border-gray-200">
-          Agent override: {result.agentOverride.action === "accepted" ? "Accepted" : "Issue confirmed"}
+        <div className={`text-sm pt-2 border-t border-gray-200 ${
+          result.agentOverride.action === "accepted" ? "text-blue-600" : "text-red-600"
+        }`}>
+          {result.agentOverride.action === "accepted"
+            ? "Agent accepted — overridden, will not block approval"
+            : "Agent confirmed issue — remains flagged as a failure"}
         </div>
       )}
     </div>

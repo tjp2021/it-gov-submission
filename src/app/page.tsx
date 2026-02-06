@@ -246,7 +246,9 @@ export default function Home() {
       if (r.fieldName === fieldName) {
         return {
           ...r,
-          status: "OVERRIDDEN" as const,
+          // Accept = override the failure (status becomes OVERRIDDEN, won't count as FAIL)
+          // Confirm Issue = agent reviewed and agrees it's a problem (status stays as-is)
+          ...(action === "accepted" ? { status: "OVERRIDDEN" as const } : {}),
           agentOverride: {
             action,
             timestamp: new Date().toISOString(),
