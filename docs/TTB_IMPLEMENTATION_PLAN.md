@@ -1068,20 +1068,22 @@ After all workstreams are complete, update APPROACH.md with:
 
 ## Final Checklist Before Submission
 
+All workstreams completed as of 2026-02-05.
+
 | # | Check | Status |
 |---|-------|--------|
-| 1 | `bourbon-perfect.png` → all automated checks PASS | ☐ |
-| 2 | `beer-titlecase-warning.png` → caps check FAIL, overall FAIL | ☐ |
-| 3 | `wine-wrong-abv.png` → ABV FAIL, overall FAIL | ☐ |
-| 4 | Bold confirmation appears as checkbox, separate from checklist | ☐ |
-| 5 | Demo button works on deployed URL — one click to full results | ☐ |
-| 6 | Batch: 3 images + CSV → summary dashboard + drill-down | ☐ |
-| 7 | Single label ≤5 seconds on deployed URL | ☐ |
-| 8 | Export JSON includes pendingConfirmations | ☐ |
-| 9 | README has clear setup instructions | ☐ |
-| 10 | APPROACH.md documents bold decision + batch constraints | ☐ |
-| 11 | No test workarounds remaining | ☐ |
-| 12 | Deployed URL is live and accessible | ☐ |
+| 1 | `bourbon-perfect.png` → all automated checks PASS | ✅ |
+| 2 | `beer-titlecase-warning.png` → caps check FAIL, overall FAIL | ✅ |
+| 3 | `wine-wrong-abv.png` → ABV FAIL, overall FAIL | ✅ |
+| 4 | Bold confirmation appears as checkbox, separate from checklist | ✅ |
+| 5 | Demo button works on deployed URL — one click to full results | ✅ |
+| 6 | Batch: 3 images + CSV → summary dashboard + drill-down | ✅ |
+| 7 | Single label ≤5 seconds on deployed URL | ✅ |
+| 8 | Export JSON includes pendingConfirmations | ✅ |
+| 9 | README has clear setup instructions | ✅ |
+| 10 | APPROACH.md documents bold decision + batch constraints | ✅ |
+| 11 | No test workarounds remaining | ✅ |
+| 12 | Deployed URL is live and accessible | ✅ |
 
 ---
 

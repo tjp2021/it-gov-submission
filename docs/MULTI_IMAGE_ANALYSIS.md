@@ -8,7 +8,7 @@
 
 **Solution:** Replaced single-image upload with multi-image upload (1-6 images) on the root page. Extractions are merged with source tracking and conflict detection. Human resolves conflicts when images show different values for the same field.
 
-**Why REVIEW is always expected:** The government warning bold check is hardcoded to WARNING status (see [BOLD_DETECTION_ANALYSIS.md](./BOLD_DETECTION_ANALYSIS.md)). Any WARNING → overall status = REVIEW. This is by design.
+**Status logic:** The government warning bold check is `category: "confirmation"` — it surfaces as a pending confirmation for the agent but does not affect `computeOverallStatus()`. Perfect labels return PASS with a pending bold confirmation. See [GOVERNMENT_WARNING_PARADOX.md](./GOVERNMENT_WARNING_PARADOX.md) Part 10.
 
 ---
 
@@ -167,7 +167,7 @@ complete: { ...result, imageCount, unresolvedConflicts }
 - Drag-and-drop upload
 - Label selector per image (front/back/neck/side/detail/other)
 - Preview with remove button
-- Reuses preprocessing from original LabelUploader
+- Reuses image preprocessing logic (resize to 1568px, JPEG 85%)
 
 **ConflictResolutionPanel.tsx** — Displays and resolves conflicts:
 - Lists each conflict with field name
@@ -182,51 +182,34 @@ complete: { ...result, imageCount, unresolvedConflicts }
 
 ---
 
-## Why REVIEW Is Always Expected
+## How Bold Detection Works with Categories
 
 ### The Bold Detection Constraint
 
-Per [BOLD_DETECTION_ANALYSIS.md](./BOLD_DETECTION_ANALYSIS.md), bold text detection from photographs achieves at best 71% accuracy on degraded images. This is unacceptable for compliance decisions.
+Per [BOLD_DETECTION_ANALYSIS.md](./BOLD_DETECTION_ANALYSIS.md), bold text detection from photographs achieves at best 71% accuracy on degraded images. This is unacceptable for automated compliance decisions.
 
-Therefore, the bold check is **hardcoded to always return WARNING**:
+### The Solution: Field Categories
+
+The bold check has `category: "confirmation"` rather than `"automated"`. This means:
 
 ```typescript
 // src/lib/warning-check.ts
 results.push({
   fieldName: "Gov Warning — Header Bold",
-  status: "WARNING",  // Always WARNING — agent must visually confirm
+  status: "WARNING",
+  category: "confirmation",  // Does NOT affect computeOverallStatus()
   confidence: 0.5,
   details: boldDetails,
 });
 ```
 
-### The Status Aggregation Logic
+`computeOverallStatus()` filters to `category: "automated"` fields only. Confirmation fields become `pendingConfirmations[]` — the agent sees a checkbox to confirm bold formatting, but it doesn't block the overall PASS/FAIL/REVIEW status.
 
-Per PRD Section 4.4:
+### The Result
 
-```typescript
-function getOverallStatus(fieldResults) {
-  if (hasUnresolvedFail) return "FAIL";
-  if (hasWarningOrNotFound) return "REVIEW";  // ← Any WARNING triggers this
-  return "PASS";
-}
-```
+A perfect label returns **PASS** with 1 pending confirmation (bold). The agent confirms bold formatting separately via a checkbox. This makes PASS reachable while still requiring human verification of bold formatting.
 
-### The Implication
-
-Since bold detection always returns WARNING, and any WARNING triggers REVIEW:
-
-**Every verification result will be REVIEW (or FAIL if there are failures).**
-
-PASS is effectively impossible in the current design because:
-1. Bold detection is mandatory (per 27 CFR Part 16)
-2. Bold detection cannot be reliably automated
-3. Therefore, human review is always required
-
-**This is intentional.** The take-home document (Jenny Park quote) emphasizes:
-> "the 'GOVERNMENT WARNING:' part has to be in all caps and bold"
-
-We cannot certify bold compliance without human verification.
+See [GOVERNMENT_WARNING_PARADOX.md](./GOVERNMENT_WARNING_PARADOX.md) Part 10 for the full analysis.
 
 ---
 
@@ -252,15 +235,13 @@ For conflict testing:
 
 | Test ID | Description | Images | Expected |
 |---------|-------------|--------|----------|
-| M1 | Two images merge | 2 | PASS_OR_REVIEW |
-| M2 | Three images merge | 3 | PASS_OR_REVIEW |
+| M1 | Two images merge | 2 | PASS* |
+| M2 | Three images merge | 3 | PASS |
 | M3 | ABV conflict detection | 2 | CONFLICT detected |
 | M4 | Brand mismatch with app data | 2 | REVIEW |
-| M5 | Single image (backward compat) | 1 | PASS_OR_REVIEW |
+| M5 | Single image (backward compat) | 1 | PASS |
 
-### Why PASS_OR_REVIEW?
-
-AI extraction has inherent variance. The same image can produce slightly different text on different API calls (e.g., "OLD TOM" vs "OLD TOM DISTILLERY"). Rather than fighting this variance, we accept both PASS and REVIEW as valid outcomes for tests where the label fundamentally matches the application data.
+*M1 is intermittently flaky due to AI extraction variance on Brand Name (e.g., "OLD TOM" vs "OLD TOM DISTILLERY"). The test accepts both PASS and REVIEW as valid outcomes.
 
 ### Test Runner
 

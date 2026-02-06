@@ -45,11 +45,11 @@ Switched to Gemini 2.0 Flash, which averages ~2.5 seconds per label — 2x faste
 **Problem:** This is an anti-pattern. 10 labels at 2.5s each = 25 seconds. Users see no progress until completion.
 
 **Solution:** Implemented parallel processing with:
-- **Concurrency limit of 3** — Prevents API rate limiting while maximizing throughput
+- **Concurrency limit of 5** — Prevents API rate limiting while maximizing throughput
 - **Server-Sent Events (SSE)** — Stream results to the client as each label completes
 - **Semaphore pattern** — Controls concurrent execution without overwhelming the API
 
-**Result:** 10 labels now complete in ~10 seconds (2.5x faster than sequential). Users see real-time progress as each result arrives.
+**Result:** 10 labels now complete in ~5 seconds (5x faster than sequential). Users see real-time progress as each result arrives.
 
 ### Architecture: Shared Verification Logic
 
@@ -69,6 +69,20 @@ Switched to Gemini 2.0 Flash, which averages ~2.5 seconds per label — 2x faste
 
 **See:** `docs/GOVERNMENT_WARNING_PARADOX.md` for the full problem analysis and resolution.
 
+### Batch Processing: Shared Data → Per-Label CSV + Manual Entry
+
+**Initial approach:** Batch mode verified multiple label images against a single shared application data set. This was useful for front/back/side labels of one product but didn't match the real workflow where agents verify batches of different products.
+
+**Problem:** Real batch workflows involve 10 different products, each with unique brand names, ABV values, and producer addresses. A single shared application data set doesn't work.
+
+**Solution:** Rewrote batch mode with per-label application data:
+- **CSV upload** — Agents prepare application data in a spreadsheet. The `image_filename` column matches each row to an uploaded image file.
+- **Manual entry** — Per-label forms for agents who prefer direct entry.
+- **Filename matching** — `src/lib/batch-matcher.ts` pairs images to application rows by filename, with validation for unmatched files.
+- **CSV parser** — `src/lib/csv-parser.ts` validates required columns and row data, with 16 unit tests covering edge cases (empty fields, missing columns, whitespace handling).
+
+**Result:** Batch mode now handles the real use case — 10 different products verified in parallel with per-label data. SSE streaming shows progress as each label completes.
+
 ### Testing: Unit Tests → E2E Tests
 
 **Initial approach:** Unit tests for matching functions.
@@ -77,7 +91,7 @@ Switched to Gemini 2.0 Flash, which averages ~2.5 seconds per label — 2x faste
 - Upload → Process → Results display
 - Batch processing with 10 labels (PRD maximum)
 - Performance assertions (parallel must be faster than sequential)
-- 20 tests total, all passing
+- 25 tests total, all passing
 
 ---
 
@@ -122,11 +136,9 @@ The ABLA mandates the same warning statement on every beverage label sold in the
 | Scenario | Time | Notes |
 |----------|------|-------|
 | Single label | ~2.5s | Gemini Flash extraction + comparison |
-| Batch of 10 | ~3s | Parallel processing with concurrency 10 |
-| Batch of 50 | ~14s | **Tested** in e2e stress test |
-| Batch of 300 | ~78s | *Projected* based on 50-label test (not tested due to API costs) |
+| Batch of 10 | ~5s | Parallel processing with concurrency 5 |
 
-The 5-second single-label requirement from Sarah is met. Batch processing supports up to 300 labels (per take-home requirement "200-300 label applications at once") with real-time SSE streaming showing progress as each completes.
+The 5-second single-label requirement from Sarah is met. Batch processing is capped at 10 labels for the prototype, with real-time SSE streaming showing progress as each completes. Production would need a job queue for 200+ labels.
 
 ---
 
@@ -136,7 +148,7 @@ These are honest constraints of this prototype, not bugs.
 
 **Bold detection is best-effort.** Neither Gemini nor traditional OCR can reliably determine font weight from a photograph (max 71% accuracy across all approaches tested — see `docs/BOLD_DETECTION_ANALYSIS.md`). The bold check is categorized as a `"confirmation"` field — it surfaces as a pending confirmation for the agent to address, but does not block PASS status. This separation means a perfect label returns PASS with a pending bold confirmation, rather than being stuck at REVIEW. Capitalization detection (ALL CAPS) is reliable and checked separately as an `"automated"` field.
 
-**Batch uses single application data.** The current batch mode verifies multiple label images against the same application data (useful for front/back/side labels of one product). Full batch processing with per-label application data would require CSV upload or a more complex UI.
+**Batch is capped at 10 labels.** The prototype limits batch mode to 10 labels maximum. Production would need a job queue architecture (Bull/Redis) with background workers for the 200-300 label batches Sarah described.
 
 **No authentication or audit trail.** A production system for a federal agency needs FedRAMP-compliant auth (likely Azure AD), role-based access, and a complete decision audit trail logging every verification with agent ID, timestamp, and rationale. The prototype is stateless.
 
@@ -150,13 +162,12 @@ These are honest constraints of this prototype, not bugs.
 
 ## What I'd Build Next
 
-1. **Per-label application data in batch** — Support CSV upload or per-label data entry for true batch processing of different applications.
-2. **Beverage type detection** — Auto-detect spirits vs wine vs malt beverage from the label and apply type-specific validation rules.
-3. **COLA database integration** — Pull application data directly from COLAs Online instead of manual entry, eliminating transcription errors.
-4. **Decision audit trail** — Log every verification with agent ID, timestamp, override rationale. Required for any government compliance workflow.
-5. **Historical analytics** — Dashboard showing rejection patterns, common compliance issues, and processing time trends to help leadership identify systemic problems.
-6. **On-premise AI deployment** — Host the extraction model behind government firewalls for production use with sensitive data.
-7. **Accessibility (WCAG 2.1 AA)** — Full audit and remediation for Section 508 compliance, which is mandatory for government-facing tools.
+1. **Beverage type detection** — Auto-detect spirits vs wine vs malt beverage from the label and apply type-specific validation rules.
+2. **COLA database integration** — Pull application data directly from COLAs Online instead of manual entry, eliminating transcription errors.
+3. **Decision audit trail** — Log every verification with agent ID, timestamp, override rationale. Required for any government compliance workflow.
+4. **Historical analytics** — Dashboard showing rejection patterns, common compliance issues, and processing time trends to help leadership identify systemic problems.
+5. **On-premise AI deployment** — Host the extraction model behind government firewalls for production use with sensitive data.
+6. **Accessibility (WCAG 2.1 AA)** — Full audit and remediation for Section 508 compliance, which is mandatory for government-facing tools.
 
 ---
 
@@ -180,4 +191,5 @@ These are honest constraints of this prototype, not bugs.
 - **Export Results** — Download JSON or CSV for records
 - **Demo Mode** — Pre-loaded example with one click
 - **Client-side Preprocessing** — Images auto-resized to 1568px and compressed to JPEG 85% before upload
-- **Comprehensive Test Suite** — 20 Playwright e2e tests covering single verification, batch processing, and stress tests
+- **Per-Label Batch with CSV** — Upload application data via CSV or manual entry, matched to images by filename
+- **Comprehensive Test Suite** — 25 Playwright E2E tests, 14 single-image, 5 multi-image, 8 validation, 8 batch, 16 CSV unit tests

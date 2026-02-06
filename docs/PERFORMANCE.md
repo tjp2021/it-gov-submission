@@ -107,31 +107,33 @@ AFTER (Gemini Flash):
 
 ---
 
-## Test Results (2026-02-04)
+## Test Results (2026-02-04, updated 2026-02-05)
+
+> **Note:** Results below reflect the category architecture fix. Bold is now `category: "confirmation"` — a pending confirmation that does not affect `computeOverallStatus()`. Tests that previously showed REVIEW (solely due to bold WARNING) now correctly show PASS. See `docs/GOVERNMENT_WARNING_PARADOX.md`.
 
 ### Gemini Flash vs Claude Vision (18 test cases)
 
 ```
 Test Case                | Vision     | Gemini     | Match
 -------------------------|------------|------------|-------
-B1-perfect               | REVIEW     | REVIEW     | ✅
-B2-case-mismatch         | REVIEW     | REVIEW     | ✅
+B1-perfect               | PASS       | PASS       | ✅
+B2-case-mismatch         | PASS       | PASS       | ✅
 B3-wrong-abv             | FAIL       | FAIL       | ✅
 B4-warning-titlecase     | FAIL       | FAIL       | ✅
 B5-no-warning            | FAIL       | FAIL       | ✅
-B6-imported              | REVIEW     | REVIEW     | ✅
-I1-proof-to-abv          | REVIEW     | REVIEW     | ✅
-I2-ml-to-floz            | REVIEW     | REVIEW     | ✅
-I3-address-abbrev        | REVIEW     | REVIEW     | ✅
-I4-punctuation           | REVIEW     | REVIEW     | ✅
-S1-high-abv              | REVIEW     | REVIEW     | ✅
-S2-low-abv               | REVIEW     | REVIEW     | ✅
-S3-odd-proof             | REVIEW     | REVIEW     | ✅
-S4-liters                | REVIEW     | REVIEW     | ✅
-S5-multiline-address     | REVIEW     | REVIEW     | ✅
+B6-imported              | PASS       | PASS       | ✅
+I1-proof-to-abv          | PASS       | PASS       | ✅
+I2-ml-to-floz            | PASS       | PASS       | ✅
+I3-address-abbrev        | PASS       | PASS       | ✅
+I4-punctuation           | PASS       | PASS       | ✅
+S1-high-abv              | PASS       | PASS       | ✅
+S2-low-abv               | PASS       | PASS       | ✅
+S3-odd-proof             | PASS       | PASS       | ✅
+S4-liters                | PASS       | PASS       | ✅
+S5-multiline-address     | PASS       | PASS       | ✅
 S6-truncated-warning     | FAIL       | FAIL       | ✅
-S7-unicode-brand         | REVIEW     | REVIEW     | ✅
-S8-floz-to-ml            | REVIEW     | REVIEW     | ✅
+S7-unicode-brand         | PASS       | PASS       | ✅
+S8-floz-to-ml            | PASS       | PASS       | ✅
 
 Accuracy Match: 18/18 (100%)
 ```

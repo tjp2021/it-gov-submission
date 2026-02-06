@@ -1,8 +1,8 @@
 # TTB AI-Powered Alcohol Label Verification App — PRD & Build Plan
 
 > **Version:** v1
-> **Last Updated:** February 2, 2026
-> **Status:** Planning
+> **Last Updated:** February 5, 2026
+> **Status:** Completed — see Section 0.5 for deviations from plan
 > **Owner:** Timothy Joo
 > **Context:** Take-home project for Treasury TTB position
 
@@ -11,6 +11,22 @@
 ## 0. What This Document Is
 
 This is the comprehensive plan for a take-home project: build an AI-powered prototype that helps TTB compliance agents verify alcohol beverage labels. This document extracts every requirement, stakeholder signal, and constraint from the project brief, then defines architecture, tech decisions, evaluation criteria, and implementation plan.
+
+---
+
+## 0.5 Deviations from Plan
+
+This PRD was written before implementation. The table below records where the as-built system deviates from the original plan and why. The rest of this document reflects the original plan. For the as-built system, see `docs/APPROACH.md`.
+
+| Planned | Actual | Why |
+|---------|--------|-----|
+| Claude Vision (Sonnet) | Gemini 2.0 Flash | 5s → 2.5s, same accuracy, 30x cheaper. See `docs/PERFORMANCE.md` |
+| Azure App Service | Vercel | Zero-config Next.js deploy. Production would use Azure per Marcus. |
+| `ANTHROPIC_API_KEY` | `GEMINI_API_KEY` | Consequence of model switch |
+| Batch: shared app data | Per-label CSV + manual entry | Real workflows need different data per label |
+| `LabelUploader` (single image) | `MultiImageUploader` (1-6 images) | Products have front/back/neck labels, need merge |
+| Bold check blocks PASS | Bold is "confirmation" category | 71% accuracy made PASS unreachable. See `docs/GOVERNMENT_WARNING_PARADOX.md` |
+| Next.js 14+ | Next.js 16.1.6 | Latest stable at build time |
 
 ---
 

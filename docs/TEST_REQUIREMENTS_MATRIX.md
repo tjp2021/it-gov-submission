@@ -166,7 +166,7 @@ This document defines all test scenarios required to validate the TTB Label Veri
 | Stakeholder | Requirement | Test IDs | Status |
 |-------------|-------------|----------|--------|
 | **Sarah** | 5-second response | All tests avg 2.37s | ✅ |
-| **Sarah** | Batch 200-300 labels | Batch e2e (50 labels tested) | ✅ |
+| **Sarah** | Batch 200-300 labels | Batch e2e (10 labels, prototype cap) | ✅ |
 | **Dave** | Case-insensitive matching | B2-case-mismatch | ✅ |
 | **Dave** | Punctuation tolerance | I4-punctuation | ✅ |
 | **Jenny** | Gov warning ALL CAPS check | B4-warning-titlecase | ✅ |

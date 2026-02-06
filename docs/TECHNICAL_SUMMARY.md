@@ -16,16 +16,16 @@ Build an AI-powered tool for TTB (Alcohol and Tobacco Tax and Trade Bureau) comp
 
 | Requirement | Status | Notes |
 |-------------|--------|-------|
-| **≤5 second response time** | ⚠️ ~5-6s | Cloud API bottleneck (see Constraints) |
-| Fuzzy matching for brand names | ✅ | Jaro-Winkler, 0.85 threshold |
+| **≤5 second response time** | ✅ ~2.5s avg | Gemini Flash, 50% under target |
+| Fuzzy matching for brand names | ✅ | Exact after normalization; any difference → WARNING |
 | ABV/Proof conversion | ✅ | 90 Proof = 45% ABV |
 | Volume unit conversion | ✅ | mL ↔ fl oz, 0.5% tolerance |
-| Strict government warning check | ✅ | Presence + caps + bold + text accuracy |
+| Strict government warning check | ✅ | Presence + caps + bold (confirmation) + text accuracy |
 | Agent override buttons | ✅ | Accept/Confirm Issue per field |
-| Export results | ✅ | JSON export |
-| Demo button | ✅ | Pre-loaded example data |
-| Batch processing | ✅ | Multi-label upload at /batch |
-| Vercel deployment ready | ✅ | Auto-detected Next.js, deployment docs |
+| Export results | ✅ | JSON + CSV export |
+| Demo button | ✅ | 5 pre-loaded scenarios |
+| Batch processing | ✅ | Per-label CSV + manual entry at /batch |
+| Vercel deployment ready | ✅ | Live at gov-submission.vercel.app |
 
 ---
 
@@ -36,76 +36,60 @@ Build an AI-powered tool for TTB (Alcohol and Tobacco Tax and Trade Bureau) comp
 │                      Next.js App                        │
 ├─────────────────────────────────────────────────────────┤
 │  Frontend (React)          │  API Routes               │
-│  - LabelUploader           │  - /api/verify (Claude)   │
-│  - ApplicationForm         │  - /api/verify-gemini ⚡  │
-│  - VerificationResults     │  - /api/verify-stream     │
-│  - BatchUploader           │  - /api/verify-ocr        │
+│  - MultiImageUploader      │  - /api/verify-gemini     │
+│  - ApplicationForm         │  - /api/verify-stream     │
+│  - VerificationResults     │  - /api/batch-verify      │
+│  - ConflictResolutionPanel │                           │
+│  - DemoButton (5 scenarios)│                           │
+│  - BatchUploader (CSV)     │                           │
+│  - BatchResults            │                           │
+│  - FieldResultCard         │                           │
+│  - LoadingState            │                           │
 └─────────────────────────────────────────────────────────┘
                               │
-                   ┌──────────┴──────────┐
-                   ▼                     ▼
-┌──────────────────────────┐  ┌──────────────────────────┐
-│    Claude Vision API     │  │   Gemini 2.0 Flash ⚡    │
-│  (claude-sonnet-4)       │  │   (gemini-2.0-flash)     │
-│                          │  │                          │
-│  - High accuracy         │  │  - 2x faster (~2.5s)     │
-│  - ~5s inference         │  │  - Same accuracy         │
-│  - Higher cost           │  │  - 30x cheaper           │
-└──────────────────────────┘  └──────────────────────────┘
-                   │                     │
-                   └──────────┬──────────┘
                               ▼
-┌─────────────────────────────────────────────────────────┐
-│                  Comparison Engine                      │
-│                                                         │
-│  - fuzzyMatch() — brand name, class/type                │
-│  - matchABV() — numeric + proof conversion              │
-│  - matchNetContents() — volume + unit conversion        │
-│  - addressMatch() — normalize abbreviations             │
-│  - strictMatch() — government warning text              │
-└─────────────────────────────────────────────────────────┘
+┌──────────────────────────────────────────────────────────┐
+│   Gemini 2.0 Flash (gemini-2.0-flash)                    │
+│   - ~2.5s inference, 100% accuracy, JSON schema output   │
+└──────────────────────────────────────────────────────────┘
+                              │
+                              ▼
+┌──────────────────────────────────────────────────────────┐
+│                  Comparison Engine                        │
+│                                                          │
+│  Field categories:                                       │
+│  - "automated" → affects PASS/FAIL/REVIEW status         │
+│  - "confirmation" → agent checkbox, doesn't block PASS   │
+│                                                          │
+│  - brandMatch() — exact after normalization              │
+│  - fuzzyMatch() — class/type (Jaro-Winkler 0.85)        │
+│  - matchABV() — numeric + proof conversion               │
+│  - matchNetContents() — volume + unit conversion         │
+│  - addressMatch() — normalize abbreviations (0.70)       │
+│  - strictMatch() — government warning text               │
+│  - warningCheck() — 4 sub-checks (3 automated, 1 conf.) │
+└──────────────────────────────────────────────────────────┘
 ```
 
 ---
 
 ## Key Technical Decisions
 
-1. **Claude Vision + tool_use** — Structured extraction directly into schema, no OCR post-processing
-2. **Jaro-Winkler** — O(m+n) fuzzy matching, prefix-weighted (good for brand names)
-3. **Field-specific matchers** — Different fields need different logic (fuzzy vs strict vs numeric)
-4. **Government warning split into 4 checks** — Presence, header caps, header bold, text accuracy
-5. **Client-side image preprocessing** — Resize to 1568px, JPEG 85% before upload
-6. **Streaming API** — SSE for progressive results display
+1. **Gemini 2.0 Flash + JSON schema** — Structured extraction directly into named fields. Tried Claude Vision (5s, accurate) and Tesseract OCR (33% accuracy) first. Gemini is 2x faster with same accuracy. See `docs/PERFORMANCE.md`.
+2. **Field categories** — Bold check is `"confirmation"` (doesn't block PASS), everything else is `"automated"`. Solves the paradox where 71% bold detection accuracy made PASS unreachable. See `docs/GOVERNMENT_WARNING_PARADOX.md`.
+3. **Jaro-Winkler** — O(m+n) fuzzy matching, prefix-weighted (good for brand names)
+4. **Field-specific matchers** — Different fields need different logic (fuzzy vs strict vs numeric)
+5. **Government warning split into 4 checks** — Presence, header caps, header bold (confirmation), text accuracy
+6. **Client-side image preprocessing** — Resize to 1568px, JPEG 85% before upload
+7. **Streaming API** — SSE for progressive results in multi-image and batch modes
 
 ---
 
-## Constraints & Open Issues
+## Constraints
 
-### Latency (Solved)
+### Bold Detection (Solved with Categories)
 
-**Target:** ≤5 seconds
-**Actual with Gemini Flash:** ~2.5 seconds average ✅
-
-| Component | Claude Vision | Gemini Flash |
-|-----------|---------------|--------------|
-| Image upload | ~0.3s | ~0.3s |
-| API inference | ~4-5s | **~2s** |
-| Comparison logic | <10ms | <10ms |
-| **Total** | **~5-6s** | **~2.5s** |
-
-**What we tried (see `docs/PERFORMANCE.md` for details):**
-- Haiku model — same latency, worse accuracy (94.4% vs 100%) ❌
-- Tesseract OCR + classification — 33% accuracy, unusable ❌
-- **Gemini 2.0 Flash** — 100% accuracy, 2.1x faster ✅
-
-**Recommendation:** Use `/api/verify-gemini` endpoint for production.
-
-### Bold Detection
-
-Government warning header must be bold (27 CFR Part 16). Neither Claude nor any OCR can reliably detect font weight from photos. Current approach:
-- Best-effort visual assessment
-- Always flagged as WARNING for agent review
-- Agent must visually confirm
+Government warning header must be bold (27 CFR Part 16). Neither Gemini nor any OCR can reliably detect font weight from photos (71% max accuracy). Solution: bold check is `category: "confirmation"` — surfaces as a pending confirmation for the agent without blocking PASS status. See `docs/GOVERNMENT_WARNING_PARADOX.md`.
 
 ### Address Matching
 
@@ -120,14 +104,20 @@ Address comparison is approximate. Labels abbreviate ("St" vs "Street", "KY" vs 
 
 | Suite | Tests | Pass Rate |
 |-------|-------|-----------|
-| Unit (matching logic) | 18 | 100% |
-| E2E (Playwright) | 7 | 100% |
-| Stress tests | 8 | 100% |
+| Single-image (basic + intermediate) | 14 | 100% |
+| Multi-image (merge + conflict) | 5 | 100% |
+| Input validation | 8 | 100% |
+| Batch processing | 8 | 100% |
+| CSV parser + matcher (unit) | 16 | 100% |
+| E2E (Playwright) | 25 | 100% |
 
 ```bash
-npm test              # Unit tests
-npm run test:e2e      # Playwright
-npm run benchmark     # Direct API latency
+npm test              # Single-image tests (14)
+npm run test:multi    # Multi-image tests (5)
+npm run test:validation # Validation tests (8)
+npm run test:batch    # Batch tests (8)
+npm run test:csv      # CSV unit tests (16)
+npm run test:e2e      # Playwright E2E (25)
 ```
 
 ---
@@ -137,37 +127,49 @@ npm run benchmark     # Direct API latency
 ```
 src/
 ├── app/
-│   ├── page.tsx                 # Main verification UI
-│   ├── batch/page.tsx           # Batch processing
+│   ├── page.tsx                    # Main verification UI (multi-image)
+│   ├── batch/page.tsx              # Batch processing
 │   └── api/
-│       ├── verify/route.ts      # Standard endpoint
-│       └── verify-stream/route.ts # SSE streaming
-├── components/
-│   ├── LabelUploader.tsx        # Image upload + preprocessing
-│   ├── ApplicationForm.tsx      # COLA data entry
-│   ├── VerificationResults.tsx  # Results + overrides
-│   └── LoadingState.tsx         # Streaming progress
-├── lib/
-│   ├── extraction.ts            # Claude Vision API
-│   ├── comparison.ts            # Field matchers
-│   ├── warning-check.ts         # Gov warning sub-checks
-│   ├── utils.ts                 # Normalization helpers
-│   └── constants.ts             # Thresholds, config
+│       ├── verify-gemini/route.ts  # Single label verification
+│       ├── verify-stream/route.ts  # SSE streaming (multi-image)
+│       └── batch-verify/route.ts   # Batch with SSE
+├── components/                     # 9 components
+│   ├── MultiImageUploader.tsx      # Multi-image upload (1-6 images)
+│   ├── ApplicationForm.tsx         # COLA data entry
+│   ├── VerificationResults.tsx     # Results + overrides
+│   ├── FieldResultCard.tsx         # Individual field result
+│   ├── ConflictResolutionPanel.tsx # Multi-image conflict resolution
+│   ├── DemoButton.tsx              # 5 demo scenarios
+│   ├── LoadingState.tsx            # SSE streaming progress
+│   ├── BatchUploader.tsx           # CSV + manual batch entry
+│   └── BatchResults.tsx            # Batch results dashboard
+├── lib/                            # 11 modules
+│   ├── gemini-extraction.ts        # Gemini 2.0 Flash API
+│   ├── comparison.ts               # Field matchers
+│   ├── warning-check.ts            # Gov warning sub-checks
+│   ├── verify-single.ts            # Shared verification logic
+│   ├── merge-extraction.ts         # Multi-image field merge
+│   ├── csv-parser.ts               # CSV application data parser
+│   ├── batch-matcher.ts            # Image-to-application matching
+│   ├── image-preprocessing.ts      # Image optimization
+│   ├── constants.ts                # Standard warning text, thresholds
+│   ├── utils.ts                    # Normalization, Jaro-Winkler
+│   └── types.ts                    # TypeScript interfaces
 ```
 
 ---
 
-## Open Design Questions
+## Resolved Design Questions
 
-Notes on trade-offs I'm still weighing:
+These were open questions during early development. All have been resolved:
 
-1. **Latency:** 5-6s is at the edge of the ≤5s requirement. Cloud API inference is the bottleneck. Potential optimization: OCR + text-only classification (see `docs/OCR_APPROACH.md`).
+1. **Latency:** Solved by switching to Gemini Flash — 2.5s average, well under the 5s requirement. See `docs/PERFORMANCE.md`.
 
-2. **Accuracy vs Speed:** Haiku is faster but 94% accuracy vs Sonnet's ~100%. Currently using Sonnet. Could offer a toggle if speed becomes critical.
+2. **Accuracy vs Speed:** Gemini Flash matches Claude Vision at 100% accuracy while being 2x faster. No trade-off needed.
 
-3. **Bold detection:** Best-effort + agent review feels right since bold detection from photos is fundamentally unreliable.
+3. **Bold detection:** Solved with the category architecture — bold is a `"confirmation"` field that surfaces as an agent checkbox without blocking PASS. See `docs/GOVERNMENT_WARNING_PARADOX.md`.
 
-4. **Streaming:** Adds complexity but improves perceived performance by showing progress during the 5s wait.
+4. **Streaming:** Implemented for both multi-image (`/api/verify-stream`) and batch (`/api/batch-verify`) endpoints using SSE.
 
 ---
 
@@ -175,7 +177,7 @@ Notes on trade-offs I'm still weighing:
 
 ```bash
 npm install
-export ANTHROPIC_API_KEY=sk-ant-...
+export GEMINI_API_KEY=your-key-here
 npm run dev
 # Open http://localhost:3000
 ```

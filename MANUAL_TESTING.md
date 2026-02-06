@@ -126,11 +126,11 @@ This creates 6 versions simulating bad photos:
 2. Use application data from `sample-applications.json` for one of them
 3. **Expected**: Mix of PASS/FAIL/REVIEW results
 
-### Test 10: 300 Label Limit
-1. Try to upload 305 files
+### Test 10: 10 Label Limit
+1. Try to upload 15 files
 2. **Expected**:
-   - Only 300 accepted
-   - Error message shown: "Maximum 300 labels per batch"
+   - Only 10 accepted
+   - Error message shown: "Maximum 10 labels per batch"
 
 ---
 
@@ -138,7 +138,7 @@ This creates 6 versions simulating bad photos:
 
 ### Test 11: Navigation
 1. From `/`, click "Batch Mode →"
-2. Verify subtitle shows "Verify up to 300 labels at once"
+2. Verify subtitle shows "Verify up to 10 labels at once"
 3. From `/batch`, click "← Single Mode"
 4. **Expected**: Clean navigation both ways
 

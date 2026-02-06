@@ -2,6 +2,10 @@
 
 AI-powered alcohol beverage label verification for TTB compliance officers.
 
+## Live Demo
+
+**[gov-submission.vercel.app](https://gov-submission.vercel.app)** — click any demo scenario to see results in ~2.5 seconds.
+
 ## Quick Start
 
 ```bash
@@ -19,12 +23,13 @@ npm run dev
 
 ## Features
 
-- **Single Label Verification** — Upload a label image and compare against COLA application data
-- **Batch Processing** — Verify up to 300 labels in parallel at `/batch` (50 labels in ~12s)
+- **Single Label Verification** — Upload 1-6 label images (front/back/neck) and compare against COLA application data with field merge and conflict detection
+- **Batch Processing** — Verify up to 10 labels with per-label application data (CSV upload or manual entry) at `/batch`
+- **5 Demo Scenarios** — Perfect match, case mismatch, wrong ABV, wrong warning format, imported spirit
 - **Smart Matching** — Strict brand matching, fuzzy class/address matching, unit conversion for ABV/volume
 - **Agent Override** — Accept warnings or confirm issues with one click
 - **Export Results** — Download verification results as JSON or CSV
-- **Demo Mode** — Try the tool instantly with pre-loaded example data
+- **Multi-Image Merge** — Multiple views of the same product merge into one verification with conflict detection
 
 ## How It Works
 
@@ -34,6 +39,10 @@ npm run dev
 4. **Review** — Each field shows PASS/FAIL/WARNING with confidence scores
 5. **Override** if needed — Agent makes final compliance decision
 
+## Development Journey
+
+Started with Claude Vision (Sonnet) — accurate but ~5s per label. Tried OCR (failed at 33% accuracy). Switched to **Gemini 2.0 Flash** — same accuracy, 2.5s, 30x cheaper. Discovered the [bold detection paradox](docs/GOVERNMENT_WARNING_PARADOX.md) and solved it with field categories. Rebuilt batch from shared application data to per-label CSV + manual entry. See [APPROACH.md](docs/APPROACH.md) for the full journey.
+
 ## Test Suite
 
 Run automated tests to verify matching logic:
@@ -42,49 +51,74 @@ Run automated tests to verify matching logic:
 # Start dev server in another terminal first
 npm run dev
 
-# Run basic + intermediate tests (ground truth HTML labels)
+# Run basic + intermediate single-image tests
 npm test
 
-# Run all tests including stress tests
-npm test -- basic intermediate stress
+# Run multi-image merge tests
+npm run test:multi
 
-# Run all groups including DALL-E generated
-npm test -- --all
+# Run input validation tests
+npm run test:validation
+
+# Run batch processing tests
+npm run test:batch
+
+# Run CSV parser + batch matcher unit tests (no server needed)
+npm run test:csv
+
+# Run Playwright E2E tests
+npm run test:e2e
 ```
 
 ### Test Groups
 
 | Group | Tests | Description |
 |-------|-------|-------------|
-| Basic | 6 | Core matching: perfect match, fuzzy match, ABV mismatch, warning violations |
+| Basic | 10 | Core matching: perfect match, fuzzy match, ABV mismatch, warning violations |
 | Intermediate | 4 | Unit conversions: proof↔ABV, mL↔fl oz, address abbreviations |
-| Stress | 8 | Edge cases: extreme ABV, unicode, truncated warnings, complex addresses |
-| Composite | 4 | HTML labels on bottle templates with blur/noise effects |
-| Advanced | 5 | DALL-E generated images (requires OpenAI API key) |
+| Multi-Image | 5 | Two/three image merge, conflict detection, backward compat |
+| Validation | 8 | Input validation: missing fields, bad images, size limits |
+| Batch | 8 | Batch functional (3) + batch validation (5) |
+| CSV Unit | 16 | CSV parser (8) + batch matcher (8), no server needed |
+| E2E (Playwright) | 25 | Full-flow verification, batch processing, UI interactions |
 
 ## Project Structure
 
 ```
 src/
 ├── app/
-│   ├── page.tsx           # Single verification mode
-│   ├── batch/page.tsx     # Batch processing mode
-│   └── api/verify/        # Verification API endpoint
-├── components/
-│   ├── LabelUploader.tsx  # Image upload with preprocessing
-│   ├── ApplicationForm.tsx # COLA data entry
-│   ├── VerificationResults.tsx # Results display with overrides
-│   ├── BatchUploader.tsx  # Multi-file upload
-│   └── BatchResults.tsx   # Batch results display
-├── lib/
-│   ├── extraction.ts      # Vision API integration (Claude/Gemini)
-│   ├── comparison.ts      # Field matching functions
-│   ├── utils.ts           # Normalization helpers
-│   └── types.ts           # TypeScript interfaces
+│   ├── page.tsx                    # Single verification mode (multi-image)
+│   ├── batch/page.tsx              # Batch processing mode
+│   └── api/
+│       ├── verify-gemini/route.ts  # Single label verification
+│       ├── verify-stream/route.ts  # SSE streaming (multi-image)
+│       └── batch-verify/route.ts   # Batch processing with SSE
+├── components/                     # 9 components
+│   ├── MultiImageUploader.tsx      # Multi-image upload (1-6 images)
+│   ├── ApplicationForm.tsx         # COLA data entry
+│   ├── VerificationResults.tsx     # Results display with overrides
+│   ├── FieldResultCard.tsx         # Individual field result card
+│   ├── ConflictResolutionPanel.tsx # Multi-image conflict resolution
+│   ├── DemoButton.tsx              # 5 demo scenarios
+│   ├── LoadingState.tsx            # SSE streaming progress
+│   ├── BatchUploader.tsx           # Batch upload with CSV support
+│   └── BatchResults.tsx            # Batch results dashboard
+├── lib/                            # 11 modules
+│   ├── gemini-extraction.ts        # Gemini 2.0 Flash integration
+│   ├── comparison.ts               # Field matching functions
+│   ├── warning-check.ts            # Government warning sub-checks
+│   ├── verify-single.ts            # Shared verification logic
+│   ├── merge-extraction.ts         # Multi-image field merge
+│   ├── csv-parser.ts               # CSV application data parser
+│   ├── batch-matcher.ts            # Image-to-application matching
+│   ├── image-preprocessing.ts      # Client-side image optimization
+│   ├── constants.ts                # Standard warning text, thresholds
+│   ├── utils.ts                    # Normalization, Jaro-Winkler
+│   └── types.ts                    # TypeScript interfaces
 └── test-data/
-    ├── labels/            # HTML test labels (ground truth)
-    ├── sample-labels/     # PNG screenshots for testing
-    └── sample-applications.json  # Test scenarios
+    ├── labels/                     # HTML test labels (ground truth)
+    ├── sample-labels/              # PNG screenshots for testing
+    └── sample-applications.json    # Test scenarios
 ```
 
 ## Matching Logic
@@ -104,9 +138,13 @@ src/
 ```bash
 npm run dev              # Start development server
 npm run build            # Production build
-npm test                 # Run verification tests
+npm test                 # Run single-image verification tests (14)
+npm run test:multi       # Run multi-image merge tests (5)
+npm run test:validation  # Run input validation tests (8)
+npm run test:batch       # Run batch processing tests (8)
+npm run test:csv         # Run CSV parser unit tests (16)
+npm run test:e2e         # Run Playwright E2E tests (25)
 npm run test:screenshots # Generate PNGs from HTML labels
-npm run test:generate    # Generate DALL-E test images (requires API key)
 ```
 
 ## Environment Variables
@@ -188,15 +226,21 @@ See: [Field Matching Analysis](docs/FIELD_MATCHING_ANALYSIS.md#1-brand-name-matc
 
 See: [Field Matching Analysis](docs/FIELD_MATCHING_ANALYSIS.md#6-country-of-origin-matching)
 
-### Batch Processing → SSE Streaming with Parallel Processing
-**Changed from:** Sequential API calls (50 labels = 125s)
-**Changed to:** Parallel processing with concurrency limit of 10, SSE streaming
+### Batch Processing → Per-Label CSV + Manual Entry
+**Changed from:** Shared application data for all labels
+**Changed to:** Per-label application data via CSV upload or manual entry, with filename matching
+
+**Architecture:**
+- CSV parser with validation (`src/lib/csv-parser.ts`, 16 unit tests)
+- Image-to-application filename matching (`src/lib/batch-matcher.ts`)
+- Parallel processing with concurrency limit of 5, SSE streaming
+- 10 label maximum (prototype scope)
 
 **Performance:**
 - 3 labels: ~3s (parallel)
-- 50 labels: ~12s (10 concurrent workers)
+- 10 labels: ~5s (5 concurrent workers)
 
-**Tradeoff:** Higher server resource usage, but 10x throughput improvement.
+**Tradeoff:** Higher server resource usage, but 10x throughput improvement. Production would need a job queue for 200+ labels.
 
 See: `src/app/api/batch-verify/route.ts`
 
@@ -210,6 +254,16 @@ See: `src/app/api/batch-verify/route.ts`
 **Result:** 56/57 passing (98.2%). The one "failure" (dual labeling "750 mL (25.4 FL OZ)") is handled by 0.5% volume tolerance.
 
 See: `scripts/test-edge-cases.js`
+
+### Batch Rewrite → Per-Label Application Data
+**Changed from:** All labels verified against a single shared application
+**Changed to:** Each label has its own application data, entered via CSV upload or manual form
+
+**Why:** Real batch workflows involve different products, each with unique application data. CSV upload with filename matching (`image_filename` column) lets agents prepare data in spreadsheets and upload alongside label images.
+
+**New components:** CSV parser with 16 unit tests, filename matcher, per-label manual entry forms.
+
+See: [APPROACH.md](docs/APPROACH.md#batch-processing-shared-data--per-label-csv--manual-entry)
 
 ## License
 
