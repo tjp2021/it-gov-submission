@@ -1,267 +1,309 @@
-import { test, expect, Page } from '@playwright/test';
+import { test, expect } from '@playwright/test';
 import path from 'path';
 
-test.describe('Batch Label Verification', () => {
-  const demoLabelPath = path.join(__dirname, '../../public/demo-label.png');
+const DEMO_DIR = path.join(__dirname, '../../public/demos');
+const SAMPLE_CSV = path.join(__dirname, '../../public/sample-batch.csv');
 
-  // Helper to fill form with demo data
-  async function fillDemoFormData(page: Page) {
-    await page.fill('input[placeholder*="Old Tom Distillery"]', "Stone's Throw");
-    await page.fill('input[placeholder*="Kentucky Straight"]', "Straight Bourbon Whiskey");
-    await page.fill('input[placeholder*="45% Alc"]', "45% ABV");
-    await page.fill('input[placeholder*="750 mL"]', "750 mL");
-    await page.fill('input[placeholder*="Louisville"]', "Westward Distillery, Portland, Oregon");
-  }
-
+test.describe('Batch Label Verification — /batch', () => {
   test.beforeEach(async ({ page }) => {
-    await page.goto('http://localhost:3000/batch');
+    await page.goto('/batch');
   });
 
-  test('batch page loads correctly', async ({ page }) => {
+  // ===== PAGE LOAD =====
+
+  test('page loads with new per-label UI', async ({ page }) => {
     await expect(page.locator('text=Batch Label Verification')).toBeVisible();
-    await expect(page.locator('text=Drop multiple label images')).toBeVisible();
-    await expect(page.locator('text=/0\\/300 selected/')).toBeVisible();
+    await expect(page.locator('text=Verify up to 10 labels with individual application data')).toBeVisible();
+    await expect(page.locator('text=Drop label images here')).toBeVisible();
+    await expect(page.locator('text=/0\/10/')).toBeVisible();
   });
 
-  test('can upload multiple images at once', async ({ page }) => {
-    const fileInput = page.locator('input[type="file"]');
-
-    // Upload multiple files at once (setInputFiles with array)
-    await fileInput.setInputFiles([demoLabelPath, demoLabelPath]);
-    await expect(page.locator('text=/2\\/300 selected/')).toBeVisible();
-
-    // Should show thumbnails
-    const thumbnails = page.locator('img[alt="demo-label.png"]');
-    await expect(thumbnails).toHaveCount(2);
+  test('does NOT show old shared ApplicationForm', async ({ page }) => {
+    // Old UI had these — make sure they're gone
+    await expect(page.locator('text=All uploaded labels will be verified against this application data')).not.toBeVisible();
+    await expect(page.locator('text=Government Warning Statement')).not.toBeVisible();
+    await expect(page.locator('text=/0\/300/')).not.toBeVisible();
   });
 
-  test('enforces 300-label limit', async ({ page }) => {
-    const fileInput = page.locator('input[type="file"]');
+  // ===== IMAGE UPLOAD =====
 
-    // Create array of 305 files (same demo label) - exceeds 300 limit
-    const files = Array(305).fill(demoLabelPath);
+  test('can upload images and see thumbnails', async ({ page }) => {
+    const fileInput = page.locator('input[type="file"][accept*="image"]');
+    await fileInput.setInputFiles([
+      path.join(DEMO_DIR, 'label-perfect.png'),
+      path.join(DEMO_DIR, 'label-wrong-abv.png'),
+    ]);
 
-    // Upload all at once - should only accept first 300
-    await fileInput.setInputFiles(files);
+    // Should show count updated
+    await expect(page.locator('text=/2\/10/')).toBeVisible({ timeout: 5000 });
 
-    // Should show 300/300 selected
-    await expect(page.locator('text=/300\\/300 selected/')).toBeVisible();
-
-    // Should show error message about limit
-    await expect(page.locator('text=/Maximum 300 labels per batch/')).toBeVisible();
+    // Thumbnails should appear
+    await expect(page.locator('img[alt="label-perfect.png"]')).toBeVisible();
+    await expect(page.locator('img[alt="label-wrong-abv.png"]')).toBeVisible();
   });
 
-  test('can remove uploaded images', async ({ page }) => {
-    const fileInput = page.locator('input[type="file"]');
+  test('shows data mode toggle after uploading images', async ({ page }) => {
+    const fileInput = page.locator('input[type="file"][accept*="image"]');
+    await fileInput.setInputFiles(path.join(DEMO_DIR, 'label-perfect.png'));
 
-    // Upload 3 files at once
-    await fileInput.setInputFiles([demoLabelPath, demoLabelPath, demoLabelPath]);
-    await expect(page.locator('text=/3\\/300 selected/')).toBeVisible();
+    // Data mode toggle should appear
+    await expect(page.getByText('Application Data', { exact: true })).toBeVisible({ timeout: 5000 });
+    await expect(page.locator('button:has-text("Upload CSV")')).toBeVisible();
+    await expect(page.locator('button:has-text("Enter Manually")')).toBeVisible();
+  });
 
-    // Remove one using the X button (hover to reveal)
-    const firstThumbnail = page.locator('img[alt="demo-label.png"]').first().locator('..');
-    await firstThumbnail.hover();
-    await page.locator('button:has-text("×")').first().click();
+  test('can remove individual images', async ({ page }) => {
+    const fileInput = page.locator('input[type="file"][accept*="image"]');
+    await fileInput.setInputFiles([
+      path.join(DEMO_DIR, 'label-perfect.png'),
+      path.join(DEMO_DIR, 'label-wrong-abv.png'),
+    ]);
+    await expect(page.locator('text=/2\/10/')).toBeVisible({ timeout: 5000 });
 
-    await expect(page.locator('text=/2\\/300 selected/')).toBeVisible();
+    // Hover on first thumbnail to reveal X button and click it
+    const firstThumb = page.locator('img[alt="label-perfect.png"]').locator('..');
+    await firstThumb.hover();
+    await firstThumb.locator('button').click();
 
-    // Clear all
+    await expect(page.locator('text=/1\/10/')).toBeVisible();
+  });
+
+  test('clear all removes everything', async ({ page }) => {
+    const fileInput = page.locator('input[type="file"][accept*="image"]');
+    await fileInput.setInputFiles([
+      path.join(DEMO_DIR, 'label-perfect.png'),
+      path.join(DEMO_DIR, 'label-wrong-abv.png'),
+    ]);
+    await expect(page.locator('text=/2\/10/')).toBeVisible({ timeout: 5000 });
+
     await page.click('text=Clear All');
-    await expect(page.locator('text=/0\\/300 selected/')).toBeVisible();
+    await expect(page.locator('text=/0\/10/')).toBeVisible();
   });
 
-  test('validates required fields before verification', async ({ page }) => {
-    const fileInput = page.locator('input[type="file"]');
-    await fileInput.setInputFiles(demoLabelPath);
+  // ===== CSV MODE =====
 
-    // Form starts empty, so just try to verify without filling anything
-    await page.click('button:has-text("Verify 1 Label")');
+  test('CSV mode: upload sample CSV and see match preview', async ({ page }) => {
+    // Upload 3 demo images
+    const fileInput = page.locator('input[type="file"][accept*="image"]');
+    await fileInput.setInputFiles([
+      path.join(DEMO_DIR, 'label-perfect.png'),
+      path.join(DEMO_DIR, 'label-wrong-abv.png'),
+      path.join(DEMO_DIR, 'label-imported.png'),
+    ]);
+    await expect(page.locator('text=/3\/10/')).toBeVisible({ timeout: 5000 });
 
-    // Should show error
-    await expect(page.locator('text=Please fill in required application fields')).toBeVisible();
+    // Upload CSV
+    const csvInput = page.locator('input[accept*=".csv"]');
+    await csvInput.setInputFiles(SAMPLE_CSV);
+
+    // Should show match preview — images get preprocessed to .jpg, so basename fallback kicks in
+    await expect(page.locator('text=/3\/3 images matched/')).toBeVisible({ timeout: 5000 });
+
+    // Verify button should be enabled with 3 labels
+    await expect(page.locator('button:has-text("Verify 3 Label")')).toBeEnabled();
   });
 
-  test('processes batch and shows streaming progress', async ({ page }) => {
-    // Fill form first
-    await fillDemoFormData(page);
+  test('CSV mode: download template link exists', async ({ page }) => {
+    const fileInput = page.locator('input[type="file"][accept*="image"]');
+    await fileInput.setInputFiles(path.join(DEMO_DIR, 'label-perfect.png'));
+    await expect(page.locator('text=/1\/10/')).toBeVisible({ timeout: 5000 });
 
-    // Upload 2 files
-    const fileInput = page.locator('input[type="file"]');
-    await fileInput.setInputFiles([demoLabelPath, demoLabelPath]);
-    await expect(page.locator('text=/2\\/300 selected/')).toBeVisible();
+    const downloadLink = page.locator('a:has-text("Download template")');
+    await expect(downloadLink).toBeVisible();
+    await expect(downloadLink).toHaveAttribute('href', '/sample-batch.csv');
+  });
 
-    // Start verification
-    await page.click('button:has-text("Verify 2 Labels")');
+  test('CSV mode: shows errors for bad CSV', async ({ page }) => {
+    const fileInput = page.locator('input[type="file"][accept*="image"]');
+    await fileInput.setInputFiles(path.join(DEMO_DIR, 'label-perfect.png'));
+    await expect(page.locator('text=/1\/10/')).toBeVisible({ timeout: 5000 });
 
-    // Should show processing state
+    // Create a bad CSV (missing required columns) and upload it
+    // We'll use the file chooser approach with a temporary file
+    const csvInput = page.locator('input[accept*=".csv"]');
+
+    // Use evaluate to create and set a bad CSV file
+    await page.evaluate(() => {
+      const badCsv = 'wrong_column,also_wrong\nfoo,bar\n';
+      const blob = new Blob([badCsv], { type: 'text/csv' });
+      const file = new File([blob], 'bad.csv', { type: 'text/csv' });
+      const dt = new DataTransfer();
+      dt.items.add(file);
+      const input = document.querySelector('input[accept*=".csv"]') as HTMLInputElement;
+      if (input) {
+        Object.defineProperty(input, 'files', { value: dt.files });
+        input.dispatchEvent(new Event('change', { bubbles: true }));
+      }
+    });
+
+    await expect(page.locator('text=CSV Errors')).toBeVisible({ timeout: 3000 });
+    await expect(page.locator('text=/Missing required columns/')).toBeVisible();
+  });
+
+  test('CSV mode: shows unmatched warnings', async ({ page }) => {
+    // Upload 1 image but CSV has 3 rows
+    const fileInput = page.locator('input[type="file"][accept*="image"]');
+    await fileInput.setInputFiles(path.join(DEMO_DIR, 'label-perfect.png'));
+    await expect(page.locator('text=/1\/10/')).toBeVisible({ timeout: 5000 });
+
+    const csvInput = page.locator('input[accept*=".csv"]');
+    await csvInput.setInputFiles(SAMPLE_CSV);
+
+    // Should show partial match — 1 matched, 2 unmatched rows
+    await expect(page.locator('text=/1\/1 images matched/')).toBeVisible({ timeout: 5000 });
+    await expect(page.locator('text=/Unmatched CSV rows/')).toBeVisible();
+  });
+
+  // ===== MANUAL MODE =====
+
+  test('manual mode: shows per-image forms', async ({ page }) => {
+    const fileInput = page.locator('input[type="file"][accept*="image"]');
+    await fileInput.setInputFiles([
+      path.join(DEMO_DIR, 'label-perfect.png'),
+      path.join(DEMO_DIR, 'label-wrong-abv.png'),
+    ]);
+    await expect(page.locator('text=/2\/10/')).toBeVisible({ timeout: 5000 });
+
+    // Switch to manual mode
+    await page.click('button:has-text("Enter Manually")');
+
+    // Should show 2 separate form sections (one per image)
+    await expect(page.locator('text=label-perfect.png').first()).toBeVisible();
+    await expect(page.locator('text=label-wrong-abv.png').first()).toBeVisible();
+
+    // Each form should have brand name field
+    const brandInputs = page.locator('input[placeholder="Brand Name"]');
+    await expect(brandInputs).toHaveCount(2);
+  });
+
+  test('manual mode: verify button disabled until forms filled', async ({ page }) => {
+    const fileInput = page.locator('input[type="file"][accept*="image"]');
+    await fileInput.setInputFiles(path.join(DEMO_DIR, 'label-perfect.png'));
+    await expect(page.locator('text=/1\/10/')).toBeVisible({ timeout: 5000 });
+
+    await page.click('button:has-text("Enter Manually")');
+
+    // Button should show 0 labels (no complete forms yet)
+    await expect(page.locator('button:has-text("Verify 0 Label")')).toBeDisabled();
+
+    // Fill in required fields for the one image
+    await page.fill('input[placeholder="Brand Name"]', 'Old Tom Distillery');
+    await page.fill('input[placeholder="Class/Type"]', 'Kentucky Straight Bourbon Whiskey');
+    await page.fill('input[placeholder="Alcohol Content"]', '45% Alc./Vol.');
+    await page.fill('input[placeholder="Net Contents"]', '750 mL');
+    await page.fill('input[placeholder="Name & Address"]', 'Old Tom Distillery, Louisville, Kentucky');
+
+    // Button should now be enabled
+    await expect(page.locator('button:has-text("Verify 1 Label")')).toBeEnabled();
+  });
+
+  // ===== FULL E2E: CSV → VERIFY → RESULTS =====
+
+  test('CSV flow end-to-end: upload 3 demos → CSV → verify → results', async ({ page }) => {
+    // Upload 3 demo images
+    const fileInput = page.locator('input[type="file"][accept*="image"]');
+    await fileInput.setInputFiles([
+      path.join(DEMO_DIR, 'label-perfect.png'),
+      path.join(DEMO_DIR, 'label-wrong-abv.png'),
+      path.join(DEMO_DIR, 'label-imported.png'),
+    ]);
+    await expect(page.locator('text=/3\/10/')).toBeVisible({ timeout: 5000 });
+
+    // Upload CSV
+    const csvInput = page.locator('input[accept*=".csv"]');
+    await csvInput.setInputFiles(SAMPLE_CSV);
+    await expect(page.locator('text=/3\/3 images matched/')).toBeVisible({ timeout: 5000 });
+
+    // Click verify
+    await page.click('button:has-text("Verify 3 Label")');
+
+    // Should show processing
     await expect(page.locator('text=Processing Labels...')).toBeVisible({ timeout: 5000 });
-
-    // Should eventually show results (BatchResults shows PASS/FAIL/ERROR status)
-    await expect(page.locator('text=Batch Results')).toBeVisible({ timeout: 45000 });
-  });
-
-  test('batch processes faster with parallelism', async ({ page }) => {
-    // Fill form first
-    await fillDemoFormData(page);
-
-    // Upload 3 files to test parallel processing
-    const fileInput = page.locator('input[type="file"]');
-    await fileInput.setInputFiles([demoLabelPath, demoLabelPath, demoLabelPath]);
-
-    const startTime = Date.now();
-
-    // Start verification
-    await page.click('button:has-text("Verify 3 Labels")');
+    await expect(page.locator('text=/\\d+ of 3 labels/')).toBeVisible({ timeout: 10000 });
 
     // Wait for results
-    await expect(page.locator('text=Batch Results')).toBeVisible({ timeout: 45000 });
+    await expect(page.locator('text=Batch Results')).toBeVisible({ timeout: 30000 });
 
-    const elapsed = Date.now() - startTime;
-
-    // With Gemini at ~2.5s per image and concurrency of 3,
-    // 3 images should complete in ~3-5s, not 7.5s (sequential)
-    // Using 15s as threshold to account for network variance
-    expect(elapsed).toBeLessThan(15000);
-
-    console.log(`Batch of 3 completed in ${(elapsed/1000).toFixed(2)}s`);
-  });
-
-  test('shows individual results for each label', async ({ page }) => {
-    // Fill form first
-    await fillDemoFormData(page);
-
-    // Upload 2 files
-    const fileInput = page.locator('input[type="file"]');
-    await fileInput.setInputFiles([demoLabelPath, demoLabelPath]);
-
-    // Verify
-    await page.click('button:has-text("Verify 2 Labels")');
-
-    // Wait for completion
-    await expect(page.locator('text=Batch Results')).toBeVisible({ timeout: 45000 });
-
-    // Should show results for both files
-    const resultCards = page.locator('text=demo-label.png');
-    await expect(resultCards).toHaveCount(2);
-  });
-
-  test('handles verification and shows results', async ({ page }) => {
-    // Fill form first
-    await fillDemoFormData(page);
-
-    // Upload valid file
-    const fileInput = page.locator('input[type="file"]');
-    await fileInput.setInputFiles(demoLabelPath);
-
-    // Verify
-    await page.click('button:has-text("Verify 1 Label")');
-
-    // Should show processing then results
-    await expect(page.locator('text=Processing Labels...')).toBeVisible({ timeout: 5000 });
-    await expect(page.locator('text=Batch Results')).toBeVisible({ timeout: 45000 });
-  });
-
-  test('can reset and verify again', async ({ page }) => {
-    // Fill form first
-    await fillDemoFormData(page);
-
-    // First verification
-    const fileInput = page.locator('input[type="file"]');
-    await fileInput.setInputFiles(demoLabelPath);
-    await page.click('button:has-text("Verify 1 Label")');
-
-    // Wait for results
-    await expect(page.locator('text=Batch Results')).toBeVisible({ timeout: 45000 });
-
-    // Reset
-    await page.click('button:has-text("New Batch")');
-
-    // Should be back to input state
-    await expect(page.locator('text=Drop multiple label images')).toBeVisible();
-    await expect(page.locator('text=/0\\/300 selected/')).toBeVisible();
-  });
-
-  test('shows summary statistics after verification', async ({ page }) => {
-    // Fill form first
-    await fillDemoFormData(page);
-
-    // Upload file
-    const fileInput = page.locator('input[type="file"]');
-    await fileInput.setInputFiles(demoLabelPath);
-
-    // Start verification
-    await page.click('button:has-text("Verify 1 Label")');
-
-    // Wait for results
-    await expect(page.locator('text=Batch Results')).toBeVisible({ timeout: 45000 });
-
-    // Should show summary stats (Total count)
+    // Summary stats
     await expect(page.locator('text=Total')).toBeVisible();
     await expect(page.locator('text=Passed')).toBeVisible();
     await expect(page.locator('text=Failed')).toBeVisible();
+
+    // Brand names should be visible in results (from SSE brandName field)
+    await expect(page.locator('text=Old Tom Distillery')).toBeVisible();
+    await expect(page.locator('text=Chateau Margaux')).toBeVisible();
+    await expect(page.locator('text=Glenfiddich')).toBeVisible();
   });
 
-  test('stress test: processes 50 labels in parallel', async ({ page }) => {
-    // Fill form first
-    await fillDemoFormData(page);
+  test('manual flow end-to-end: fill form → verify → results', async ({ page }) => {
+    const fileInput = page.locator('input[type="file"][accept*="image"]');
+    await fileInput.setInputFiles(path.join(DEMO_DIR, 'label-perfect.png'));
+    await expect(page.locator('text=/1\/10/')).toBeVisible({ timeout: 5000 });
 
-    // Upload 50 files - tests scaling (system supports 300, testing 50 for reasonable CI time)
-    const fileInput = page.locator('input[type="file"]');
-    const fiftyFiles = Array(50).fill(demoLabelPath);
-    await fileInput.setInputFiles(fiftyFiles);
+    // Switch to manual and fill form
+    await page.click('button:has-text("Enter Manually")');
+    await page.fill('input[placeholder="Brand Name"]', 'Old Tom Distillery');
+    await page.fill('input[placeholder="Class/Type"]', 'Kentucky Straight Bourbon Whiskey');
+    await page.fill('input[placeholder="Alcohol Content"]', '45% Alc./Vol. (90 Proof)');
+    await page.fill('input[placeholder="Net Contents"]', '750 mL');
+    await page.fill('input[placeholder="Name & Address"]', 'Old Tom Distillery, Louisville, Kentucky');
 
-    // Verify 50 files uploaded
-    await expect(page.locator('text=/50\\/300 selected/')).toBeVisible();
+    await page.click('button:has-text("Verify 1 Label")');
 
-    const startTime = Date.now();
-
-    // Start verification
-    await page.click('button:has-text("Verify 50 Labels")');
-
-    // Should show processing state
     await expect(page.locator('text=Processing Labels...')).toBeVisible({ timeout: 5000 });
+    await expect(page.locator('text=Batch Results')).toBeVisible({ timeout: 30000 });
 
-    // Wait for results - 50 labels with concurrency 10 should take ~12-15s
-    // Using 120s timeout to be safe for CI/network variance
-    await expect(page.locator('text=Batch Results')).toBeVisible({ timeout: 120000 });
-
-    const elapsed = Date.now() - startTime;
-
-    // With concurrency of 10 and ~2.5s per image,
-    // 50 images should complete in ~12.5s (ceil(50/10) * 2.5 = 12.5s)
-    // Allow up to 60s for network variance
-    expect(elapsed).toBeLessThan(60000);
-
-    // Verify all 50 results are shown
-    await expect(page.locator('text=Total').first()).toBeVisible();
-
-    // Check the summary shows 50 total
-    const summaryText = await page.locator('div:has-text("Total")').first().textContent();
-    expect(summaryText).toContain('50');
-
-    console.log(`Batch of 50 completed in ${(elapsed/1000).toFixed(2)}s`);
+    // Should show brand name in results
+    await expect(page.locator('text=Old Tom Distillery')).toBeVisible();
   });
 
-  test('stress test: verifies streaming shows progressive results', async ({ page }) => {
-    // Fill form first
-    await fillDemoFormData(page);
+  // ===== RESULTS =====
 
-    // Upload 10 files - enough to see streaming behavior even with concurrency 10
-    const fileInput = page.locator('input[type="file"]');
-    await fileInput.setInputFiles(Array(10).fill(demoLabelPath));
+  test('results show export buttons', async ({ page }) => {
+    // Quick setup: 1 image + manual data
+    const fileInput = page.locator('input[type="file"][accept*="image"]');
+    await fileInput.setInputFiles(path.join(DEMO_DIR, 'label-perfect.png'));
+    await expect(page.locator('text=/1\/10/')).toBeVisible({ timeout: 5000 });
 
-    // Start verification
-    await page.click('button:has-text("Verify 10 Labels")');
+    await page.click('button:has-text("Enter Manually")');
+    await page.fill('input[placeholder="Brand Name"]', 'Old Tom Distillery');
+    await page.fill('input[placeholder="Class/Type"]', 'Kentucky Straight Bourbon Whiskey');
+    await page.fill('input[placeholder="Alcohol Content"]', '45%');
+    await page.fill('input[placeholder="Net Contents"]', '750 mL');
+    await page.fill('input[placeholder="Name & Address"]', 'Test Address');
 
-    // Should show processing state immediately
-    await expect(page.locator('text=Processing Labels...')).toBeVisible({ timeout: 5000 });
+    await page.click('button:has-text("Verify 1 Label")');
+    await expect(page.locator('text=Batch Results')).toBeVisible({ timeout: 30000 });
 
-    // Progress should update as results stream in
-    // With concurrency of 10, all start together but complete progressively
-    // Look for any progress indicator during processing
-    await expect(page.locator('text=/\\d+ of 10 labels/')).toBeVisible({ timeout: 15000 });
+    await expect(page.locator('button:has-text("Export CSV")')).toBeVisible();
+    await expect(page.locator('button:has-text("Export JSON")')).toBeVisible();
+    await expect(page.locator('button:has-text("New Batch")')).toBeVisible();
+  });
 
-    // Wait for completion
-    await expect(page.locator('text=Batch Results')).toBeVisible({ timeout: 45000 });
+  test('New Batch resets to input state', async ({ page }) => {
+    const fileInput = page.locator('input[type="file"][accept*="image"]');
+    await fileInput.setInputFiles(path.join(DEMO_DIR, 'label-perfect.png'));
+    await expect(page.locator('text=/1\/10/')).toBeVisible({ timeout: 5000 });
+
+    await page.click('button:has-text("Enter Manually")');
+    await page.fill('input[placeholder="Brand Name"]', 'Old Tom Distillery');
+    await page.fill('input[placeholder="Class/Type"]', 'Bourbon');
+    await page.fill('input[placeholder="Alcohol Content"]', '45%');
+    await page.fill('input[placeholder="Net Contents"]', '750 mL');
+    await page.fill('input[placeholder="Name & Address"]', 'Address');
+
+    await page.click('button:has-text("Verify 1 Label")');
+    await expect(page.locator('text=Batch Results')).toBeVisible({ timeout: 30000 });
+
+    await page.click('button:has-text("New Batch")');
+    await expect(page.locator('text=Drop label images here')).toBeVisible();
+    await expect(page.locator('text=/0\/10/')).toBeVisible();
+  });
+
+  // ===== NAVIGATION =====
+
+  test('can navigate back to single mode', async ({ page }) => {
+    await page.click('text=Single Mode');
+    await expect(page).toHaveURL('/');
   });
 });

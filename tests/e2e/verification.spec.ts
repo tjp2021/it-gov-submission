@@ -1,112 +1,92 @@
 import { test, expect } from '@playwright/test';
 import path from 'path';
 
-test.describe('Label Verification', () => {
+const DEMO_DIR = path.join(__dirname, '../../public/demos');
+
+test.describe('Single Label Verification — /', () => {
   test.beforeEach(async ({ page }) => {
-    await page.goto('http://localhost:3000');
+    await page.goto('/');
   });
 
-  test('completes verification with demo data', async ({ page }) => {
-    // Click demo button to load sample data
-    await page.click('text=Try with example data');
-
-    // Wait for image to load
-    await expect(page.locator('img[alt="Label preview"]')).toBeVisible({ timeout: 5000 });
-
-    // Click verify button
-    await page.click('button:has-text("Verify Label")');
-
-    // Wait for results - either loading state or final results
-    await expect(page.locator('text=/Processed in|Analyzing|elapsed/')).toBeVisible({ timeout: 15000 });
-
-    // Final results should appear - use exact match to avoid matching "Brand name match"
-    await expect(page.getByText('Brand Name', { exact: true })).toBeVisible({ timeout: 15000 });
+  test('page loads with upload zone and form', async ({ page }) => {
+    await expect(page.locator('text=Drop label images here or click to browse')).toBeVisible();
+    await expect(page.getByText('Application Data (from COLA)')).toBeVisible();
+    await expect(page.locator('text=Try with example data')).toBeVisible();
   });
 
-  test('displays all field results after verification', async ({ page }) => {
-    // Click demo button
+  test('demo button loads image and fills form', async ({ page }) => {
     await page.click('text=Try with example data');
-    await expect(page.locator('img[alt="Label preview"]')).toBeVisible({ timeout: 5000 });
+    await page.click('text=Perfect Label');
 
-    // Click verify
+    // Image preview appears with alt="Label front"
+    await expect(page.locator('img[alt="Label front"]')).toBeVisible({ timeout: 5000 });
+  });
+
+  test('demo PASS: Perfect Label → PASSED', async ({ page }) => {
+    await page.click('text=Try with example data');
+    await page.click('text=Perfect Label');
+    await expect(page.locator('img[alt="Label front"]')).toBeVisible({ timeout: 5000 });
+
     await page.click('button:has-text("Verify Label")');
 
-    // Wait for field results to appear - use exact match to avoid matching status messages
-    await expect(page.getByText('Brand Name', { exact: true })).toBeVisible({ timeout: 15000 });
+    await expect(page.getByRole('heading', { name: 'PASSED' })).toBeVisible({ timeout: 15000 });
+
+    // Field results
+    await expect(page.getByText('Brand Name', { exact: true })).toBeVisible();
     await expect(page.getByText('Class/Type', { exact: true })).toBeVisible();
     await expect(page.getByText('Alcohol Content', { exact: true })).toBeVisible();
-    await expect(page.getByText('Net Contents', { exact: true })).toBeVisible();
-    await expect(page.getByText('Name & Address', { exact: true })).toBeVisible();
-    await expect(page.locator('text=Gov Warning — Present')).toBeVisible();
 
-    // Should show processing time
+    // Processing time
     await expect(page.locator('text=/Processed in \\d+\\.\\d+s/')).toBeVisible();
   });
 
-  test('verification completes under 10 seconds', async ({ page }) => {
-    // Click demo button
+  test('demo FAIL: Wrong ABV → FAILED', async ({ page }) => {
     await page.click('text=Try with example data');
-    await expect(page.locator('img[alt="Label preview"]')).toBeVisible({ timeout: 5000 });
+    await page.click('text=Wrong ABV');
+    await expect(page.locator('img[alt="Label front"]')).toBeVisible({ timeout: 5000 });
 
-    const startTime = Date.now();
-
-    // Click verify
     await page.click('button:has-text("Verify Label")');
 
-    // Wait for results - use exact match to avoid matching status messages
+    await expect(page.getByRole('heading', { name: 'FAILED' })).toBeVisible({ timeout: 15000 });
+  });
+
+  test('can upload custom image via file input', async ({ page }) => {
+    const fileInput = page.locator('input[type="file"][accept*="image"]');
+    await fileInput.setInputFiles(path.join(DEMO_DIR, 'label-perfect.png'));
+
+    // Uploaded image gets label "front" by default
+    await expect(page.locator('img[alt="Label front"]')).toBeVisible({ timeout: 5000 });
+  });
+
+  test('verify completes under 10 seconds', async ({ page }) => {
+    await page.click('text=Try with example data');
+    await page.click('text=Perfect Label');
+    await expect(page.locator('img[alt="Label front"]')).toBeVisible({ timeout: 5000 });
+
+    const start = Date.now();
+    await page.click('button:has-text("Verify Label")');
     await expect(page.getByText('Brand Name', { exact: true })).toBeVisible({ timeout: 15000 });
+    const elapsed = Date.now() - start;
 
-    const elapsed = Date.now() - startTime;
-
-    // Should complete in under 10 seconds (generous for CI)
     expect(elapsed).toBeLessThan(10000);
-
-    console.log(`Verification completed in ${(elapsed/1000).toFixed(2)}s`);
+    console.log(`Single verification: ${(elapsed / 1000).toFixed(2)}s`);
   });
 
-  test('shows PASS, FAIL, or REVIEW status', async ({ page }) => {
+  test('reset returns to input state', async ({ page }) => {
     await page.click('text=Try with example data');
-    await expect(page.locator('img[alt="Label preview"]')).toBeVisible({ timeout: 5000 });
+    await page.click('text=Perfect Label');
+    await expect(page.locator('img[alt="Label front"]')).toBeVisible({ timeout: 5000 });
 
     await page.click('button:has-text("Verify Label")');
-
-    // Should show one of the status indicators
-    await expect(page.locator('text=/APPROVED|REJECTED|NEEDS REVIEW/')).toBeVisible({ timeout: 15000 });
-  });
-
-  test('can upload custom image', async ({ page }) => {
-    // Upload the demo label image directly
-    const imagePath = path.join(__dirname, '../../public/demo-label.png');
-
-    // Find the file input and upload
-    const fileInput = page.locator('input[type="file"]');
-    await fileInput.setInputFiles(imagePath);
-
-    // Should show preview
-    await expect(page.locator('img[alt="Label preview"]')).toBeVisible({ timeout: 5000 });
-  });
-
-  test('batch mode loads correctly', async ({ page }) => {
-    // Navigate to batch mode
-    await page.click('text=Batch Mode');
-
-    // Should show batch upload UI
-    await expect(page.locator('text=Batch Label Verification')).toBeVisible();
-    await expect(page.locator('text=Drop multiple label images')).toBeVisible();
-  });
-
-  test('can reset and verify again', async ({ page }) => {
-    // First verification
-    await page.click('text=Try with example data');
-    await expect(page.locator('img[alt="Label preview"]')).toBeVisible({ timeout: 5000 });
-    await page.click('button:has-text("Verify Label")');
-    // Use exact match to avoid matching status messages like "Brand name match"
     await expect(page.getByText('Brand Name', { exact: true })).toBeVisible({ timeout: 15000 });
 
-    // Click reset
     await page.click('text=Verify Another');
+    await expect(page.locator('text=Drop label images here or click to browse')).toBeVisible({ timeout: 5000 });
+  });
 
-    // Should be back to input state
-    await expect(page.locator('text=Drop label image here')).toBeVisible({ timeout: 5000 });
+  test('navigates to batch mode', async ({ page }) => {
+    await page.click('text=Batch Mode');
+    await expect(page).toHaveURL(/\/batch/);
+    await expect(page.locator('text=Batch Label Verification')).toBeVisible();
   });
 });
