@@ -7,6 +7,7 @@ interface BatchResult {
   id: string;
   fileName: string;
   brandName: string;
+  imageUrl: string | null;
   result: VerificationResult | null;
   error: string | null;
 }
@@ -195,33 +196,47 @@ export default function BatchResults({ results, onReset }: BatchResultsProps) {
                 {r.error ? (
                   <div className="py-3 text-red-600">{r.error}</div>
                 ) : r.result ? (
-                  <div className="py-3 space-y-2">
-                    {r.result.fieldResults.map((field) => (
-                      <div
-                        key={field.fieldName}
-                        className="flex items-center justify-between text-sm"
-                      >
-                        <span className="text-gray-600">{field.fieldName}</span>
-                        <div className="flex items-center gap-2">
-                          <span
-                            className={`px-2 py-0.5 rounded text-xs ${
-                              field.status === "PASS"
-                                ? "bg-green-100 text-green-700"
-                                : field.status === "FAIL"
-                                  ? "bg-red-100 text-red-700"
-                                  : field.status === "WARNING"
-                                    ? "bg-yellow-100 text-yellow-700"
-                                    : "bg-gray-100 text-gray-700"
-                            }`}
-                          >
-                            {field.status}
-                          </span>
-                          <span className="text-gray-400">
-                            {(field.confidence * 100).toFixed(0)}%
-                          </span>
-                        </div>
+                  <div className="py-3 flex gap-4">
+                    {/* Label Image Thumbnail */}
+                    {r.imageUrl && (
+                      <div className="flex-shrink-0">
+                        {/* eslint-disable-next-line @next/next/no-img-element */}
+                        <img
+                          src={r.imageUrl}
+                          alt={`${r.brandName} label`}
+                          className="w-32 h-40 object-contain rounded border border-gray-200 bg-white"
+                        />
                       </div>
-                    ))}
+                    )}
+                    {/* Field Results */}
+                    <div className="flex-1 space-y-2">
+                      {r.result.fieldResults.map((field) => (
+                        <div
+                          key={field.fieldName}
+                          className="flex items-center justify-between text-sm"
+                        >
+                          <span className="text-gray-600">{field.fieldName}</span>
+                          <div className="flex items-center gap-2">
+                            <span
+                              className={`px-2 py-0.5 rounded text-xs ${
+                                field.status === "PASS"
+                                  ? "bg-green-100 text-green-700"
+                                  : field.status === "FAIL"
+                                    ? "bg-red-100 text-red-700"
+                                    : field.status === "WARNING"
+                                      ? "bg-yellow-100 text-yellow-700"
+                                      : "bg-gray-100 text-gray-700"
+                              }`}
+                            >
+                              {field.status}
+                            </span>
+                            <span className="text-gray-400">
+                              {(field.confidence * 100).toFixed(0)}%
+                            </span>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
                   </div>
                 ) : null}
               </div>

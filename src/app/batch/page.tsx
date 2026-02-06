@@ -11,6 +11,7 @@ interface BatchResult {
   id: string;
   fileName: string;
   brandName: string;
+  imageUrl: string | null;
   result: VerificationResult | null;
   error: string | null;
 }
@@ -76,6 +77,12 @@ export default function BatchPage() {
     setState("processing");
     setProgress({ current: 0, total: matchedItems.length });
 
+    // Build image preview URLs before sending to API
+    const imageUrlMap = new Map<string, string>();
+    for (const item of matchedItems) {
+      imageUrlMap.set(item.id, URL.createObjectURL(item.imageFile));
+    }
+
     // Build FormData with per-label images and app data
     const formData = new FormData();
 
@@ -132,6 +139,7 @@ export default function BatchPage() {
                 id: resultEvent.id,
                 fileName: resultEvent.fileName,
                 brandName: resultEvent.brandName,
+                imageUrl: imageUrlMap.get(resultEvent.id) || null,
                 result: resultEvent.result,
                 error: resultEvent.error,
               });
