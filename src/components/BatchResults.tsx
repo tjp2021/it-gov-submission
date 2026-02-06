@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import type { VerificationResult } from "@/lib/types";
+import type { VerificationResult, ApplicationData } from "@/lib/types";
 import { computeOverallStatus } from "@/lib/verify-single";
 import ImageModal from "./ImageModal";
 
@@ -10,6 +10,7 @@ interface BatchResult {
   fileName: string;
   brandName: string;
   imageUrl: string | null;
+  applicationData: ApplicationData;
   result: VerificationResult | null;
   error: string | null;
 }
@@ -249,7 +250,31 @@ export default function BatchResults({ results: initialResults, onReset }: Batch
                 {r.error ? (
                   <div className="py-3 text-red-600">{r.error}</div>
                 ) : r.result ? (
-                  <div className="py-3 flex gap-4">
+                  <div className="py-3 space-y-3">
+                    {/* Processing time */}
+                    {r.result.processingTimeMs > 0 && (
+                      <div className="text-xs text-gray-400 text-right">
+                        Processed in {(r.result.processingTimeMs / 1000).toFixed(1)}s
+                      </div>
+                    )}
+
+                    {/* Submitted Application Data */}
+                    <details className="text-xs border border-gray-200 rounded-lg">
+                      <summary className="cursor-pointer px-3 py-2 text-gray-600 hover:text-gray-800 font-medium">
+                        Submitted Application Data
+                      </summary>
+                      <div className="px-3 pb-2 grid grid-cols-2 gap-x-4 gap-y-1 text-gray-700">
+                        <div><span className="text-gray-400">Brand:</span> {r.applicationData.brandName}</div>
+                        <div><span className="text-gray-400">Class/Type:</span> {r.applicationData.classType}</div>
+                        <div><span className="text-gray-400">ABV:</span> {r.applicationData.alcoholContent}</div>
+                        <div><span className="text-gray-400">Volume:</span> {r.applicationData.netContents}</div>
+                        <div><span className="text-gray-400">Address:</span> {r.applicationData.nameAddress}</div>
+                        <div><span className="text-gray-400">Country:</span> {r.applicationData.countryOfOrigin || "\u2014"}</div>
+                        <div className="col-span-2"><span className="text-gray-400">Warning:</span> {r.applicationData.governmentWarning ? "Provided" : "Not provided"}</div>
+                      </div>
+                    </details>
+
+                    <div className="flex gap-4">
                     {/* Label Image Thumbnail — click to enlarge */}
                     {r.imageUrl && (
                       <button
@@ -345,6 +370,7 @@ export default function BatchResults({ results: initialResults, onReset }: Batch
                         </div>
                       ))}
                     </div>
+                  </div>
                   </div>
                 ) : null}
               </div>

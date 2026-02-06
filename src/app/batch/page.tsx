@@ -12,6 +12,7 @@ interface BatchResult {
   fileName: string;
   brandName: string;
   imageUrl: string | null;
+  applicationData: import("@/lib/types").ApplicationData;
   result: VerificationResult | null;
   error: string | null;
 }
@@ -135,11 +136,13 @@ export default function BatchPage() {
             if (event.type === "result") {
               const resultEvent = event as SSEResultEvent;
 
+              const matchedItem = matchedItems.find((m) => m.id === resultEvent.id);
               batchResults.push({
                 id: resultEvent.id,
                 fileName: resultEvent.fileName,
                 brandName: resultEvent.brandName,
                 imageUrl: imageUrlMap.get(resultEvent.id) || null,
+                applicationData: matchedItem!.applicationData,
                 result: resultEvent.result,
                 error: resultEvent.error,
               });
