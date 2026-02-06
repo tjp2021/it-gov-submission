@@ -271,20 +271,37 @@ export default function BatchResults({ results: initialResults, onReset }: Batch
                     {/* Field Results */}
                     <div className="flex-1 space-y-2">
                       {r.result.fieldResults.map((field) => (
-                        <div key={field.fieldName} className="space-y-1">
+                        <div key={field.fieldName} className="space-y-1 py-1.5 border-b border-gray-100 last:border-0">
                           <div className="flex items-center justify-between text-sm">
-                            <span className="text-gray-600">{field.fieldName}</span>
+                            <span className="font-medium text-gray-700">{field.fieldName}</span>
                             <div className="flex items-center gap-2">
                               <span
                                 className={`px-2 py-0.5 rounded text-xs ${getFieldStatusStyle(field.status)}`}
                               >
                                 {field.status}
                               </span>
-                              <span className="text-gray-400">
+                              <span className="text-gray-400 text-xs">
                                 {(field.confidence * 100).toFixed(0)}%
                               </span>
                             </div>
                           </div>
+
+                          {/* Expected vs Extracted values */}
+                          <div className="grid grid-cols-2 gap-2 text-xs ml-2">
+                            <div>
+                              <span className="text-gray-400">Expected: </span>
+                              <span className="font-mono text-gray-700">{field.applicationValue || "\u2014"}</span>
+                            </div>
+                            <div>
+                              <span className="text-gray-400">Found: </span>
+                              <span className="font-mono text-gray-700">{field.extractedValue || "Not found"}</span>
+                            </div>
+                          </div>
+
+                          {/* Details for failures */}
+                          {(field.status === "FAIL" || field.status === "WARNING") && field.details && (
+                            <p className="text-xs text-gray-500 ml-2">{field.details}</p>
+                          )}
 
                           {/* Override buttons for FAIL/WARNING fields */}
                           {(field.status === "FAIL" || field.status === "WARNING") &&

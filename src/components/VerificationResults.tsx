@@ -227,7 +227,6 @@ export default function VerificationResults({
       <div
         className={`rounded-lg border-2 ${config.border} ${config.bg} p-6 text-center`}
       >
-        <div className={`text-2xl mb-2 font-bold ${config.text}`}>{config.icon}</div>
         <h2 className={`text-2xl font-bold ${config.text}`}>
           {config.label}
         </h2>
