@@ -425,7 +425,8 @@ export default function BatchUploader({ onReady, onClear }: BatchUploaderProps) 
                 <div className="flex items-center gap-3">
                   <button
                     onClick={() => csvInputRef.current?.click()}
-                    className="px-4 py-2 text-sm bg-gray-100 hover:bg-gray-200 rounded-lg border border-gray-300"
+                    className="px-4 py-2 text-sm text-white hover:opacity-90 rounded-lg"
+                    style={{ backgroundColor: '#1e3a5f' }}
                   >
                     Choose CSV File
                   </button>
