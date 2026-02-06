@@ -165,7 +165,7 @@ These are honest constraints of this prototype, not bugs.
 - **Next.js 16** with TypeScript — Fullstack framework, single deployment, evaluators run locally with one command
 - **Tailwind CSS** — Fast iteration on UI, clean results display
 - **Gemini 2.0 Flash** — Vision extraction, ~2.5s per label
-- **Azure App Service** — Matches TTB's existing cloud infrastructure
+- **Vercel** — Zero-config Next.js deployment
 - **Playwright** — E2E testing for verification flows
 - **Sharp** — Server-side image processing for test generation
 

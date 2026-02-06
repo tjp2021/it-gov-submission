@@ -116,19 +116,19 @@ npm run test:generate    # Generate DALL-E test images (requires API key)
 | `GEMINI_API_KEY` | Yes | Google Gemini API key for vision extraction |
 | `OPENAI_API_KEY` | No | For generating DALL-E test images |
 
-## Azure Deployment
+## Deployment
 
-The app is configured for Azure App Service deployment:
+The app deploys to Vercel:
 
 ```bash
-# Build for production
-npm run build
+# Production deploy
+vercel --prod
 
-# The standalone output is in .next/standalone
-# Deploy to Azure App Service with:
-# - Runtime: Node.js 20
-# - Startup command: node server.js
+# Preview deploy
+vercel
 ```
+
+Set `GEMINI_API_KEY` in Vercel Dashboard → Settings → Environment Variables.
 
 ## Documentation
 
@@ -158,7 +158,7 @@ npm run build
 | Document | Purpose | Key Metrics |
 |----------|---------|-------------|
 | [Performance](docs/PERFORMANCE.md) | Latency optimization journey from Claude to Gemini | Achieved 2.5s avg (50% under PRD requirement) |
-| [Azure Deployment](docs/AZURE_DEPLOYMENT.md) | Production deployment configuration | App Service setup, environment variables |
+| [Deployment](docs/DEPLOYMENT.md) | Production deployment configuration | Vercel setup, environment variables |
 | [OCR Approach](docs/OCR_APPROACH.md) | Evaluation of dedicated OCR vs vision models | Why Gemini Flash vision outperforms Tesseract+preprocessing |
 
 ### Decision Records

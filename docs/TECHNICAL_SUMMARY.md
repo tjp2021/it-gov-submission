@@ -25,7 +25,7 @@ Build an AI-powered tool for TTB (Alcohol and Tobacco Tax and Trade Bureau) comp
 | Export results | ✅ | JSON export |
 | Demo button | ✅ | Pre-loaded example data |
 | Batch processing | ✅ | Multi-label upload at /batch |
-| Azure deployment ready | ✅ | Standalone build, deployment docs |
+| Vercel deployment ready | ✅ | Auto-detected Next.js, deployment docs |
 
 ---
 
