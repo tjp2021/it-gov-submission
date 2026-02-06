@@ -118,8 +118,18 @@ export async function extractWithGemini(
     return { success: true, fields, processingTimeMs };
   } catch (error) {
     const processingTimeMs = Date.now() - startTime;
-    const message =
+    const rawMessage =
       error instanceof Error ? error.message : "Unknown Gemini error";
-    return { success: false, error: message, processingTimeMs };
+
+    // Surface a user-friendly message for rate limiting
+    if (rawMessage.includes("429") || rawMessage.includes("Resource exhausted")) {
+      return {
+        success: false,
+        error: "Rate limit reached — too many requests to Gemini API. Please wait a moment and try again.",
+        processingTimeMs,
+      };
+    }
+
+    return { success: false, error: rawMessage, processingTimeMs };
   }
 }
