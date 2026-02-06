@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import type { VerificationResult } from "@/lib/types";
+import { computeOverallStatus } from "@/lib/verify-single";
 
 interface BatchResult {
   id: string;
@@ -17,8 +18,42 @@ interface BatchResultsProps {
   onReset: () => void;
 }
 
-export default function BatchResults({ results, onReset }: BatchResultsProps) {
+export default function BatchResults({ results: initialResults, onReset }: BatchResultsProps) {
+  const [results, setResults] = useState<BatchResult[]>(initialResults);
   const [expandedId, setExpandedId] = useState<string | null>(null);
+
+  const handleFieldOverride = (
+    resultId: string,
+    fieldName: string,
+    action: "accepted" | "confirmed_issue"
+  ) => {
+    setResults((prev) =>
+      prev.map((r) => {
+        if (r.id !== resultId || !r.result) return r;
+
+        const updatedFields = r.result.fieldResults.map((f) => {
+          if (f.fieldName !== fieldName) return f;
+          return {
+            ...f,
+            ...(action === "accepted" ? { status: "OVERRIDDEN" as const } : {}),
+            agentOverride: {
+              action,
+              timestamp: new Date().toISOString(),
+            },
+          };
+        });
+
+        return {
+          ...r,
+          result: {
+            ...r.result,
+            overallStatus: computeOverallStatus(updatedFields),
+            fieldResults: updatedFields,
+          },
+        };
+      })
+    );
+  };
 
   const summary = {
     total: results.length,
@@ -99,6 +134,21 @@ export default function BatchResults({ results, onReset }: BatchResultsProps) {
         return "bg-yellow-100 text-yellow-800 border-yellow-300";
       default:
         return "bg-gray-100 text-gray-800 border-gray-300";
+    }
+  };
+
+  const getFieldStatusStyle = (status: string) => {
+    switch (status) {
+      case "PASS":
+        return "bg-green-100 text-green-700";
+      case "FAIL":
+        return "bg-red-100 text-red-700";
+      case "WARNING":
+        return "bg-yellow-100 text-yellow-700";
+      case "OVERRIDDEN":
+        return "bg-blue-100 text-blue-700";
+      default:
+        return "bg-gray-100 text-gray-700";
     }
   };
 
@@ -212,29 +262,60 @@ export default function BatchResults({ results, onReset }: BatchResultsProps) {
                     {/* Field Results */}
                     <div className="flex-1 space-y-2">
                       {r.result.fieldResults.map((field) => (
-                        <div
-                          key={field.fieldName}
-                          className="flex items-center justify-between text-sm"
-                        >
-                          <span className="text-gray-600">{field.fieldName}</span>
-                          <div className="flex items-center gap-2">
-                            <span
-                              className={`px-2 py-0.5 rounded text-xs ${
-                                field.status === "PASS"
-                                  ? "bg-green-100 text-green-700"
-                                  : field.status === "FAIL"
-                                    ? "bg-red-100 text-red-700"
-                                    : field.status === "WARNING"
-                                      ? "bg-yellow-100 text-yellow-700"
-                                      : "bg-gray-100 text-gray-700"
+                        <div key={field.fieldName} className="space-y-1">
+                          <div className="flex items-center justify-between text-sm">
+                            <span className="text-gray-600">{field.fieldName}</span>
+                            <div className="flex items-center gap-2">
+                              <span
+                                className={`px-2 py-0.5 rounded text-xs ${getFieldStatusStyle(field.status)}`}
+                              >
+                                {field.status}
+                              </span>
+                              <span className="text-gray-400">
+                                {(field.confidence * 100).toFixed(0)}%
+                              </span>
+                            </div>
+                          </div>
+
+                          {/* Override buttons for FAIL/WARNING fields */}
+                          {(field.status === "FAIL" || field.status === "WARNING") &&
+                            !field.agentOverride && (
+                              <div className="flex gap-2 ml-2">
+                                <button
+                                  onClick={(e) => {
+                                    e.stopPropagation();
+                                    handleFieldOverride(r.id, field.fieldName, "accepted");
+                                  }}
+                                  className="px-2 py-0.5 text-xs font-medium bg-green-600 text-white rounded hover:bg-green-700"
+                                >
+                                  Accept
+                                </button>
+                                <button
+                                  onClick={(e) => {
+                                    e.stopPropagation();
+                                    handleFieldOverride(r.id, field.fieldName, "confirmed_issue");
+                                  }}
+                                  className="px-2 py-0.5 text-xs font-medium bg-red-600 text-white rounded hover:bg-red-700"
+                                >
+                                  Confirm Issue
+                                </button>
+                              </div>
+                            )}
+
+                          {/* Override status */}
+                          {field.agentOverride && (
+                            <div
+                              className={`text-xs ml-2 ${
+                                field.agentOverride.action === "accepted"
+                                  ? "text-blue-600"
+                                  : "text-red-600"
                               }`}
                             >
-                              {field.status}
-                            </span>
-                            <span className="text-gray-400">
-                              {(field.confidence * 100).toFixed(0)}%
-                            </span>
-                          </div>
+                              {field.agentOverride.action === "accepted"
+                                ? "Agent accepted — overridden"
+                                : "Agent confirmed issue"}
+                            </div>
+                          )}
                         </div>
                       ))}
                     </div>
