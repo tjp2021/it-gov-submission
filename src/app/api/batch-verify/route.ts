@@ -2,6 +2,9 @@
  * SSE Batch Verification Endpoint
  * Processes multiple labels in parallel with controlled concurrency
  * Streams results back as each completes
+ *
+ * Supports per-label application data via appData_{id} fields,
+ * with backward compat fallback to shared applicationData field.
  */
 
 import { NextRequest } from "next/server";
@@ -9,22 +12,25 @@ import { verifySingleLabel, SingleVerificationResult } from "@/lib/verify-single
 import type { ApplicationData } from "@/lib/types";
 
 export const runtime = "nodejs";
-export const maxDuration = 300; // Allow up to 5 minutes for large batches (300 labels)
+export const maxDuration = 120;
 
-const MAX_BATCH_SIZE = 300;
-const CONCURRENCY_LIMIT = 10; // Higher concurrency for large batches
+const MAX_BATCH_SIZE = 10;
+const CONCURRENCY_LIMIT = 5;
 
 interface BatchItem {
   id: string;
   fileName: string;
   imageBase64: string;
   mimeType: string;
+  applicationData: ApplicationData;
+  brandName: string;
 }
 
 interface SSEResultEvent {
   type: "result";
   id: string;
   fileName: string;
+  brandName: string;
   result: SingleVerificationResult | null;
   error: string | null;
   index: number;
@@ -54,19 +60,16 @@ async function withConcurrencyLimit<T>(
 ): Promise<T[]> {
   const results: T[] = new Array(tasks.length);
   let nextIndex = 0;
-  let completedCount = 0;
 
   async function runNext(): Promise<void> {
     while (nextIndex < tasks.length) {
       const currentIndex = nextIndex++;
       const result = await tasks[currentIndex]();
       results[currentIndex] = result;
-      completedCount++;
       onComplete(result, currentIndex);
     }
   }
 
-  // Start concurrent workers up to the limit
   const workers = Array(Math.min(limit, tasks.length))
     .fill(null)
     .map(() => runNext());
@@ -89,26 +92,21 @@ export async function POST(request: NextRequest): Promise<Response> {
     );
   }
 
-  // Get application data
-  const applicationDataJson = formData.get("applicationData") as string | null;
-  if (!applicationDataJson) {
-    return new Response(
-      JSON.stringify({ error: "No application data provided" }),
-      { status: 400, headers: { "Content-Type": "application/json" } }
-    );
+  // Check for shared application data (backward compat fallback)
+  let sharedAppData: ApplicationData | null = null;
+  const sharedJson = formData.get("applicationData") as string | null;
+  if (sharedJson) {
+    try {
+      sharedAppData = JSON.parse(sharedJson);
+    } catch {
+      return new Response(
+        JSON.stringify({ error: "Invalid application data JSON" }),
+        { status: 400, headers: { "Content-Type": "application/json" } }
+      );
+    }
   }
 
-  let applicationData: ApplicationData;
-  try {
-    applicationData = JSON.parse(applicationDataJson);
-  } catch {
-    return new Response(
-      JSON.stringify({ error: "Invalid application data JSON" }),
-      { status: 400, headers: { "Content-Type": "application/json" } }
-    );
-  }
-
-  // Collect all image files
+  // Collect all image files and their per-label app data
   const batchItems: BatchItem[] = [];
   const entries = Array.from(formData.entries());
 
@@ -117,12 +115,27 @@ export async function POST(request: NextRequest): Promise<Response> {
       const file = value;
       const id = key.replace("image_", "");
 
-      // Validate file type
       if (!["image/jpeg", "image/png", "image/webp", "image/gif"].includes(file.type)) {
         continue;
       }
 
-      // Convert to base64
+      // Look for per-label app data first, then fall back to shared
+      let appData: ApplicationData | null = null;
+      const perLabelJson = formData.get(`appData_${id}`) as string | null;
+      if (perLabelJson) {
+        try {
+          appData = JSON.parse(perLabelJson);
+        } catch {
+          continue; // Skip labels with invalid app data
+        }
+      } else if (sharedAppData) {
+        appData = sharedAppData;
+      }
+
+      if (!appData) {
+        continue; // No app data available for this label
+      }
+
       const buffer = await file.arrayBuffer();
       const imageBase64 = Buffer.from(buffer).toString("base64");
 
@@ -131,14 +144,15 @@ export async function POST(request: NextRequest): Promise<Response> {
         fileName: file.name,
         imageBase64,
         mimeType: file.type,
+        applicationData: appData,
+        brandName: appData.brandName,
       });
     }
   }
 
-  // Enforce batch size limit
   if (batchItems.length === 0) {
     return new Response(
-      JSON.stringify({ error: "No valid images provided" }),
+      JSON.stringify({ error: "No valid images with application data provided" }),
       { status: 400, headers: { "Content-Type": "application/json" } }
     );
   }
@@ -161,18 +175,18 @@ export async function POST(request: NextRequest): Promise<Response> {
         controller.enqueue(encoder.encode(data));
       };
 
-      // Create verification tasks
       const tasks = batchItems.map((item, index) => async (): Promise<SSEResultEvent> => {
         const verifyResult = await verifySingleLabel(
           item.imageBase64,
           item.mimeType,
-          applicationData
+          item.applicationData
         );
 
         return {
           type: "result",
           id: item.id,
           fileName: item.fileName,
+          brandName: item.brandName,
           result: verifyResult.success ? verifyResult.result : null,
           error: verifyResult.success ? null : verifyResult.error,
           index,
@@ -181,14 +195,12 @@ export async function POST(request: NextRequest): Promise<Response> {
       });
 
       try {
-        // Process with concurrency limit, streaming results as they complete
         await withConcurrencyLimit(
           tasks,
           CONCURRENCY_LIMIT,
           (result) => send(result)
         );
 
-        // Send completion event
         const completeEvent: SSECompleteEvent = {
           type: "complete",
           totalProcessed: total,

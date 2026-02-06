@@ -4,30 +4,23 @@ import { useState, useCallback } from "react";
 import Link from "next/link";
 import BatchUploader from "@/components/BatchUploader";
 import BatchResults from "@/components/BatchResults";
-import ApplicationForm, { defaultApplicationData } from "@/components/ApplicationForm";
-import type { ApplicationData, VerificationResult } from "@/lib/types";
-
-interface BatchFile {
-  id: string;
-  file: File;
-  preview: string;
-  status: "pending" | "processing" | "done" | "error";
-}
+import type { MatchedBatchItem, VerificationResult } from "@/lib/types";
 
 interface BatchResult {
   id: string;
   fileName: string;
+  brandName: string;
   result: VerificationResult | null;
   error: string | null;
 }
 
 type AppState = "input" | "processing" | "results";
 
-// SSE event types from batch-verify endpoint
 interface SSEResultEvent {
   type: "result";
   id: string;
   fileName: string;
+  brandName: string;
   result: VerificationResult | null;
   error: string | null;
   index: number;
@@ -49,45 +42,37 @@ type SSEEvent = SSEResultEvent | SSECompleteEvent | SSEErrorEvent;
 
 export default function BatchPage() {
   const [state, setState] = useState<AppState>("input");
-  const [files, setFiles] = useState<BatchFile[]>([]);
-  const [applicationData, setApplicationData] = useState<ApplicationData>(
-    defaultApplicationData
-  );
+  const [matchedItems, setMatchedItems] = useState<MatchedBatchItem[]>([]);
   const [results, setResults] = useState<BatchResult[]>([]);
   const [error, setError] = useState<string | null>(null);
   const [progress, setProgress] = useState({ current: 0, total: 0 });
 
-  const handleFilesSelect = useCallback((newFiles: BatchFile[]) => {
-    setFiles(newFiles);
+  const handleReady = useCallback((items: MatchedBatchItem[]) => {
+    setMatchedItems(items);
+    setError(null);
+  }, []);
+
+  const handleClear = useCallback(() => {
+    setMatchedItems([]);
     setError(null);
   }, []);
 
   const handleVerifyBatch = async () => {
-    if (files.length === 0) {
-      setError("Please upload at least one label image");
-      return;
-    }
-
-    if (!applicationData.brandName || !applicationData.classType) {
-      setError("Please fill in required application fields");
+    if (matchedItems.length === 0) {
+      setError("No labels ready for verification. Upload images and provide application data.");
       return;
     }
 
     setError(null);
     setState("processing");
-    setProgress({ current: 0, total: files.length });
+    setProgress({ current: 0, total: matchedItems.length });
 
-    // Mark all files as processing initially
-    setFiles((prev) =>
-      prev.map((f) => ({ ...f, status: "processing" as const }))
-    );
-
-    // Build FormData with all images
+    // Build FormData with per-label images and app data
     const formData = new FormData();
-    formData.append("applicationData", JSON.stringify(applicationData));
 
-    for (const file of files) {
-      formData.append(`image_${file.id}`, file.file);
+    for (const item of matchedItems) {
+      formData.append(`image_${item.id}`, item.imageFile);
+      formData.append(`appData_${item.id}`, JSON.stringify(item.applicationData));
     }
 
     const batchResults: BatchResult[] = [];
@@ -129,32 +114,21 @@ export default function BatchPage() {
           } else if (line.startsWith("data: ")) {
             eventData = line.slice(6);
           } else if (line === "" && eventType && eventData) {
-            // Process complete event
             const event = JSON.parse(eventData) as SSEEvent;
 
             if (event.type === "result") {
               const resultEvent = event as SSEResultEvent;
 
-              // Update file status
-              const status = resultEvent.error ? "error" : "done";
-              setFiles((prev) =>
-                prev.map((f) =>
-                  f.id === resultEvent.id ? { ...f, status } : f
-                )
-              );
-
-              // Add to results
               batchResults.push({
                 id: resultEvent.id,
                 fileName: resultEvent.fileName,
+                brandName: resultEvent.brandName,
                 result: resultEvent.result,
                 error: resultEvent.error,
               });
 
-              // Update progress
-              setProgress({ current: batchResults.length, total: files.length });
+              setProgress({ current: batchResults.length, total: matchedItems.length });
             } else if (event.type === "complete") {
-              // Batch complete
               console.log(`Batch completed in ${(event as SSECompleteEvent).totalTimeMs}ms`);
             } else if (event.type === "error") {
               throw new Error((event as SSEErrorEvent).error);
@@ -168,13 +142,6 @@ export default function BatchPage() {
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : "Unknown error";
       setError(errorMessage);
-
-      // Mark any remaining files as error
-      setFiles((prev) =>
-        prev.map((f) =>
-          f.status === "processing" ? { ...f, status: "error" as const } : f
-        )
-      );
     }
 
     setResults(batchResults);
@@ -183,8 +150,7 @@ export default function BatchPage() {
 
   const handleReset = () => {
     setState("input");
-    setFiles([]);
-    setApplicationData(defaultApplicationData);
+    setMatchedItems([]);
     setResults([]);
     setError(null);
     setProgress({ current: 0, total: 0 });
@@ -201,10 +167,7 @@ export default function BatchPage() {
                 Batch Label Verification
               </h1>
               <p className="text-gray-600 mt-2">
-                Verify multiple labels against the same application data
-              </p>
-              <p className="text-xs text-gray-500 mt-1">
-                Upload up to 300 labels. All verified against the same application data.
+                Verify up to 10 labels with individual application data
               </p>
             </div>
             <Link
@@ -234,7 +197,7 @@ export default function BatchPage() {
                     className="h-full transition-all duration-300"
                     style={{
                       backgroundColor: '#1e3a5f',
-                      width: `${(progress.current / progress.total) * 100}%`,
+                      width: `${progress.total > 0 ? (progress.current / progress.total) * 100 : 0}%`,
                     }}
                   />
                 </div>
@@ -253,25 +216,7 @@ export default function BatchPage() {
           {/* Input State */}
           {state === "input" && (
             <div className="space-y-8">
-              {/* Batch Uploader */}
-              <BatchUploader
-                onFilesSelect={handleFilesSelect}
-                files={files}
-              />
-
-              {/* Divider */}
-              <hr className="border-gray-200" />
-
-              {/* Application Form */}
-              <div>
-                <p className="text-sm text-gray-600 mb-4">
-                  All uploaded labels will be verified against this application data:
-                </p>
-                <ApplicationForm
-                  data={applicationData}
-                  onChange={setApplicationData}
-                />
-              </div>
+              <BatchUploader onReady={handleReady} onClear={handleClear} />
 
               {/* Error Message */}
               {error && (
@@ -283,11 +228,11 @@ export default function BatchPage() {
               {/* Verify Button */}
               <button
                 onClick={handleVerifyBatch}
-                disabled={files.length === 0}
+                disabled={matchedItems.length === 0}
                 className="w-full py-4 text-lg font-semibold rounded-lg transition-colors text-white hover:opacity-90 disabled:opacity-60 disabled:cursor-not-allowed"
                 style={{ backgroundColor: '#1e3a5f' }}
               >
-                ▶ Verify {files.length} Label{files.length !== 1 ? "s" : ""}
+                Verify {matchedItems.length} Label{matchedItems.length !== 1 ? "s" : ""}
               </button>
             </div>
           )}

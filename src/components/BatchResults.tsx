@@ -6,6 +6,7 @@ import type { VerificationResult } from "@/lib/types";
 interface BatchResult {
   id: string;
   fileName: string;
+  brandName: string;
   result: VerificationResult | null;
   error: string | null;
 }
@@ -29,6 +30,7 @@ export default function BatchResults({ results, onReset }: BatchResultsProps) {
   const handleExportAll = () => {
     const exportData = results.map((r) => ({
       fileName: r.fileName,
+      brandName: r.brandName,
       status: r.result?.overallStatus || "ERROR",
       error: r.error,
       fields: r.result?.fieldResults.map((f) => ({
@@ -52,10 +54,10 @@ export default function BatchResults({ results, onReset }: BatchResultsProps) {
   };
 
   const handleExportCSV = () => {
-    const headers = ["File Name", "Status", "Brand Name", "Class/Type", "ABV", "Volume", "Address", "Country", "Warning"];
+    const headers = ["File Name", "Brand Name", "Status", "Brand Match", "Class/Type", "ABV", "Volume", "Address", "Country", "Warning"];
     const rows = results.map((r) => {
       if (!r.result) {
-        return [r.fileName, "ERROR", r.error || "Unknown error", "", "", "", "", "", ""];
+        return [r.fileName, r.brandName, "ERROR", r.error || "Unknown error", "", "", "", "", "", ""];
       }
       const getFieldStatus = (name: string) => {
         const field = r.result?.fieldResults.find((f) => f.fieldName === name);
@@ -63,6 +65,7 @@ export default function BatchResults({ results, onReset }: BatchResultsProps) {
       };
       return [
         r.fileName,
+        r.brandName,
         r.result.overallStatus,
         getFieldStatus("Brand Name"),
         getFieldStatus("Class/Type"),
@@ -169,7 +172,12 @@ export default function BatchResults({ results, onReset }: BatchResultsProps) {
                         ? "❌"
                         : "⚡"}
                 </span>
-                <span className="font-medium">{r.fileName}</span>
+                <div className="text-left">
+                  <span className="font-medium block">{r.brandName || r.fileName}</span>
+                  {r.brandName && (
+                    <span className="text-xs text-gray-500">{r.fileName}</span>
+                  )}
+                </div>
               </div>
               <div className="flex items-center gap-2">
                 <span className="px-2 py-1 text-sm rounded">

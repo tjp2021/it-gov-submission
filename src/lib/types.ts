@@ -111,6 +111,27 @@ export interface BatchResult {
   };
 }
 
+// Batch CSV row — one row per label, maps to ApplicationData
+export interface BatchApplicationRow {
+  image_filename: string;
+  brandName: string;
+  classType: string;
+  alcoholContent: string;
+  netContents: string;
+  nameAddress: string;
+  countryOfOrigin?: string;
+  // governmentWarning excluded — auto-filled with STANDARD_WARNING_TEXT
+}
+
+// A matched batch item: image file paired with its application data
+export interface MatchedBatchItem {
+  id: string;
+  imageFile: File;
+  applicationData: ApplicationData;
+  originalFilename: string;
+  brandName: string;
+}
+
 // Internal match result from comparison functions
 export interface MatchResult {
   status: FieldStatus;
