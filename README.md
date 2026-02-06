@@ -21,6 +21,22 @@ npm run dev
 # Open http://localhost:3000
 ```
 
+## What This Solves
+
+Each feature maps directly to a stakeholder need from the discovery interviews:
+
+| Stakeholder Need | Solution |
+|---|---|
+| Sarah: "5 seconds or nobody's going to use it" | Gemini Flash averages 2.5s — half the budget |
+| Sarah: "Handle batch uploads... 200, 300 at once" | Batch mode at `/batch` with CSV upload (10-label prototype; production needs a job queue) |
+| Sarah: "Something my mother could figure out" | Demo button — one click to see results, zero setup |
+| Dave: "'STONE'S THROW' vs 'Stone's Throw' — obviously the same thing" | Fuzzy matching with case/punctuation normalization — this passes, not rejected |
+| Dave: "You need judgment" | Agent override on every field — accept warnings or confirm issues with one click |
+| Jenny: "Warning statement has to be exact, word-for-word" | 4 sub-checks: presence, ALL CAPS header, bold header, text accuracy |
+| Jenny: "Government Warning in title case instead of all caps. Rejected." | Header caps check catches this — automatic FAIL |
+| Jenny: "Images that aren't perfectly shot" | Gemini Flash handles angles, glare, blur natively; client-side preprocessing optimizes before upload |
+| Marcus: "Standalone proof-of-concept" | Stateless, no COLA integration, no auth — runs independently |
+
 ## Features
 
 - **Single Label Verification** — Upload 1-6 label images (front/back/neck) and compare against COLA application data with field merge and conflict detection
