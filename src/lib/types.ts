@@ -92,25 +92,6 @@ export interface VerificationResult {
   fieldResults: FieldResult[];
 }
 
-// Batch processing types
-export interface BatchLabel {
-  labelImage: File;
-  applicationData: ApplicationData;
-}
-
-export interface BatchResult {
-  batchId: string;
-  status: "processing" | "complete";
-  results: VerificationResult[];
-  summary: {
-    total: number;
-    completed: number;
-    passed: number;
-    failed: number;
-    needsReview: number;
-  };
-}
-
 // Batch CSV row — one row per label, maps to ApplicationData
 export interface BatchApplicationRow {
   image_filename: string;

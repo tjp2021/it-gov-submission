@@ -408,7 +408,7 @@ export default function Home() {
         {/* Footer */}
         <footer className="mt-8 text-center text-sm text-gray-500">
           <p>
-            Prototype for TTB Compliance Division - Built with Gemini Flash
+            Prototype for TTB Compliance Division &bull; Built with Gemini Flash
           </p>
         </footer>
       </div>

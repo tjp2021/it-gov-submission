@@ -137,8 +137,6 @@ export default function BatchPage() {
               });
 
               setProgress({ current: batchResults.length, total: matchedItems.length });
-            } else if (event.type === "complete") {
-              console.log(`Batch completed in ${(event as SSECompleteEvent).totalTimeMs}ms`);
             } else if (event.type === "error") {
               throw new Error((event as SSEErrorEvent).error);
             }

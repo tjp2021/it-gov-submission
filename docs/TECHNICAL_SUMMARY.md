@@ -133,13 +133,14 @@ src/
 │       ├── verify-gemini/route.ts  # Single label verification
 │       ├── verify-stream/route.ts  # SSE streaming (multi-image)
 │       └── batch-verify/route.ts   # Batch with SSE
-├── components/                     # 9 components
+├── components/                     # 10 components
 │   ├── MultiImageUploader.tsx      # Multi-image upload (1-6 images)
 │   ├── ApplicationForm.tsx         # COLA data entry
 │   ├── VerificationResults.tsx     # Results + overrides
 │   ├── FieldResultCard.tsx         # Individual field result
 │   ├── ConflictResolutionPanel.tsx # Multi-image conflict resolution
-│   ├── DemoButton.tsx              # 5 demo scenarios
+│   ├── DemoButton.tsx              # 5 single-image demo scenarios
+│   ├── BatchDemoButton.tsx         # 4 batch demo scenarios
 │   ├── LoadingState.tsx            # SSE streaming progress
 │   ├── BatchUploader.tsx           # CSV + manual batch entry
 │   └── BatchResults.tsx            # Batch results dashboard

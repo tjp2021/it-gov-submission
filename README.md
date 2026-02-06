@@ -25,7 +25,8 @@ npm run dev
 
 - **Single Label Verification** — Upload 1-6 label images (front/back/neck) and compare against COLA application data with field merge and conflict detection
 - **Batch Processing** — Verify up to 10 labels with per-label application data (CSV upload or manual entry) at `/batch`
-- **5 Demo Scenarios** — Perfect match, case mismatch, wrong ABV, wrong warning format, imported spirit
+- **5 Single-Image Demos** — Perfect match, case mismatch, wrong ABV, wrong warning format, imported spirit
+- **4 Batch Demos** — CSV pass, manual pass, mixed results, all-fail
 - **Smart Matching** — Strict brand matching, fuzzy class/address matching, unit conversion for ABV/volume
 - **Agent Override** — Accept warnings or confirm issues with one click
 - **Export Results** — Download verification results as JSON or CSV
@@ -93,13 +94,14 @@ src/
 │       ├── verify-gemini/route.ts  # Single label verification
 │       ├── verify-stream/route.ts  # SSE streaming (multi-image)
 │       └── batch-verify/route.ts   # Batch processing with SSE
-├── components/                     # 9 components
+├── components/                     # 10 components
 │   ├── MultiImageUploader.tsx      # Multi-image upload (1-6 images)
 │   ├── ApplicationForm.tsx         # COLA data entry
 │   ├── VerificationResults.tsx     # Results display with overrides
 │   ├── FieldResultCard.tsx         # Individual field result card
 │   ├── ConflictResolutionPanel.tsx # Multi-image conflict resolution
-│   ├── DemoButton.tsx              # 5 demo scenarios
+│   ├── DemoButton.tsx              # 5 single-image demo scenarios
+│   ├── BatchDemoButton.tsx         # 4 batch demo scenarios
 │   ├── LoadingState.tsx            # SSE streaming progress
 │   ├── BatchUploader.tsx           # Batch upload with CSV support
 │   └── BatchResults.tsx            # Batch results dashboard
@@ -254,16 +256,6 @@ See: `src/app/api/batch-verify/route.ts`
 **Result:** 56/57 passing (98.2%). The one "failure" (dual labeling "750 mL (25.4 FL OZ)") is handled by 0.5% volume tolerance.
 
 See: `scripts/test-edge-cases.js`
-
-### Batch Rewrite → Per-Label Application Data
-**Changed from:** All labels verified against a single shared application
-**Changed to:** Each label has its own application data, entered via CSV upload or manual form
-
-**Why:** Real batch workflows involve different products, each with unique application data. CSV upload with filename matching (`image_filename` column) lets agents prepare data in spreadsheets and upload alongside label images.
-
-**New components:** CSV parser with 16 unit tests, filename matcher, per-label manual entry forms.
-
-See: [APPROACH.md](docs/APPROACH.md#batch-processing-shared-data--per-label-csv--manual-entry)
 
 ## License
 
