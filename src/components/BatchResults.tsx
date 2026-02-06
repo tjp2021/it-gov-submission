@@ -3,6 +3,7 @@
 import { useState } from "react";
 import type { VerificationResult } from "@/lib/types";
 import { computeOverallStatus } from "@/lib/verify-single";
+import ImageModal from "./ImageModal";
 
 interface BatchResult {
   id: string;
@@ -21,6 +22,7 @@ interface BatchResultsProps {
 export default function BatchResults({ results: initialResults, onReset }: BatchResultsProps) {
   const [results, setResults] = useState<BatchResult[]>(initialResults);
   const [expandedId, setExpandedId] = useState<string | null>(null);
+  const [modalImage, setModalImage] = useState<{ src: string; alt: string } | null>(null);
 
   const handleFieldOverride = (
     resultId: string,
@@ -248,16 +250,23 @@ export default function BatchResults({ results: initialResults, onReset }: Batch
                   <div className="py-3 text-red-600">{r.error}</div>
                 ) : r.result ? (
                   <div className="py-3 flex gap-4">
-                    {/* Label Image Thumbnail */}
+                    {/* Label Image Thumbnail — click to enlarge */}
                     {r.imageUrl && (
-                      <div className="flex-shrink-0">
+                      <button
+                        className="flex-shrink-0 cursor-zoom-in"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          setModalImage({ src: r.imageUrl!, alt: `${r.brandName} label` });
+                        }}
+                      >
                         {/* eslint-disable-next-line @next/next/no-img-element */}
                         <img
                           src={r.imageUrl}
                           alt={`${r.brandName} label`}
-                          className="w-32 h-40 object-contain rounded border border-gray-200 bg-white"
+                          className="w-32 h-40 object-contain rounded border border-gray-200 bg-white hover:border-blue-400 hover:shadow-md transition-all"
                         />
-                      </div>
+                        <span className="text-xs text-gray-400 mt-1 block">Click to enlarge</span>
+                      </button>
                     )}
                     {/* Field Results */}
                     <div className="flex-1 space-y-2">
@@ -326,6 +335,15 @@ export default function BatchResults({ results: initialResults, onReset }: Batch
           </div>
         ))}
       </div>
+
+      {/* Image Modal */}
+      {modalImage && (
+        <ImageModal
+          src={modalImage.src}
+          alt={modalImage.alt}
+          onClose={() => setModalImage(null)}
+        />
+      )}
     </div>
   );
 }

@@ -8,6 +8,7 @@ import type {
   PendingConfirmation,
 } from "@/lib/types";
 import FieldResultCard from "./FieldResultCard";
+import ImageModal from "./ImageModal";
 
 interface LabelImageInfo {
   id: string;
@@ -87,6 +88,8 @@ export default function VerificationResults({
   const handleConfirmation = (id: string, confirmed: boolean) => {
     setConfirmations(prev => ({ ...prev, [id]: confirmed }));
   };
+
+  const [modalImage, setModalImage] = useState<{ src: string; alt: string } | null>(null);
 
   const allConfirmed = (result.pendingConfirmations || []).every(
     pc => confirmations[pc.id]
@@ -256,24 +259,34 @@ export default function VerificationResults({
             Label Image{labelImages.length > 1 ? "s" : ""} (for reference)
           </h3>
           {labelImages.length === 1 ? (
-            <img
-              src={labelImages[0].preview}
-              alt="Uploaded label"
-              className="max-w-full max-h-64 mx-auto rounded border border-gray-300"
-            />
+            <button
+              className="cursor-zoom-in mx-auto block"
+              onClick={() => setModalImage({ src: labelImages[0].preview, alt: "Uploaded label" })}
+            >
+              <img
+                src={labelImages[0].preview}
+                alt="Uploaded label"
+                className="max-w-full max-h-64 rounded border border-gray-300 hover:border-blue-400 hover:shadow-md transition-all"
+              />
+              <span className="text-xs text-gray-400 mt-1 block">Click to enlarge</span>
+            </button>
           ) : (
             <div className="grid grid-cols-3 md:grid-cols-6 gap-3">
               {labelImages.map((img) => (
-                <div key={img.id} className="text-center">
+                <button
+                  key={img.id}
+                  className="text-center cursor-zoom-in"
+                  onClick={() => setModalImage({ src: img.preview, alt: `${img.label} label` })}
+                >
                   <img
                     src={img.preview}
                     alt={`${img.label} label`}
-                    className="w-full aspect-square object-contain rounded border border-gray-300 bg-white"
+                    className="w-full aspect-square object-contain rounded border border-gray-300 bg-white hover:border-blue-400 hover:shadow-md transition-all"
                   />
                   <span className="text-xs text-gray-500 mt-1 block">
                     {getLabelDisplayName(img.label)}
                   </span>
-                </div>
+                </button>
               ))}
             </div>
           )}
@@ -382,6 +395,15 @@ export default function VerificationResults({
           </>
         )}
       </details>
+
+      {/* Image Modal */}
+      {modalImage && (
+        <ImageModal
+          src={modalImage.src}
+          alt={modalImage.alt}
+          onClose={() => setModalImage(null)}
+        />
+      )}
     </div>
   );
 }
